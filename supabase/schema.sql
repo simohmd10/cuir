@@ -398,7 +398,8 @@ CREATE OR REPLACE FUNCTION place_order(
   p_customer_city TEXT,
   p_notes TEXT,
   p_coupon_code TEXT,
-  p_items JSONB  -- array of { product_id, quantity, color, size }
+  p_payment_method TEXT DEFAULT 'cod',
+  p_items JSONB DEFAULT '[]'::JSONB  -- array of { product_id, quantity, color, size }
 )
 RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER
