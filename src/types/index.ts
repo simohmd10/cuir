@@ -67,6 +67,7 @@ export interface Order {
   status: OrderStatus;
   total: number;
   discount_amount: number;
+  delivery_fee?: number;
   coupon_code?: string;
   payment_method: 'cod';
   idempotency_key: string;
