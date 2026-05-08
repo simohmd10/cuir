@@ -32,7 +32,7 @@ async function fetchDashboardData() {
   if (customersRes.error) throw customersRes.error;
 
   return {
-    orders: (ordersRes.data ?? []) as (Order & { customer: { name: string; phone: string } | null })[],
+    orders: (ordersRes.data ?? []) as unknown as (Order & { customer: { name: string; phone: string } | null })[],
     customers: customersRes.data ?? [],
   };
 }
