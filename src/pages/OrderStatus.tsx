@@ -11,7 +11,7 @@ import {
 
 import { useLanguage } from '../context/LanguageContext';
 import { supabase } from '../lib/supabase';
-import { formatPrice, getImageUrl, getStatusLabel, formatDate } from '../lib/utils';
+import { formatPrice, getImageUrl, formatDate } from '../lib/utils';
 import LazyImage from '../components/ui/LazyImage';
 import type { Order, OrderStatus } from '../types';
 
