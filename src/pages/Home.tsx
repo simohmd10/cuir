@@ -1,9 +1,6 @@
 import { memo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  motion,
-  useReducedMotion,
-} from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Truck, Leaf, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -63,7 +60,7 @@ const TESTIMONIALS = [
   },
   {
     quote_ar: 'أفضل حقيبة اشتريتها في حياتي. الجلد الطبيعي يشعرك بالفخامة الحقيقية',
-    quote_fr: "Qualité exceptionnelle, exactement comme sur les photos. Je recommande vivement!",
+    quote_fr: 'Qualité exceptionnelle, exactement comme sur les photos. Je recommande vivement!',
     name_ar: 'ليلى ب.',
     name_fr: 'Layla B.',
     city_ar: 'الرباط',
@@ -79,19 +76,49 @@ const TESTIMONIALS = [
   },
 ] as const;
 
+const EDITORIAL_FEATURES = [
+  {
+    num: '01',
+    title_ar: 'الجودة',
+    title_fr: 'Qualité Supérieure',
+    desc_ar: 'نختار أجود أنواع الجلود الطبيعية من المدابغ العريقة',
+    desc_fr: 'Nous sélectionnons les meilleurs cuirs dans les tanneries traditionnelles',
+  },
+  {
+    num: '02',
+    title_ar: 'الحرفية',
+    title_fr: 'Savoir-faire Artisanal',
+    desc_ar: 'كل قطعة تُصنع بيدي حرفيين مغاربة متمرسين',
+    desc_fr: 'Chaque pièce est façonnée à la main par des artisans marocains experts',
+  },
+  {
+    num: '03',
+    title_ar: 'الأصالة',
+    title_fr: 'Authenticité Marocaine',
+    desc_ar: 'تراث عريق يمتد لقرون من قلب مدينة مراكش',
+    desc_fr: "Un héritage séculaire au cœur de la médina de Marrakech",
+  },
+] as const;
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Sub-components (memo'd for perf on static sections)
 ───────────────────────────────────────────────────────────────────────────── */
 
 /** Tiny section overline label */
-const SectionLabel = memo(function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="section-label">{children}</p>;
+const SectionLabel = memo(function SectionLabel({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <p className={`section-label ${className}`}>{children}</p>;
 });
 
-/** Star row — pure SVG, no dep */
+/** Five gold stars — pure SVG, no extra dep */
 const Stars = memo(function Stars({ count = 5 }: { count?: number }) {
   return (
-    <div className="flex gap-0.5" aria-label={`${count} étoiles`}>
+    <div className="flex gap-0.5" aria-label={`${count} stars`}>
       {Array.from({ length: count }).map((_, i) => (
         <svg
           key={i}
@@ -106,12 +133,12 @@ const Stars = memo(function Stars({ count = 5 }: { count?: number }) {
   );
 });
 
-/** Trust-bar strip */
+/** Trust-bar strip — below hero */
 const TrustBar = memo(function TrustBar({ lang }: { lang: 'ar' | 'fr' }) {
   const items = [
     {
       icon: <Truck className="w-4 h-4" />,
-      label: lang === 'ar' ? 'توصيل ٢–٥ أيام' : 'Livraison 2–5 jours',
+      label: lang === 'ar' ? 'توصيل 2-5 أيام' : 'Livraison 2–5 jours',
     },
     {
       icon: <Leaf className="w-4 h-4" />,
@@ -144,13 +171,17 @@ const TrustBar = memo(function TrustBar({ lang }: { lang: 'ar' | 'fr' }) {
   );
 });
 
-/** Delivery banner */
-const DeliveryBanner = memo(function DeliveryBanner({ lang }: { lang: 'ar' | 'fr' }) {
+/** Delivery banner — full-width camel strip */
+const DeliveryBanner = memo(function DeliveryBanner({
+  lang,
+}: {
+  lang: 'ar' | 'fr';
+}) {
   return (
     <div className="bg-camel py-5 text-center">
       <p className="font-display italic text-2xl text-ink px-4">
         {lang === 'ar'
-          ? 'توصيل مجاني للطلبات فوق ٥٠٠ درهم | Livraison gratuite dès 500 DH'
+          ? 'توصيل مجاني للطلبات فوق 500 درهم | Livraison gratuite dès 500 DH'
           : 'Livraison gratuite dès 500 DH | توصيل مجاني فوق 500 درهم'}
       </p>
     </div>
@@ -166,7 +197,7 @@ export default function Home() {
   const isAr = lang === 'ar';
   const shouldReduceMotion = useReducedMotion();
 
-  /* Data fetching */
+  /* ── Data fetching ─────────────────────────────────────────────────────── */
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: featured, isLoading: featuredLoading } = useProducts({
     isFeatured: true,
@@ -177,14 +208,15 @@ export default function Home() {
     limit: 4,
   });
 
-  /* SEO */
+  /* ── SEO ───────────────────────────────────────────────────────────────── */
   useEffect(() => {
     document.title = isAr
       ? 'كوير — حقائب جلدية فاخرة من المغرب'
       : 'CUIR — Maroquinerie de Luxe du Maroc';
   }, [isAr]);
 
-  /* Respect prefers-reduced-motion by stripping animation props */
+  /* ── Animation helpers ─────────────────────────────────────────────────── */
+  // Strip animation props entirely when user prefers reduced motion
   const motionProps = shouldReduceMotion
     ? {}
     : {
@@ -222,7 +254,7 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          {/* Grid */}
+          {/* Category grid */}
           <motion.div
             {...motionProps}
             variants={STAGGER_GRID}
@@ -244,17 +276,20 @@ export default function Home() {
                       className="group relative block overflow-hidden"
                       aria-label={isAr ? cat.name_ar : cat.name}
                     >
-                      {/* Image */}
-                      <div className="relative overflow-hidden" style={{ aspectRatio: '4/5' }}>
+                      {/* Image wrapper */}
+                      <div
+                        className="relative overflow-hidden"
+                        style={{ aspectRatio: '4/5' }}
+                      >
                         {cat.image ? (
                           <img
                             src={getImageUrl(cat.image)}
                             alt={isAr ? cat.name_ar : cat.name}
                             loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-800 ease-[var(--ease-luxury)] group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-[800ms] ease-[var(--ease-luxury)] group-hover:scale-105"
                           />
                         ) : (
-                          /* warm leather gradient fallback */
+                          /* Warm leather gradient fallback — no inline style needed */
                           <div
                             className="w-full h-full"
                             style={{
@@ -265,9 +300,9 @@ export default function Home() {
                         )}
 
                         {/* Bottom gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent transition-opacity duration-600 group-hover:from-ink/80" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent transition-opacity duration-[600ms] group-hover:from-ink/80" />
 
-                        {/* Category name */}
+                        {/* Category label */}
                         <div className="absolute bottom-0 inset-x-0 p-5">
                           <p className="font-display text-xl text-cream-50 font-light leading-snug">
                             {isAr ? cat.name_ar : cat.name}
@@ -322,31 +357,34 @@ export default function Home() {
                 ))}
           </motion.div>
 
-          {/* View all */}
+          {/* View all CTA */}
           <motion.div
             {...motionProps}
             variants={FADE_UP}
             className="mt-14 flex justify-center"
           >
-            <Link to="/shop" className="btn-ghost inline-flex items-center gap-3">
-              <span>{isAr ? 'عرض جميع المنتجات' : 'Voir tous les produits'}</span>
+            <Link
+              to="/shop"
+              className="btn-ghost inline-flex items-center gap-3"
+            >
+              <span>
+                {isAr ? 'عرض جميع المنتجات' : 'Voir tous les produits'}
+              </span>
               <ArrowIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
             </Link>
           </motion.div>
         </div>
       </section>
 
-      {/* ══ Section 5 — Editorial Story ══════════════════════════════════════ */}
+      {/* ══ Section 5 — Editorial Story (no image) ═══════════════════════════ */}
       <section className="section-luxury bg-ink text-cream-100">
         <div className="container-luxury">
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
 
-            {/* Left — quote */}
+            {/* Left — large quote */}
             <motion.div {...motionProps} variants={FADE_UP}>
-              <SectionLabel>
-                <span className="text-camel">
-                  {isAr ? 'قصتنا — Notre Histoire' : 'Notre Histoire — قصتنا'}
-                </span>
+              <SectionLabel className="text-camel">
+                {isAr ? 'قصتنا — Notre Histoire' : 'Notre Histoire — قصتنا'}
               </SectionLabel>
 
               <blockquote
@@ -370,7 +408,8 @@ export default function Home() {
                     Le cuir n&apos;est pas qu&apos;une matière,
                     <br />
                     c&apos;est une histoire racontée
-                    <br />à chaque point de couture
+                    <br />
+                    à chaque point de couture
                   </>
                 )}
               </blockquote>
@@ -380,7 +419,9 @@ export default function Home() {
                   to="/about"
                   className="btn-ghost text-cream-100 border-cream-100 hover:bg-cream-100 hover:text-ink inline-flex items-center gap-3"
                 >
-                  <span>{isAr ? 'اكتشف قصتنا' : 'Découvrir notre histoire'}</span>
+                  <span>
+                    {isAr ? 'اكتشف قصتنا' : 'Découvrir notre histoire'}
+                  </span>
                   <ArrowIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
                 </Link>
               </div>
@@ -392,29 +433,7 @@ export default function Home() {
               variants={STAGGER_GRID}
               className="space-y-10"
             >
-              {[
-                {
-                  num: '01',
-                  title_ar: 'الجودة',
-                  title_fr: 'Qualité Supérieure',
-                  desc_ar: 'نختار أجود أنواع الجلود الطبيعية من المدابغ العريقة',
-                  desc_fr: 'Nous sélectionnons les meilleurs cuirs dans les tanneries traditionnelles',
-                },
-                {
-                  num: '02',
-                  title_ar: 'الحرفية',
-                  title_fr: 'Savoir-faire Artisanal',
-                  desc_ar: 'كل قطعة تُصنع بيدي حرفيين مغاربة متمرسين',
-                  desc_fr: 'Chaque pièce est façonnée à la main par des artisans marocains experts',
-                },
-                {
-                  num: '03',
-                  title_ar: 'الأصالة',
-                  title_fr: 'Authenticité Marocaine',
-                  desc_ar: 'تراث عريق يمتد لقرون من قلب مدينة مراكش',
-                  desc_fr: "Un héritage séculaire au cœur de la médina de Marrakech",
-                },
-              ].map((feat) => (
+              {EDITORIAL_FEATURES.map((feat) => (
                 <motion.div
                   key={feat.num}
                   variants={GRID_ITEM}
@@ -453,7 +472,9 @@ export default function Home() {
             className="mb-14 text-center"
           >
             <SectionLabel>
-              {isAr ? 'الأكثر مبيعاً — Best-sellers' : 'Best-sellers — الأكثر مبيعاً'}
+              {isAr
+                ? 'الأكثر مبيعاً — Best-sellers'
+                : 'Best-sellers — الأكثر مبيعاً'}
             </SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يعشقه عملاؤنا' : 'Nos Favoris'}
@@ -493,7 +514,9 @@ export default function Home() {
             className="mb-14 text-center"
           >
             <SectionLabel>
-              {isAr ? 'آراء عملائنا — Avis Clients' : 'Avis Clients — آراء عملائنا'}
+              {isAr
+                ? 'آراء عملائنا — Avis Clients'
+                : 'Avis Clients — آراء عملائنا'}
             </SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يقوله عملاؤنا' : 'Ce que disent nos clients'}
@@ -525,10 +548,12 @@ export default function Home() {
                 </blockquote>
 
                 <footer className="border-t border-cream-300 pt-5">
-                  <p className={[
-                    'font-body font-medium text-ink text-sm',
-                    isAr ? 'font-arabic' : '',
-                  ].join(' ')}>
+                  <p
+                    className={[
+                      'font-body font-medium text-ink text-sm',
+                      isAr ? 'font-arabic' : '',
+                    ].join(' ')}
+                  >
                     {isAr ? t.name_ar : t.name_fr}
                   </p>
                   <p className="label-luxury mt-0.5">
