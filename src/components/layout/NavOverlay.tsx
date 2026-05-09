@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 interface NavOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onExited?: () => void;
 }
 
 const EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
@@ -35,7 +36,7 @@ const itemVariants = {
   exit:    { opacity: 0, y: 8,  transition: { duration: 0.15 } },
 };
 
-export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
+export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProps) {
   const { t, lang, setLang, dir } = useLanguage();
   const { isAdmin } = useAuth();
   const location = useLocation();
@@ -97,7 +98,11 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
       style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
       aria-hidden={!isOpen}
     >
-      <AnimatePresence>
+      <AnimatePresence
+        onExitComplete={() => {
+          if (!isOpen) onExited?.();
+        }}
+      >
         {isOpen && (
           <motion.div
             id="nav-overlay"
