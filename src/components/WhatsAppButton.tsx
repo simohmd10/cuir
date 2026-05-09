@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '212600000000';
 const WA_GREEN = '#25D366';
 
@@ -12,104 +10,59 @@ const MESSAGES: Record<'ar' | 'fr', string> = {
   fr: "Bonjour, je voudrais m'informer sur vos produits",
 };
 
-// ─── WhatsAppButton ───────────────────────────────────────────────────────────
 export default function WhatsAppButton() {
   const { lang, dir } = useLanguage();
   const [visible, setVisible] = useState(false);
 
-  // Delay appearance by 2 s after mount — subtle, non-intrusive
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    MESSAGES[lang]
-  )}`;
-
-  // RTL → bottom-left; LTR → bottom-right
-  const positionStyle =
-    dir === 'rtl'
-      ? { bottom: '1.5rem', left: '1.5rem' }
-      : { bottom: '1.5rem', right: '1.5rem' };
+  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(MESSAGES[lang])}`;
+  const positionCls = dir === 'rtl' ? 'bottom-6 left-6' : 'bottom-6 right-6';
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          className="fixed z-50"
-          style={positionStyle}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 24,
-          }}
+    <div
+      className={[
+        'fixed z-50',
+        positionCls,
+        'transition-all duration-500 ease-[var(--ease-luxury)]',
+        visible ? 'opacity-100 scale-100' : 'opacity-0 scale-0 pointer-events-none',
+      ].join(' ')}
+    >
+      {/* Pulse ring */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 rounded-full wa-pulse"
+        style={{ backgroundColor: WA_GREEN }}
+      />
+
+      {/* Button */}
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={lang === 'ar' ? 'تواصل عبر واتساب' : 'Contacter via WhatsApp'}
+        className="relative flex items-center justify-center w-14 h-14 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366] hover:scale-110 active:scale-95 transition-transform duration-300"
+        style={{
+          backgroundColor: WA_GREEN,
+          boxShadow: '0 4px 24px rgba(37, 211, 102, 0.40)',
+        }}
+      >
+        <span
+          aria-label="1 new message"
+          className={[
+            'absolute -top-0.5 w-[18px] h-[18px] rounded-full',
+            'bg-red-500 text-white text-[10px] font-bold leading-none',
+            'flex items-center justify-center shadow-sm z-10',
+            dir === 'rtl' ? '-left-0.5' : '-right-0.5',
+          ].join(' ')}
         >
-          {/* ── Pulse ring — radiates outward every 3 s ──────────────────── */}
-          <motion.span
-            aria-hidden="true"
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{ backgroundColor: WA_GREEN }}
-            animate={{
-              scale: [1, 1.6, 1.6],
-              opacity: [0.5, 0, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeOut',
-              repeatDelay: 0.4,
-            }}
-          />
-
-          {/* ── Button ───────────────────────────────────────────────────── */}
-          <motion.a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={
-              lang === 'ar'
-                ? 'تواصل عبر واتساب'
-                : 'Contacter via WhatsApp'
-            }
-            className="relative flex items-center justify-center w-14 h-14 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
-            style={{
-              backgroundColor: WA_GREEN,
-              boxShadow: '0 4px 24px rgba(37, 211, 102, 0.40)',
-            }}
-            whileHover={{
-              scale: 1.08,
-              boxShadow: '0 6px 36px rgba(37, 211, 102, 0.58)',
-            }}
-            whileTap={{ scale: 0.94 }}
-            transition={{
-              duration: 0.25,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }}
-          >
-            {/* Notification badge "1" */}
-            <span
-              aria-label="1 new message"
-              className={[
-                'absolute -top-0.5 w-[18px] h-[18px] rounded-full',
-                'bg-red-500 text-white text-[10px] font-bold leading-none',
-                'flex items-center justify-center shadow-sm z-10',
-                dir === 'rtl' ? '-left-0.5' : '-right-0.5',
-              ].join(' ')}
-            >
-              1
-            </span>
-
-            <MessageCircle
-              className="w-6 h-6 text-white relative z-10"
-              strokeWidth={1.75}
-            />
-          </motion.a>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          1
+        </span>
+        <MessageCircle className="w-6 h-6 text-white relative z-10" strokeWidth={1.75} />
+      </a>
+    </div>
   );
 }

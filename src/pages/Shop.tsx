@@ -1,18 +1,17 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Search, X, ChevronDown, Check } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts, useCategories } from '../hooks/useProducts';
 import { classNames } from '../lib/utils';
+import { useRevealGroup } from '../hooks/useReveal';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 12;
 const DEBOUNCE_MS = 400;
-const EASE_LUXURY = [0.25, 0.46, 0.45, 0.94] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,49 +30,16 @@ const SORT_OPTIONS: SortOption[] = [
   { value: 'rating',     ar: 'الأعلى تقييماً',      fr: 'Mieux noté'     },
 ];
 
-// ─── Animation variants ───────────────────────────────────────────────────────
-
-const headerVariants = {
-  hidden:  { opacity: 0, y: -12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_LUXURY } },
-};
-
-const gridVariants = {
-  hidden:  {},
-  visible: { transition: { staggerChildren: 0.055, delayChildren: 0.05 } },
-};
-
-const cardVariants = {
-  hidden:  { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.48, ease: EASE_LUXURY } },
-};
-
-const dropdownVariants = {
-  hidden:  { opacity: 0, y: -6, scaleY: 0.96 },
-  visible: { opacity: 1, y: 0, scaleY: 1, transition: { duration: 0.18, ease: EASE_LUXURY } },
-  exit:    { opacity: 0, y: -4, scaleY: 0.96, transition: { duration: 0.14 } },
-};
-
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
 function EmptyState({ lang }: { lang: string }) {
   return (
     <div className="col-span-full flex flex-col items-center gap-8 py-28 text-center">
-      {/* Decorative mark */}
-      <div
-        className="w-14 h-14 border border-camel/30 flex items-center justify-center"
-        aria-hidden="true"
-      >
+      <div className="w-14 h-14 border border-camel/30 flex items-center justify-center" aria-hidden="true">
         <span className="text-xl text-camel font-display font-light leading-none">—</span>
       </div>
-
       <div className="space-y-2.5 max-w-xs">
-        <p
-          className={classNames(
-            'font-light text-xl text-ink',
-            lang === 'ar' ? 'font-arabic' : 'font-display'
-          )}
-        >
+        <p className={classNames('font-light text-xl text-ink', lang === 'ar' ? 'font-arabic' : 'font-display')}>
           {lang === 'ar' ? 'لا توجد منتجات' : 'Aucun produit trouvé'}
         </p>
         <p className="text-xs tracking-luxury uppercase text-ink/35 font-body">
@@ -82,7 +48,6 @@ function EmptyState({ lang }: { lang: string }) {
             : 'Modifiez les filtres ou la recherche'}
         </p>
       </div>
-
       <Link to="/shop" className="btn-ghost text-xs">
         {lang === 'ar' ? 'عرض جميع المنتجات' : 'Voir toute la collection'}
       </Link>
@@ -129,9 +94,7 @@ function SortDropdown({ value, onChange, lang, dir }: SortDropdownProps) {
         aria-expanded={open}
         aria-label={lang === 'ar' ? 'ترتيب حسب' : 'Trier par'}
       >
-        <span className="flex-1 text-start">
-          {lang === 'ar' ? current.ar : current.fr}
-        </span>
+        <span className="flex-1 text-start">{lang === 'ar' ? current.ar : current.fr}</span>
         <ChevronDown
           className={classNames(
             'w-3.5 h-3.5 flex-shrink-0 transition-transform duration-300 text-ink/40',
@@ -141,48 +104,39 @@ function SortDropdown({ value, onChange, lang, dir }: SortDropdownProps) {
         />
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.ul
-            key="sort-dropdown"
-            variants={dropdownVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            style={{ transformOrigin: 'top' }}
-            role="listbox"
-            className={classNames(
-              'absolute z-40 mt-px w-full bg-cream-100 border border-cream-300',
-              'shadow-sm py-1',
-              dir === 'rtl' ? 'right-0' : 'left-0'
-            )}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <li key={opt.value}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={opt.value === value}
-                  onClick={() => { onChange(opt.value); setOpen(false); }}
-                  className={classNames(
-                    'w-full flex items-center justify-between gap-3 px-4 py-2.5',
-                    'text-xs tracking-luxury uppercase font-body text-start',
-                    'transition-colors duration-200',
-                    opt.value === value
-                      ? 'text-ink bg-cream-200'
-                      : 'text-ink/50 hover:text-ink hover:bg-cream-200/60'
-                  )}
-                >
-                  {lang === 'ar' ? opt.ar : opt.fr}
-                  {opt.value === value && (
-                    <Check className="w-3 h-3 flex-shrink-0 text-camel" strokeWidth={2} />
-                  )}
-                </button>
-              </li>
-            ))}
-          </motion.ul>
+      {/* CSS-animated dropdown — no framer-motion */}
+      <ul
+        role="listbox"
+        className={classNames(
+          'absolute z-40 mt-px w-full bg-cream-100 border border-cream-300 shadow-sm py-1',
+          'transition-all duration-200 origin-top',
+          dir === 'rtl' ? 'right-0' : 'left-0',
+          open ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'
         )}
-      </AnimatePresence>
+        style={{ transformOrigin: 'top' }}
+      >
+        {SORT_OPTIONS.map((opt) => (
+          <li key={opt.value}>
+            <button
+              type="button"
+              role="option"
+              aria-selected={opt.value === value}
+              onClick={() => { onChange(opt.value); setOpen(false); }}
+              className={classNames(
+                'w-full flex items-center justify-between gap-3 px-4 py-2.5',
+                'text-xs tracking-luxury uppercase font-body text-start',
+                'transition-colors duration-200',
+                opt.value === value
+                  ? 'text-ink bg-cream-200'
+                  : 'text-ink/50 hover:text-ink hover:bg-cream-200/60'
+              )}
+            >
+              {lang === 'ar' ? opt.ar : opt.fr}
+              {opt.value === value && <Check className="w-3 h-3 flex-shrink-0 text-camel" strokeWidth={2} />}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -194,8 +148,7 @@ function PillSkeleton() {
     <div
       className="flex-none h-9 w-20 skeleton"
       style={{
-        backgroundImage:
-          'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 40%, #EDE0CF 60%, #F5EDE0 100%)',
+        backgroundImage: 'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 40%, #EDE0CF 60%, #F5EDE0 100%)',
         backgroundSize: '200% 100%',
       }}
       aria-hidden="true"
@@ -207,7 +160,6 @@ function PillSkeleton() {
 
 export default function Shop() {
   const { lang, dir } = useLanguage();
-  const prefersReduced = useReducedMotion();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── URL-synced state ──────────────────────────────────────────────────────
@@ -215,24 +167,21 @@ export default function Shop() {
   const searchParam   = searchParams.get('search')   || '';
   const sortParam     = (searchParams.get('sort') as SortValue) || 'newest';
 
-  // Local search input — debounced before URL write
-  const [searchInput, setSearchInput]   = useState(searchParam);
+  const [searchInput, setSearchInput] = useState(searchParam);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load-more page counter
   const [visiblePages, setVisiblePages] = useState(1);
 
   // ── Effects ───────────────────────────────────────────────────────────────
   useEffect(() => { setSearchInput(searchParam); }, [searchParam]);
   useEffect(() => { setVisiblePages(1); }, [categoryParam, searchParam, sortParam]);
-
   useEffect(() => {
     document.title = lang === 'ar' ? 'المتجر — Cuir' : 'Boutique — Cuir';
   }, [lang]);
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: categories, isLoading: catLoading } = useCategories();
-  const { data: products,   isLoading: productsLoading } = useProducts({
+  const { data: products, isLoading: productsLoading } = useProducts({
     category: categoryParam === 'all' ? undefined : categoryParam,
     search:   searchParam || undefined,
     sortBy:   sortParam,
@@ -283,29 +232,22 @@ export default function Shop() {
   const remaining       = totalCount - visibleProducts.length;
   const isLoading       = productsLoading || catLoading;
 
+  // ── Grid reveal ───────────────────────────────────────────────────────────
+  const gridRef = useRevealGroup({ threshold: 0.04 });
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-cream-100" dir={dir}>
 
       {/* ── Page Header ────────────────────────────────────────────────────── */}
-      <motion.header
-        className="bg-cream-200 py-16 md:py-20"
-        {...(!prefersReduced && {
-          initial:  'hidden',
-          animate:  'visible',
-          variants: headerVariants,
-        })}
-      >
+      <header className="bg-cream-200 py-16 md:py-20">
         <div className="container-luxury text-center space-y-4">
           <p className="section-label">
             {lang === 'ar' ? '— المتجر | Boutique —' : '— Boutique | المتجر —'}
           </p>
-
           <h1 className="heading-section text-balance">
             {lang === 'ar' ? 'جميع التصاميم' : 'Toute la Collection'}
           </h1>
-
-          {/* Product count */}
           {!productsLoading && (
             <p className="text-[11px] tracking-luxury uppercase font-body text-ink/35 tabular-nums">
               {lang === 'ar'
@@ -314,7 +256,7 @@ export default function Shop() {
             </p>
           )}
         </div>
-      </motion.header>
+      </header>
 
       {/* ── Sticky Filter Bar ──────────────────────────────────────────────── */}
       <div
@@ -327,13 +269,12 @@ export default function Shop() {
       >
         <div className="container-luxury py-3.5 space-y-3">
 
-          {/* Row 1: Category pills — horizontal scroll on mobile */}
+          {/* Category pills */}
           <div
             className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5"
             role="group"
             aria-label={lang === 'ar' ? 'الفئات' : 'Catégories'}
           >
-            {/* "All" pill */}
             <button
               onClick={() => setCategory('all')}
               className={classNames(
@@ -359,7 +300,6 @@ export default function Shop() {
                       'flex-none px-4 py-2 text-xs tracking-luxury uppercase font-body',
                       'transition-colors duration-300 whitespace-nowrap focus:outline-none',
                       'focus-visible:ring-1 focus-visible:ring-camel',
-                      lang === 'ar' ? '' : '',
                       categoryParam === cat.slug
                         ? 'bg-ink text-cream-100'
                         : 'border border-cream-400 text-ink/50 hover:border-ink/60 hover:text-ink'
@@ -371,10 +311,8 @@ export default function Shop() {
                 ))}
           </div>
 
-          {/* Row 2: Search input + Sort dropdown */}
+          {/* Search + Sort */}
           <div className="flex flex-col sm:flex-row gap-2.5">
-
-            {/* Search */}
             <div className="relative flex-1">
               <Search
                 className={classNames(
@@ -394,32 +332,25 @@ export default function Shop() {
                 )}
                 aria-label={lang === 'ar' ? 'بحث عن منتج' : 'Rechercher un produit'}
               />
-              <AnimatePresence>
-                {searchInput && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.15 }}
-                    onClick={clearSearch}
-                    aria-label={lang === 'ar' ? 'مسح البحث' : 'Effacer la recherche'}
-                    className={classNames(
-                      'absolute top-1/2 -translate-y-1/2 text-ink/25 hover:text-ink/60',
-                      'transition-colors duration-200 p-0.5',
-                      dir === 'rtl' ? 'left-3.5' : 'right-3.5'
-                    )}
-                  >
-                    <X className="w-3.5 h-3.5" strokeWidth={2} />
-                  </motion.button>
+              {/* CSS-only clear button — no AnimatePresence */}
+              <button
+                onClick={clearSearch}
+                aria-label={lang === 'ar' ? 'مسح البحث' : 'Effacer la recherche'}
+                className={classNames(
+                  'absolute top-1/2 -translate-y-1/2 text-ink/25 hover:text-ink/60',
+                  'transition-all duration-200 p-0.5',
+                  dir === 'rtl' ? 'left-3.5' : 'right-3.5',
+                  searchInput ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
                 )}
-              </AnimatePresence>
+                tabIndex={searchInput ? 0 : -1}
+              >
+                <X className="w-3.5 h-3.5" strokeWidth={2} />
+              </button>
             </div>
-
-            {/* Sort */}
             <SortDropdown value={sortParam} onChange={setSort} lang={lang} dir={dir} />
           </div>
 
-          {/* Row 3: Product count (mobile only) */}
+          {/* Count on mobile */}
           {!isLoading && (
             <p className="text-[10px] tracking-luxury uppercase text-ink/25 font-body sm:hidden tabular-nums">
               {lang === 'ar'
@@ -434,55 +365,31 @@ export default function Shop() {
       <main className="container-luxury py-12 md:py-16">
 
         {isLoading ? (
-          /* Skeleton grid */
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
+            {Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)}
           </div>
 
         ) : totalCount === 0 ? (
-          /* Empty state */
-          <div className="grid grid-cols-1">
-            <EmptyState lang={lang} />
-          </div>
+          <div className="grid grid-cols-1"><EmptyState lang={lang} /></div>
 
         ) : (
           <>
-            {/* Product grid */}
-            <motion.div
-              key={`${categoryParam}-${searchParam}-${sortParam}`}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-              {...(!prefersReduced && {
-                initial:  'hidden',
-                animate:  'visible',
-                variants: gridVariants,
-              })}
+            <div
+              ref={gridRef}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 reveal-group"
             >
-              {visibleProducts.map((product) =>
-                prefersReduced ? (
-                  <ProductCard key={product.id} product={product} />
-                ) : (
-                  <motion.div key={product.id} variants={cardVariants}>
-                    <ProductCard product={product} />
-                  </motion.div>
-                )
-              )}
-            </motion.div>
+              {visibleProducts.map((product) => (
+                <div key={product.id} className="reveal">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
 
-            {/* Load more */}
             {hasMore && (
               <div className="mt-16 flex flex-col items-center gap-4">
-                {/* Subtle rule */}
                 <div className="w-px h-8 bg-cream-400" aria-hidden="true" />
-
-                <button
-                  onClick={() => setVisiblePages((p) => p + 1)}
-                  className="btn-ghost"
-                >
-                  {lang === 'ar'
-                    ? `تحميل المزيد — ${remaining}`
-                    : `Voir plus — ${remaining}`}
+                <button onClick={() => setVisiblePages((p) => p + 1)} className="btn-ghost">
+                  {lang === 'ar' ? `تحميل المزيد — ${remaining}` : `Voir plus — ${remaining}`}
                 </button>
               </div>
             )}

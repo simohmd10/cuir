@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useRevealGroup } from '../hooks/useReveal';
 import useEmblaCarousel from 'embla-carousel-react';
 import {
   ChevronDown,
@@ -22,10 +22,6 @@ import LazyImage from '../components/ui/LazyImage';
 import StarRating from '../components/ui/StarRating';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 import type { Review } from '../types';
-
-// ─── Easing ───────────────────────────────────────────────────────────────────
-
-const EASE_LUXURY = [0.25, 0.46, 0.45, 0.94] as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -185,12 +181,9 @@ function RatingBar({ star, pct, count }: { star: number; pct: number; count: num
     <div className="flex items-center gap-3 text-[11px] font-body text-ink/40">
       <span className="w-2 text-end tabular-nums">{star}</span>
       <div className="flex-1 h-px bg-cream-400 relative overflow-hidden">
-        <motion.div
-          className="absolute inset-y-0 start-0 bg-camel"
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.7, ease: EASE_LUXURY, delay: 0.1 * (5 - star) }}
-          style={{ height: '1px' }}
+        <div
+          className="absolute inset-y-0 start-0 bg-camel transition-[width] duration-700 ease-[var(--ease-luxury)]"
+          style={{ height: '1px', width: `${pct}%` }}
         />
       </div>
       <span className="w-4 tabular-nums">{count}</span>
@@ -228,24 +221,16 @@ function ReviewForm({ productId, lang }: { productId: string; lang: string }) {
 
   if (submitted) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="py-8 text-center"
-      >
+      <div className="py-8 text-center animate-[heroFadeIn_0.6s_var(--ease-luxury)_both]">
         <p className="section-label mb-2">
           {lang === 'ar' ? 'شكراً لك' : 'Merci'}
         </p>
-        <p
-          className={classNames(
-            'text-sm text-ink/50 font-body',
-          )}
-        >
+        <p className="text-sm text-ink/50 font-body">
           {lang === 'ar'
             ? 'تم إرسال تقييمك وسيظهر بعد المراجعة'
             : 'Votre avis a été soumis et sera publié après validation'}
         </p>
-      </motion.div>
+      </div>
     );
   }
 
@@ -356,7 +341,7 @@ export default function ProductPage() {
   const navigate    = useNavigate();
   const { lang, dir } = useLanguage();
   const { addItem } = useCart();
-  const prefersReduced = useReducedMotion();
+  const relatedGridRef = useRevealGroup();
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: product, isLoading, isError } = useProduct(id ?? '');
@@ -559,22 +544,13 @@ export default function ProductPage() {
                 className="relative overflow-hidden bg-cream-200 select-none"
                 style={{ aspectRatio: '3 / 4' }}
               >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeImage}
+                <div key={activeImage} className="w-full h-full animate-[heroFadeIn_0.3s_var(--ease-luxury)_both]">
+                  <LazyImage
+                    src={getImageUrl(images[activeImage] ?? '')}
+                    alt={productName}
                     className="w-full h-full"
-                    initial={prefersReduced ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={prefersReduced ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.3, ease: EASE_LUXURY }}
-                  >
-                    <LazyImage
-                      src={getImageUrl(images[activeImage] ?? '')}
-                      alt={productName}
-                      className="w-full h-full"
-                    />
-                  </motion.div>
-                </AnimatePresence>
+                  />
+                </div>
 
                 {/* Discount badge */}
                 {hasDiscount && (
@@ -1021,24 +997,14 @@ export default function ProductPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div ref={relatedGridRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 reveal-group">
               {isLoading
                 ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-                : related.map((p, i) =>
-                    prefersReduced ? (
-                      <ProductCard key={p.id} product={p} />
-                    ) : (
-                      <motion.div
-                        key={p.id}
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, ease: EASE_LUXURY, delay: i * 0.07 }}
-                      >
-                        <ProductCard product={p} />
-                      </motion.div>
-                    )
-                  )}
+                : related.map((p) => (
+                    <div key={p.id} className="reveal">
+                      <ProductCard product={p} />
+                    </div>
+                  ))}
             </div>
 
           </div>
