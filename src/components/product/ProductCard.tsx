@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
-import { formatPrice, getImageUrl } from '../../lib/utils';
+import { formatPrice, getImageUrl, getProductImageSrcSet } from '../../lib/utils';
 import LazyImage from '../ui/LazyImage';
 import StarRating from '../ui/StarRating';
 import type { Product } from '../../types';
@@ -55,6 +55,7 @@ const ProductCard: React.FC<{ product: Product; className?: string }> = ({
   const name = lang === 'ar' ? product.name_ar : product.name;
   const badgeLabel = lang === 'ar' ? (product.badge_ar ?? product.badge) : product.badge;
   const image = getImageUrl(product.images?.[0], '/placeholder-bag.jpg');
+  const imageSrcSet = getProductImageSrcSet(product.images?.[0], '/placeholder-bag.jpg');
   const hasVariants = product.colors.length > 1 || product.sizes.length > 1;
   const isLowStock   = product.stock > 0 && product.stock <= 5;
   const isOutOfStock = product.stock === 0;
@@ -84,7 +85,13 @@ const ProductCard: React.FC<{ product: Product; className?: string }> = ({
       >
         {/* Image — CSS scale on hover */}
         <div className="w-full h-full transition-transform duration-[800ms] ease-[var(--ease-luxury)] group-hover:scale-[1.04]">
-          <LazyImage src={image} alt={name} className="w-full h-full" />
+          <LazyImage
+            src={image}
+            srcSet={imageSrcSet}
+            alt={name}
+            className="w-full h-full"
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
+          />
         </div>
 
         {/* Badge */}

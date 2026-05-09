@@ -1,35 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface LazyImageProps {
   src: string;
   alt: string;
   className?: string;
   fallback?: string;
+  srcSet?: string;
+  sizes?: string;
+  priority?: boolean;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback }) => {
+const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback, srcSet, sizes, priority = false }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const [inView, setInView] = useState(false);
-  const imgRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
-
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const handleLoad = () => setLoaded(true);
   const handleError = () => {
@@ -40,7 +23,7 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallbac
   const showFallback = error || !src;
 
   return (
-    <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
+    <div className={`relative overflow-hidden ${className}`}>
       {/* Skeleton loader */}
       {!loaded && (
         <div className="absolute inset-0 bg-leather-100 animate-pulse">
@@ -73,12 +56,17 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallbac
       )}
 
       {/* Actual image */}
-      {inView && !showFallback && (
+      {!showFallback && (
         <img
           src={src}
+          srcSet={srcSet}
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'auto'}
+          sizes={sizes}
           className={[
             'w-full h-full object-cover transition-opacity duration-500',
             loaded ? 'opacity-100' : 'opacity-0',

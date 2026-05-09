@@ -68,6 +68,20 @@ export function getImageUrl(path: string, fallback?: string): string {
   return `${supabaseUrl}/storage/v1/object/public/products/${path}`;
 }
 
+export function getResponsiveImageUrl(path: string, width: number, fallback?: string): string {
+  if (!path) return fallback || '/placeholder-bag.jpg';
+  if (path.startsWith('http')) return `${path}${path.includes('?') ? '&' : '?'}width=${width}`;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  if (!supabaseUrl) return fallback || '/placeholder-bag.jpg';
+  return `${supabaseUrl}/storage/v1/render/image/public/products/${path}?width=${width}&quality=72`;
+}
+
+export function getProductImageSrcSet(path: string, fallback?: string): string | undefined {
+  if (!path) return undefined;
+  const widths = [240, 320, 400, 520];
+  return widths.map((w) => `${getResponsiveImageUrl(path, w, fallback)} ${w}w`).join(', ');
+}
+
 export function formatDate(dateString: string, lang: Language): string {
   return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-MA' : 'fr-MA', {
     year: 'numeric',

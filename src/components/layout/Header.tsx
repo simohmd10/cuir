@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, Menu } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
-// Lazy-load NavOverlay so framer-motion is NOT in the initial bundle.
-// It only loads when the user first opens the hamburger menu.
-const NavOverlay = lazy(() => import('./NavOverlay'));
+import NavOverlay from './NavOverlay';
 
 const NAV_LINKS = [
   { key: 'home' as const, href: '/' },
@@ -24,7 +22,6 @@ export default function Header() {
 
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [overlayMounted, setOverlayMounted] = useState(false);
   const rafRef = useRef<number>(0);
 
   // Throttled scroll listener via rAF
@@ -42,16 +39,8 @@ export default function Header() {
     };
   }, []);
 
-  // Pre-fetch NavOverlay after 2s idle so it's ready when user taps menu
-  useEffect(() => {
-    const t = setTimeout(() => setOverlayMounted(true), 2000);
-    return () => clearTimeout(t);
-  }, []);
-
-  const openMenu = () => {
-    setOverlayMounted(true);
-    setMenuOpen(true);
-  };
+  const openMenu = () => setMenuOpen(true);
+  const closeMenu = () => setMenuOpen(false);
 
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
@@ -150,11 +139,7 @@ export default function Header() {
         </div>
       </header>
 
-      {overlayMounted && (
-        <Suspense fallback={null}>
-          <NavOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-        </Suspense>
-      )}
+      <NavOverlay isOpen={menuOpen} onClose={closeMenu} />
     </>
   );
 }
