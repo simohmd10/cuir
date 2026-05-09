@@ -5,10 +5,11 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface HeroVideoProps {
   videoSrc?: string;
+  mp4Src?: string;
   posterSrc?: string;
 }
 
-export default function HeroVideo({ videoSrc, posterSrc }: HeroVideoProps) {
+export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProps) {
   const { lang, dir } = useLanguage();
   const isAr = lang === 'ar';
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -29,11 +30,21 @@ export default function HeroVideo({ videoSrc, posterSrc }: HeroVideoProps) {
     ? 'group-hover:-translate-x-1'
     : 'group-hover:translate-x-1';
 
-  /* ── Lazy-load video on desktop via requestIdleCallback ── */
+  /* ── Lazy-load video on desktop, skip on mobile / slow connections / low-end devices ── */
   useEffect(() => {
     if (!videoSrc) return;
+
+    // Mobile: poster + Ken Burns only — never autoplay video
     const isDesktop = window.matchMedia('(pointer: fine) and (min-width: 768px)').matches;
     if (!isDesktop) return;
+
+    // Skip video on slow connections or data-saver mode
+    const conn = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    if (conn?.effectiveType && ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) return;
+
+    // Skip on low-end CPUs (≤4 cores ≈ budget Android)
+    if (navigator.hardwareConcurrency <= 4) return;
 
     const load = () => setVideoReady(true);
     if ('requestIdleCallback' in window) {
@@ -67,19 +78,21 @@ export default function HeroVideo({ videoSrc, posterSrc }: HeroVideoProps) {
         />
       )}
 
-      {/* ══ Video layer (desktop only, lazy) ══ */}
+      {/* ══ Video layer (desktop only, lazy, skipped on slow/low-end) ══ */}
       {videoSrc && videoReady && (
         <video
           ref={videoRef}
           className="hero-video hero-video-fade"
-          src={videoSrc}
           poster={posterSrc}
           muted
           loop
           playsInline
           preload="none"
           aria-hidden="true"
-        />
+        >
+          <source src={videoSrc} type="video/webm" />
+          {mp4Src && <source src={mp4Src} type="video/mp4" />}
+        </video>
       )}
 
       {/* ══ Fallback gradient when no image/video ══ */}

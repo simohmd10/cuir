@@ -162,7 +162,7 @@ export default function Home() {
     <div className="min-h-screen bg-cream-100" dir={dir}>
 
       {/* ══ Hero ══════════════════════════════════════════════════════════════ */}
-      <HeroVideo />
+      <HeroVideo videoSrc="/hero.webm" posterSrc="/hero-poster.jpg" />
 
       {/* ══ Trust Bar ════════════════════════════════════════════════════════ */}
       <TrustBar lang={lang} />
