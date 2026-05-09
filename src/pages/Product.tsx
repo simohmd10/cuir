@@ -1,17 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ShoppingBag,
-  Zap,
-  Share2,
+  MessageCircle,
   Minus,
   Plus,
-  ArrowLeft,
-  Star,
+  ShoppingBag,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,96 +17,202 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useProduct, useProducts } from '../hooks/useProducts';
 import { useReviews, useSubmitReview } from '../hooks/useReviews';
-import { formatPrice, getImageUrl, classNames } from '../lib/utils';
+import { formatPrice, getImageUrl, classNames, formatDate } from '../lib/utils';
 import LazyImage from '../components/ui/LazyImage';
 import StarRating from '../components/ui/StarRating';
-import Badge from '../components/ui/Badge';
-import ProductCard from '../components/product/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 import type { Review } from '../types';
 
-// ─── Animation Variants ───────────────────────────────────────────────────────
+// ─── Easing ───────────────────────────────────────────────────────────────────
 
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.5 } },
-};
+const EASE_LUXURY = [0.25, 0.46, 0.45, 0.94] as const;
 
-const slideUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
-};
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const stagger = {
-  visible: { transition: { staggerChildren: 0.1 } },
-};
+/** Returns true if the string looks like a CSS colour value (hex or single word). */
+function isCssColor(str: string): boolean {
+  return /^#[0-9a-fA-F]{3,8}$/.test(str) || /^[a-zA-Z]+$/.test(str);
+}
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
-function ProductSkeleton() {
+function ProductSkeleton({ dir }: { dir: 'rtl' | 'ltr' }) {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-pulse">
-      <div className="h-4 bg-leather-100 rounded w-48 mb-6" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Image skeleton */}
-        <div className="space-y-3">
-          <div className="aspect-square bg-leather-100 rounded-2xl" />
-          <div className="flex gap-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="w-16 h-16 bg-leather-100 rounded-xl" />
-            ))}
+    <div className="min-h-screen bg-cream-100" dir={dir}>
+      <div className="container-luxury py-10 md:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-8 lg:gap-16">
+
+          {/* Image col */}
+          <div className="space-y-3">
+            <div
+              className="w-full bg-cream-200 skeleton"
+              style={{ aspectRatio: '3 / 4' }}
+            />
+            <div className="flex gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="w-20 h-20 bg-cream-200 skeleton flex-none" />
+              ))}
+            </div>
           </div>
-        </div>
-        {/* Details skeleton */}
-        <div className="space-y-4">
-          <div className="h-3 bg-leather-100 rounded w-24" />
-          <div className="h-7 bg-leather-100 rounded w-3/4" />
-          <div className="h-5 bg-leather-100 rounded w-32" />
-          <div className="h-8 bg-leather-100 rounded w-28" />
-          <div className="h-24 bg-leather-100 rounded" />
-          <div className="h-12 bg-leather-100 rounded-xl" />
-          <div className="h-12 bg-leather-100 rounded-xl" />
+
+          {/* Info col */}
+          <div className="space-y-5 pt-2">
+            <div className="h-3 bg-cream-200 skeleton w-20" />
+            <div className="h-10 bg-cream-200 skeleton w-4/5" />
+            <div className="h-4 bg-cream-200 skeleton w-32" />
+            <div className="h-8 bg-cream-200 skeleton w-36" />
+            <div className="space-y-2 pt-2">
+              <div className="h-3 bg-cream-200 skeleton w-full" />
+              <div className="h-3 bg-cream-200 skeleton w-11/12" />
+              <div className="h-3 bg-cream-200 skeleton w-3/4" />
+            </div>
+            <div className="h-12 bg-cream-200 skeleton w-full mt-4" />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Review Card ──────────────────────────────────────────────────────────────
+// ─── Accordion item ───────────────────────────────────────────────────────────
 
-function ReviewCard({ review }: { review: Review }) {
+interface AccordionItemProps {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  lang: string;
+}
+
+function AccordionItem({ title, children, defaultOpen = false, lang }: AccordionItemProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  const contentRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="bg-beige-50 rounded-xl p-4 border border-leather-100">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-leather-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {review.user_name.charAt(0).toUpperCase()}
+    <div className="border-b border-cream-300 last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={classNames(
+          'w-full flex items-center justify-between gap-4 py-4',
+          'text-start focus:outline-none focus-visible:ring-1 focus-visible:ring-camel'
+        )}
+        aria-expanded={open}
+      >
+        <span
+          className={classNames(
+            'text-xs tracking-luxury uppercase font-body text-ink/70',
+            lang === 'ar' ? 'font-arabic tracking-normal text-sm' : ''
+          )}
+        >
+          {title}
+        </span>
+        <ChevronDown
+          className={classNames(
+            'w-3.5 h-3.5 text-ink/30 flex-shrink-0 transition-transform duration-400',
+            open ? 'rotate-180' : ''
+          )}
+          strokeWidth={1.5}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.25,0.46,0.45,0.94)' }}
+        />
+      </button>
+
+      {/* Height animation via max-height */}
+      <div
+        ref={contentRef}
+        className="overflow-hidden transition-[max-height,opacity] duration-500"
+        style={{
+          maxHeight: open ? (contentRef.current?.scrollHeight ?? 400) + 'px' : '0px',
+          opacity: open ? 1 : 0,
+          transitionTimingFunction: 'cubic-bezier(0.25,0.46,0.45,0.94)',
+        }}
+      >
+        <div className="pb-5 text-sm text-ink/55 font-body leading-relaxed">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Review card ──────────────────────────────────────────────────────────────
+
+function ReviewCard({ review, lang }: { review: Review; lang: string }) {
+  return (
+    <article className="py-6 border-b border-cream-300 last:border-b-0">
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex items-center gap-3">
+          {/* Initial avatar */}
+          <div
+            className="w-8 h-8 flex-none bg-camel/10 flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <span className="text-xs font-body text-camel uppercase">
+              {review.user_name.charAt(0)}
+            </span>
           </div>
-          <span className="font-semibold text-leather-800 text-sm">{review.user_name}</span>
+          <div>
+            <p className="text-xs font-body text-ink font-medium">
+              {review.user_name}
+            </p>
+            <p className="text-[10px] tracking-luxury uppercase text-ink/30 font-body mt-0.5">
+              {formatDate(review.created_at, lang === 'ar' ? 'ar' : 'fr')}
+            </p>
+          </div>
         </div>
         <StarRating rating={review.rating} size="sm" />
       </div>
-      <p className="text-leather-600 text-sm leading-relaxed">{review.comment}</p>
-      <p className="text-xs text-leather-400 mt-2">
-        {new Date(review.created_at).toLocaleDateString()}
-      </p>
+
+      {review.comment && (
+        <p
+          className={classNames(
+            'text-sm text-ink/60 leading-relaxed',
+            lang === 'ar'
+              ? 'font-arabic font-light'
+              : 'font-display font-light italic'
+          )}
+        >
+          {review.comment}
+        </p>
+      )}
+    </article>
+  );
+}
+
+// ─── Rating bar row ───────────────────────────────────────────────────────────
+
+function RatingBar({ star, pct, count }: { star: number; pct: number; count: number }) {
+  return (
+    <div className="flex items-center gap-3 text-[11px] font-body text-ink/40">
+      <span className="w-2 text-end tabular-nums">{star}</span>
+      <div className="flex-1 h-px bg-cream-400 relative overflow-hidden">
+        <motion.div
+          className="absolute inset-y-0 start-0 bg-camel"
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.7, ease: EASE_LUXURY, delay: 0.1 * (5 - star) }}
+          style={{ height: '1px' }}
+        />
+      </div>
+      <span className="w-4 tabular-nums">{count}</span>
     </div>
   );
 }
 
-// ─── Review Form ──────────────────────────────────────────────────────────────
+// ─── Review form ──────────────────────────────────────────────────────────────
 
-function ReviewForm({ productId }: { productId: string }) {
-  const { t, lang } = useLanguage();
+function ReviewForm({ productId, lang }: { productId: string; lang: string }) {
   const { mutate: submitReview, isPending } = useSubmitReview();
-  const [name, setName] = useState('');
-  const [rating, setRating] = useState(0);
+  const [name, setName]       = useState('');
+  const [rating, setRating]   = useState(0);
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || rating === 0 || !comment.trim()) {
-      toast.error(lang === 'ar' ? 'يرجى تعبئة جميع الحقول' : 'Veuillez remplir tous les champs');
+      toast.error(
+        lang === 'ar' ? 'يرجى تعبئة جميع الحقول' : 'Veuillez remplir tous les champs'
+      );
       return;
     }
     submitReview(
@@ -116,9 +220,7 @@ function ReviewForm({ productId }: { productId: string }) {
       {
         onSuccess: () => {
           setSubmitted(true);
-          setName('');
-          setRating(0);
-          setComment('');
+          setName(''); setRating(0); setComment('');
         },
       }
     );
@@ -127,399 +229,475 @@ function ReviewForm({ productId }: { productId: string }) {
   if (submitted) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="py-8 text-center"
       >
-        <p className="text-emerald-700 font-semibold text-sm">{t('reviewSubmitted')}</p>
+        <p className="section-label mb-2">
+          {lang === 'ar' ? 'شكراً لك' : 'Merci'}
+        </p>
+        <p
+          className={classNames(
+            'text-sm text-ink/50 font-body',
+          )}
+        >
+          {lang === 'ar'
+            ? 'تم إرسال تقييمك وسيظهر بعد المراجعة'
+            : 'Votre avis a été soumis et sera publié après validation'}
+        </p>
       </motion.div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-semibold text-leather-700 mb-1">{t('yourName')}</label>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Name */}
+      <div className="space-y-1.5">
+        <label className="label-luxury block">
+          {lang === 'ar' ? 'الاسم' : 'Votre nom'}
+        </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={t('yourName')}
-          className="w-full px-3 py-2.5 border border-leather-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-leather-300 bg-white text-leather-800 placeholder:text-leather-400"
+          placeholder={lang === 'ar' ? 'أدخل اسمك' : 'Entrez votre nom'}
+          className="input-luxury"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-leather-700 mb-1">{t('yourRating')}</label>
+      {/* Rating */}
+      <div className="space-y-2">
+        <label className="label-luxury block">
+          {lang === 'ar' ? 'التقييم' : 'Votre note'}
+        </label>
         <StarRating rating={rating} interactive onChange={setRating} size="lg" />
       </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-leather-700 mb-1">{t('yourComment')}</label>
+      {/* Comment */}
+      <div className="space-y-1.5">
+        <label className="label-luxury block">
+          {lang === 'ar' ? 'التعليق' : 'Votre commentaire'}
+        </label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder={t('yourComment')}
+          placeholder={
+            lang === 'ar'
+              ? 'شاركنا تجربتك مع هذه الحقيبة...'
+              : 'Partagez votre expérience avec ce sac...'
+          }
           rows={4}
-          className="w-full px-3 py-2.5 border border-leather-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-leather-300 bg-white text-leather-800 placeholder:text-leather-400 resize-none"
+          className="input-luxury resize-none"
           required
         />
       </div>
 
-      <motion.button
+      <button
         type="submit"
-        disabled={isPending}
-        className="w-full py-3 bg-leather-500 text-white font-semibold rounded-xl hover:bg-leather-600 transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-        whileTap={{ scale: 0.98 }}
+        disabled={isPending || rating === 0}
+        className="btn-ghost w-full"
       >
         {isPending
-          ? lang === 'ar'
-            ? 'جاري الإرسال...'
-            : 'Envoi en cours...'
-          : t('submitReview')}
-      </motion.button>
+          ? (lang === 'ar' ? 'جاري الإرسال...' : 'Envoi en cours...')
+          : (lang === 'ar' ? 'إرسال التقييم' : 'Soumettre l\'avis')}
+      </button>
     </form>
   );
 }
 
-// ─── Product Page ─────────────────────────────────────────────────────────────
+// ─── Mobile image carousel (Embla) ───────────────────────────────────────────
 
-type Tab = 'description' | 'reviews';
+interface MobileCarouselProps {
+  images: string[];
+  productName: string;
+  selectedIndex: number;
+  onSelect: (i: number) => void;
+  dir: 'rtl' | 'ltr';
+}
+
+function MobileCarousel({ images, productName, selectedIndex, onSelect, dir }: MobileCarouselProps) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ direction: dir, loop: false });
+
+  // Sync external selectedIndex → embla
+  useEffect(() => {
+    if (emblaApi) emblaApi.scrollTo(selectedIndex, false);
+  }, [emblaApi, selectedIndex]);
+
+  // Sync embla scroll → parent
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSettle = () => onSelect(emblaApi.selectedScrollSnap());
+    emblaApi.on('settle', onSettle);
+    return () => { emblaApi.off('settle', onSettle); };
+  }, [emblaApi, onSelect]);
+
+  return (
+    <div className="overflow-hidden" ref={emblaRef}>
+      <div className="flex">
+        {images.map((img, i) => (
+          <div key={i} className="flex-none w-full" style={{ aspectRatio: '3 / 4' }}>
+            <LazyImage
+              src={getImageUrl(img)}
+              alt={`${productName} ${i + 1}`}
+              className="w-full h-full"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Product page ─────────────────────────────────────────────────────────────
 
 export default function ProductPage() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { t, lang, dir } = useLanguage();
+  const { id }      = useParams<{ id: string }>();
+  const navigate    = useNavigate();
+  const { lang, dir } = useLanguage();
   const { addItem } = useCart();
+  const prefersReduced = useReducedMotion();
 
-  // ── Product data ──────────────────────────────────────────────────────────
+  // ── Data ──────────────────────────────────────────────────────────────────
   const { data: product, isLoading, isError } = useProduct(id ?? '');
-  const { data: reviews } = useReviews(id ?? '');
-  const { data: relatedProducts } = useProducts({
+  const { data: reviews }        = useReviews(id ?? '');
+  const { data: relatedRaw }     = useProducts({
     category: product?.category,
     limit: 5,
   });
 
   // ── UI state ──────────────────────────────────────────────────────────────
   const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<Tab>('description');
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [selectedSize,  setSelectedSize]  = useState('');
+  const [quantity,      setQuantity]      = useState(1);
+  const [activeImage,   setActiveImage]   = useState(0);
+  const [addingToCart,  setAddingToCart]  = useState(false);
 
-  // ── Embla carousel for thumbnails ─────────────────────────────────────────
-  const [thumbRef, thumbApi] = useEmblaCarousel({
+  // Thumbnail embla (desktop)
+  const [thumbRef] = useEmblaCarousel({
     axis: 'x',
     dragFree: true,
     containScroll: 'keepSnaps',
     direction: dir,
   });
 
-  // ── Initialize selections when product loads ──────────────────────────────
+  // ── Derived values ────────────────────────────────────────────────────────
+  const images        = product?.images ?? [];
+  const productName   = product ? (lang === 'ar' ? product.name_ar : product.name) : '';
+  const productDesc   = product ? (lang === 'ar' ? product.description_ar : product.description) : '';
+  const isOutOfStock  = product ? product.stock === 0 : false;
+  const isLowStock    = product ? product.stock > 0 && product.stock <= 5 : false;
+  const hasDiscount   = product?.original_price != null && product.original_price > product.price;
+  const discountPct   = hasDiscount && product
+    ? Math.round(((product.original_price! - product.price) / product.original_price!) * 100)
+    : 0;
+
+  const approvedReviews = reviews ?? [];
+  const reviewCount     = approvedReviews.length > 0
+    ? approvedReviews.length
+    : product?.review_count ?? 0;
+  const avgRating = approvedReviews.length > 0
+    ? approvedReviews.reduce((s, r) => s + r.rating, 0) / approvedReviews.length
+    : product?.rating ?? 0;
+
+  const related = relatedRaw?.filter((p) => p.id !== id).slice(0, 4) ?? [];
+
+  const hasColors = (product?.colors.length ?? 0) > 0;
+  const hasSizes  = (product?.sizes.length ?? 0) > 0;
+
+  const canAddToCart =
+    !!product &&
+    !isOutOfStock &&
+    !(hasColors && !selectedColor) &&
+    !(hasSizes  && !selectedSize);
+
+  // ── Effects ───────────────────────────────────────────────────────────────
   useEffect(() => {
     if (product) {
       setSelectedColor(product.colors[0] ?? '');
-      setSelectedSize(product.sizes[0] ?? '');
+      setSelectedSize(product.sizes[0]  ?? '');
       setQuantity(1);
-      setActiveImageIndex(0);
+      setActiveImage(0);
     }
-  }, [product]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
-  // ── SEO title ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (product) {
-      const name = lang === 'ar' ? product.name_ar : product.name;
-      document.title = `${name} – Cuir`;
+      document.title = `${productName} — Cuir`;
     }
   }, [product, lang]);
 
-  // ── Image navigation ──────────────────────────────────────────────────────
-  const images = product?.images ?? [];
-  const currentImage = images[activeImageIndex] ?? '';
-
-  const goPrev = () =>
-    setActiveImageIndex((i) => (i === 0 ? images.length - 1 : i - 1));
-  const goNext = () =>
-    setActiveImageIndex((i) => (i === images.length - 1 ? 0 : i + 1));
-
-  // ── Zoom effect ───────────────────────────────────────────────────────────
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPos({ x, y });
-  };
-
-  // ── Cart actions ──────────────────────────────────────────────────────────
-  const canAddToCart = (): boolean => {
-    if (!product || product.stock === 0) return false;
-    if (product.colors.length > 0 && !selectedColor) return false;
-    if (product.sizes.length > 0 && !selectedSize) return false;
-    return true;
-  };
-
-  const handleAddToCart = () => {
-    if (!product) return;
-    if (!canAddToCart()) {
-      toast.error(t('selectColorSize'));
-      return;
+  // ── Handlers ─────────────────────────────────────────────────────────────
+  const handleAddToCart = useCallback(async () => {
+    if (!product || !canAddToCart) return;
+    setAddingToCart(true);
+    try {
+      addItem(product, quantity, selectedColor, selectedSize);
+      toast.success(
+        lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Ajouté au panier',
+        { description: productName, position: 'bottom-center', duration: 2500 }
+      );
+    } finally {
+      setAddingToCart(false);
     }
-    addItem(product, quantity, selectedColor, selectedSize);
-    toast.success(t('addedToCart'));
-  };
+  }, [product, canAddToCart, addItem, quantity, selectedColor, selectedSize, lang, productName]);
 
-  const handleBuyNow = () => {
+  const handleWhatsApp = useCallback(() => {
     if (!product) return;
-    if (!canAddToCart()) {
-      toast.error(t('selectColorSize'));
-      return;
-    }
-    addItem(product, quantity, selectedColor, selectedSize);
-    navigate('/cart');
-  };
-
-  // ── WhatsApp share ────────────────────────────────────────────────────────
-  const handleWhatsAppShare = () => {
-    if (!product) return;
-    const name = lang === 'ar' ? product.name_ar : product.name;
-    const url = window.location.href;
-    const message = encodeURIComponent(
+    const msg = encodeURIComponent(
       lang === 'ar'
-        ? `شاهد هذا المنتج الرائع: ${name}\n${url}`
-        : `Découvrez ce produit: ${name}\n${url}`
+        ? `شاهد هذا المنتج الرائع: ${productName}\n${window.location.href}`
+        : `Découvrez ce produit: ${productName}\n${window.location.href}`
     );
-    window.open(`https://wa.me/?text=${message}`, '_blank');
-  };
+    window.open(`https://wa.me/?text=${msg}`, '_blank', 'noopener');
+  }, [product, productName, lang]);
 
-  // ── Related products (exclude self) ──────────────────────────────────────
-  const related = relatedProducts?.filter((p) => p.id !== id).slice(0, 4) ?? [];
-
-  // ── Derived product values ────────────────────────────────────────────────
-  const productName = product ? (lang === 'ar' ? product.name_ar : product.name) : '';
-  const productDesc = product ? (lang === 'ar' ? product.description_ar : product.description) : '';
-  const isOutOfStock = product ? product.stock === 0 : false;
-  const isLowStock = product ? product.stock > 0 && product.stock <= 5 : false;
-  const hasDiscount =
-    product?.original_price != null && product.original_price > product.price;
-  const discountPct = hasDiscount && product
-    ? Math.round(((product.original_price! - product.price) / product.original_price!) * 100)
-    : 0;
-  const approvedReviews = reviews ?? [];
-  const avgRating =
-    approvedReviews.length > 0
-      ? approvedReviews.reduce((s, r) => s + r.rating, 0) / approvedReviews.length
-      : product?.rating ?? 0;
+  const goImagePrev = () => setActiveImage((i) => (i === 0 ? images.length - 1 : i - 1));
+  const goImageNext = () => setActiveImage((i) => (i === images.length - 1 ? 0 : i + 1));
 
   // ── Error / not found ─────────────────────────────────────────────────────
   if (isError) {
     return (
-      <div className="min-h-screen bg-beige-50 flex items-center justify-center px-4" dir={dir}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-sm"
-        >
-          <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold text-leather-800 mb-2">
-            {lang === 'ar' ? 'المنتج غير موجود' : 'Produit introuvable'}
-          </h1>
-          <p className="text-leather-500 mb-6 text-sm">
-            {lang === 'ar'
-              ? 'عذراً، لا يمكن العثور على هذا المنتج'
-              : 'Désolé, ce produit est introuvable'}
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-leather-500 text-white rounded-full font-semibold text-sm hover:bg-leather-600 transition-colors"
-          >
-            <ArrowLeft className={classNames('w-4 h-4', dir === 'rtl' ? 'rotate-180' : '')} />
-            {lang === 'ar' ? 'العودة' : 'Retour'}
-          </button>
-        </motion.div>
+      <div className="min-h-screen bg-cream-100 flex items-center justify-center px-4" dir={dir}>
+        <div className="text-center max-w-sm space-y-6">
+          <div className="w-12 h-12 border border-camel/30 flex items-center justify-center mx-auto" aria-hidden="true">
+            <span className="text-camel font-display font-light text-lg">—</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className={classNames(
+              'font-light text-2xl text-ink',
+              lang === 'ar' ? 'font-arabic' : 'font-display'
+            )}>
+              {lang === 'ar' ? 'المنتج غير موجود' : 'Produit introuvable'}
+            </h1>
+            <p className="text-xs tracking-luxury uppercase text-ink/35 font-body">
+              {lang === 'ar'
+                ? 'عذراً، لا يمكن العثور على هذا المنتج'
+                : 'Ce produit est introuvable'}
+            </p>
+          </div>
+          <Link to="/shop" className="btn-ghost inline-flex">
+            {lang === 'ar' ? 'العودة للمتجر' : 'Retour à la boutique'}
+          </Link>
+        </div>
       </div>
     );
   }
 
   // ── Loading ───────────────────────────────────────────────────────────────
   if (isLoading || !product) {
-    return (
-      <div className="min-h-screen bg-beige-50" dir={dir}>
-        <ProductSkeleton />
-      </div>
-    );
+    return <ProductSkeleton dir={dir} />;
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-beige-50" dir={dir}>
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* ── Breadcrumb ── */}
-        <motion.nav
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-          className="flex items-center gap-2 text-sm text-leather-400 mb-6 flex-wrap"
+    <div className="min-h-screen bg-cream-100" dir={dir}>
+
+      {/* ══════════════════════════════════════════════
+          PART 1 — Product Hero
+      ══════════════════════════════════════════════ */}
+      <section className="container-luxury py-10 md:py-16">
+
+        {/* Breadcrumb */}
+        <nav
+          className="flex items-center gap-2 mb-8 md:mb-12 text-[11px] tracking-luxury uppercase font-body text-ink/30"
           aria-label="breadcrumb"
         >
-          <Link to="/" className="hover:text-leather-600 transition-colors">
-            {t('home')}
+          <Link to="/" className="hover:text-camel transition-colors duration-300">
+            {lang === 'ar' ? 'الرئيسية' : 'Accueil'}
           </Link>
-          <ChevronRight className={classNames('w-3.5 h-3.5 flex-shrink-0', dir === 'rtl' ? 'rotate-180' : '')} />
-          <Link to="/shop" className="hover:text-leather-600 transition-colors">
-            {t('shop')}
+          <span aria-hidden="true">/</span>
+          <Link to="/shop" className="hover:text-camel transition-colors duration-300">
+            {lang === 'ar' ? 'المتجر' : 'Boutique'}
           </Link>
-          <ChevronRight className={classNames('w-3.5 h-3.5 flex-shrink-0', dir === 'rtl' ? 'rotate-180' : '')} />
-          <span className="text-leather-700 font-medium line-clamp-1">{productName}</span>
-        </motion.nav>
+          <span aria-hidden="true">/</span>
+          <span className="text-ink/60 line-clamp-1">{productName}</span>
+        </nav>
 
-        {/* ── Main Layout ── */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={stagger}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"
-        >
-          {/* ── LEFT: Image Gallery ── */}
-          <motion.div variants={slideUp} className="space-y-3">
-            {/* Main image */}
-            <div
-              className={classNames(
-                'relative rounded-2xl overflow-hidden bg-white shadow-sm cursor-zoom-in select-none',
-              )}
-              style={{ aspectRatio: '1/1' }}
-              onMouseEnter={() => setIsZoomed(true)}
-              onMouseLeave={() => setIsZoomed(false)}
-              onMouseMove={handleMouseMove}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeImageIndex}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="w-full h-full"
-                >
-                  {isZoomed ? (
-                    <div
-                      className="w-full h-full"
-                      style={{
-                        backgroundImage: `url(${getImageUrl(currentImage)})`,
-                        backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
-                        backgroundSize: '200%',
-                        backgroundRepeat: 'no-repeat',
-                      }}
-                    />
-                  ) : (
-                    <LazyImage
-                      src={getImageUrl(currentImage)}
-                      alt={productName}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
+        {/* Hero grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-8 lg:gap-16">
 
-              {/* Discount badge on image */}
-              {hasDiscount && (
-                <div className="absolute top-3 start-3 z-10">
-                  <Badge variant="red">-{discountPct}%</Badge>
-                </div>
-              )}
-
-              {/* Arrows */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={goPrev}
-                    className="absolute start-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors z-10"
-                    aria-label="Previous image"
+          {/* ── LEFT: Image gallery ── */}
+          <div>
+            {/* Mobile carousel */}
+            <div className="block md:hidden">
+              <div className="relative" style={{ aspectRatio: '3 / 4' }}>
+                <MobileCarousel
+                  images={images}
+                  productName={productName}
+                  selectedIndex={activeImage}
+                  onSelect={setActiveImage}
+                  dir={dir}
+                />
+                {/* Dot indicators */}
+                {images.length > 1 && (
+                  <div
+                    className="absolute bottom-3 inset-x-0 flex justify-center gap-1.5"
+                    aria-hidden="true"
                   >
-                    <ChevronLeft className={classNames('w-5 h-5 text-leather-700', dir === 'rtl' ? 'rotate-180' : '')} />
-                  </button>
-                  <button
-                    onClick={goNext}
-                    className="absolute end-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors z-10"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight className={classNames('w-5 h-5 text-leather-700', dir === 'rtl' ? 'rotate-180' : '')} />
-                  </button>
-                </>
-              )}
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImage(i)}
+                        className={classNames(
+                          'w-1 h-1 rounded-full transition-all duration-300',
+                          i === activeImage ? 'bg-cream-100 w-4' : 'bg-cream-100/40'
+                        )}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Thumbnails carousel */}
-            {images.length > 1 && (
-              <div ref={thumbRef} className="overflow-hidden">
-                <div className="flex gap-2">
-                  {images.map((img, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImageIndex(i)}
-                      className={classNames(
-                        'flex-none w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-150',
-                        i === activeImageIndex
-                          ? 'border-leather-500 shadow-md scale-105'
-                          : 'border-transparent opacity-60 hover:opacity-90'
-                      )}
-                      aria-label={`Image ${i + 1}`}
-                    >
-                      <LazyImage
-                        src={getImageUrl(img)}
-                        alt={`${productName} ${i + 1}`}
-                        className="w-full h-full"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </motion.div>
+            {/* Desktop: main image + thumbnail strip */}
+            <div className="hidden md:block space-y-3">
 
-          {/* ── RIGHT: Product Details ── */}
-          <motion.div variants={slideUp} className="flex flex-col gap-4">
-            {/* Category badge */}
-            {product.category && (
-              <div>
-                <Link to={`/shop?category=${product.category}`}>
-                  <Badge variant="leather">{product.category}</Badge>
-                </Link>
+              {/* Main image */}
+              <div
+                className="relative overflow-hidden bg-cream-200 select-none"
+                style={{ aspectRatio: '3 / 4' }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeImage}
+                    className="w-full h-full"
+                    initial={prefersReduced ? false : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={prefersReduced ? undefined : { opacity: 0 }}
+                    transition={{ duration: 0.3, ease: EASE_LUXURY }}
+                  >
+                    <LazyImage
+                      src={getImageUrl(images[activeImage] ?? '')}
+                      alt={productName}
+                      className="w-full h-full"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Discount badge */}
+                {hasDiscount && (
+                  <div
+                    className={classNames(
+                      'absolute top-4 z-10',
+                      dir === 'rtl' ? 'right-4' : 'left-4'
+                    )}
+                  >
+                    <span className="inline-block px-2 py-0.5 text-[10px] tracking-luxury uppercase font-body bg-camel-100 text-camel">
+                      -{discountPct}%
+                    </span>
+                  </div>
+                )}
+
+                {/* Prev / Next arrows */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={goImagePrev}
+                      aria-label={lang === 'ar' ? 'الصورة السابقة' : 'Image précédente'}
+                      className={classNames(
+                        'absolute top-1/2 -translate-y-1/2 z-10',
+                        'w-9 h-9 flex items-center justify-center',
+                        'bg-cream-100/80 text-ink hover:bg-cream-100 transition-colors duration-300',
+                        dir === 'rtl' ? 'right-3' : 'left-3'
+                      )}
+                    >
+                      <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                    <button
+                      onClick={goImageNext}
+                      aria-label={lang === 'ar' ? 'الصورة التالية' : 'Image suivante'}
+                      className={classNames(
+                        'absolute top-1/2 -translate-y-1/2 z-10',
+                        'w-9 h-9 flex items-center justify-center',
+                        'bg-cream-100/80 text-ink hover:bg-cream-100 transition-colors duration-300',
+                        dir === 'rtl' ? 'left-3' : 'right-3'
+                      )}
+                    >
+                      <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                  </>
+                )}
               </div>
+
+              {/* Thumbnails */}
+              {images.length > 1 && (
+                <div ref={thumbRef} className="overflow-hidden">
+                  <div className="flex gap-2">
+                    {images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImage(i)}
+                        aria-label={`${lang === 'ar' ? 'صورة' : 'Image'} ${i + 1}`}
+                        aria-pressed={i === activeImage}
+                        className={classNames(
+                          'flex-none w-20 h-20 overflow-hidden bg-cream-200',
+                          'transition-all duration-300 border-2',
+                          i === activeImage
+                            ? 'border-camel'
+                            : 'border-transparent opacity-55 hover:opacity-80'
+                        )}
+                      >
+                        <LazyImage
+                          src={getImageUrl(img)}
+                          alt={`${productName} ${i + 1}`}
+                          className="w-full h-full"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── RIGHT: Product info (sticky desktop) ── */}
+          <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
+
+            {/* Category label */}
+            {product.category && (
+              <Link
+                to={`/shop?category=${product.category}`}
+                className="section-label hover:text-camel/80 transition-colors"
+              >
+                {product.category}
+              </Link>
             )}
 
             {/* Product name */}
             <h1
               className={classNames(
-                'text-2xl md:text-3xl font-bold text-leather-900 leading-tight',
+                'font-light text-3xl md:text-4xl leading-snug text-ink',
                 lang === 'ar' ? 'font-arabic' : 'font-display'
               )}
             >
               {productName}
             </h1>
 
-            {/* Rating + review count */}
-            <div className="flex items-center gap-2">
-              <StarRating rating={avgRating} size="md" />
-              <span className="text-sm text-leather-500">
-                ({approvedReviews.length > 0 ? approvedReviews.length : product.review_count ?? 0}{' '}
-                {t('reviews')})
-              </span>
-            </div>
+            {/* Rating row */}
+            {avgRating > 0 && (
+              <div className="flex items-center gap-2.5">
+                <StarRating rating={avgRating} size="sm" />
+                <span className="text-[11px] tracking-luxury uppercase font-body text-ink/40 tabular-nums">
+                  {avgRating.toFixed(1)}{' '}
+                  ({reviewCount}{' '}
+                  {lang === 'ar' ? 'تقييم' : reviewCount === 1 ? 'avis' : 'avis'})
+                </span>
+              </div>
+            )}
 
-            {/* Price */}
+            {/* Price block */}
             <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-3xl font-bold text-leather-600">
+              <span className="text-2xl font-body text-ink tabular-nums">
                 {formatPrice(product.price, lang)}
               </span>
               {hasDiscount && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">
+                  <span className="text-sm text-ink/35 font-body line-through tabular-nums">
                     {formatPrice(product.original_price!, lang)}
                   </span>
-                  <span className="text-sm font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] tracking-luxury uppercase font-body bg-camel-100 text-camel px-2 py-0.5">
                     -{discountPct}%
                   </span>
                 </>
@@ -527,61 +705,70 @@ export default function ProductPage() {
             </div>
 
             {/* Stock status */}
-            <div className="flex items-center gap-2 text-sm">
+            <p className="text-[11px] tracking-luxury uppercase font-body">
               {isOutOfStock ? (
-                <span className="font-semibold text-red-500">{t('outOfStock')}</span>
+                <span className="text-red-400">
+                  {lang === 'ar' ? 'نفذ من المخزون | Épuisé' : 'Épuisé | نفذ'}
+                </span>
               ) : isLowStock ? (
-                <span className="font-semibold text-amber-600">
-                  {product.stock} {t('stockLeft')}
+                <span className="text-amber-500">
+                  {lang === 'ar'
+                    ? `آخر ${product.stock} قطع | Dernières ${product.stock} pièces`
+                    : `Dernières ${product.stock} pièces | آخر ${product.stock} قطع`}
                 </span>
               ) : (
-                <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                  {t('inStock')}
+                <span className="text-emerald-600">
+                  {lang === 'ar' ? 'متوفر | En stock' : 'En stock | متوفر'}
                 </span>
               )}
-            </div>
+            </p>
+
+            {/* Divider */}
+            <div className="h-px bg-cream-300" aria-hidden="true" />
 
             {/* Color selector */}
-            {product.colors.length > 0 && (
-              <div>
-                <p className="text-sm font-semibold text-leather-700 mb-2">
-                  {t('selectColor')}
+            {hasColors && (
+              <div className="space-y-2.5">
+                <p className="label-luxury">
+                  {lang === 'ar' ? 'اللون' : 'Couleur'}{' '}
                   {selectedColor && (
-                    <span className="font-normal text-leather-500 ms-2">{selectedColor}</span>
+                    <span className="text-ink/60 normal-case tracking-normal">
+                      — {selectedColor}
+                    </span>
                   )}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.colors.map((color) => {
                     const isSelected = selectedColor === color;
-                    // Try to interpret color as a CSS color (hex/name), fall back to text button
-                    const isHexOrNamed = /^#[0-9a-f]{3,8}$/i.test(color) || /^[a-z]+$/i.test(color);
-                    return isHexOrNamed ? (
+                    const isColor    = isCssColor(color);
+
+                    return isColor ? (
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
                         title={color}
-                        className={classNames(
-                          'w-8 h-8 rounded-full border-2 transition-all duration-150 flex-shrink-0',
-                          isSelected
-                            ? 'border-leather-600 ring-2 ring-leather-400 ring-offset-1 scale-110'
-                            : 'border-gray-200 hover:border-leather-400'
-                        )}
-                        style={{ backgroundColor: color }}
                         aria-label={color}
                         aria-pressed={isSelected}
+                        className={classNames(
+                          'w-8 h-8 rounded-full flex-shrink-0 transition-all duration-300',
+                          isSelected
+                            ? 'ring-2 ring-camel ring-offset-2 ring-offset-cream-100'
+                            : 'ring-1 ring-cream-400 hover:ring-camel/50'
+                        )}
+                        style={{ backgroundColor: color }}
                       />
                     ) : (
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
-                        className={classNames(
-                          'px-3 py-1.5 rounded-lg border text-sm transition-all duration-150',
-                          isSelected
-                            ? 'bg-leather-500 text-white border-leather-500 font-semibold'
-                            : 'bg-white text-leather-700 border-leather-200 hover:border-leather-400'
-                        )}
                         aria-pressed={isSelected}
+                        className={classNames(
+                          'px-3 py-1.5 text-xs tracking-luxury uppercase font-body',
+                          'border transition-colors duration-300',
+                          isSelected
+                            ? 'bg-ink text-cream-100 border-ink'
+                            : 'border-cream-400 text-ink/60 hover:border-ink/60 hover:text-ink'
+                        )}
                       >
                         {color}
                       </button>
@@ -592,9 +779,11 @@ export default function ProductPage() {
             )}
 
             {/* Size selector */}
-            {product.sizes.length > 0 && (
-              <div>
-                <p className="text-sm font-semibold text-leather-700 mb-2">{t('selectSize')}</p>
+            {hasSizes && (
+              <div className="space-y-2.5">
+                <p className="label-luxury">
+                  {lang === 'ar' ? 'المقاس / Taille' : 'Taille / المقاس'}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((size) => {
                     const isSelected = selectedSize === size;
@@ -602,13 +791,14 @@ export default function ProductPage() {
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={classNames(
-                          'px-4 py-1.5 rounded-lg border text-sm font-medium transition-all duration-150 min-w-[3rem] text-center',
-                          isSelected
-                            ? 'bg-leather-500 text-white border-leather-500 shadow-sm'
-                            : 'bg-white text-leather-700 border-leather-200 hover:border-leather-400'
-                        )}
                         aria-pressed={isSelected}
+                        className={classNames(
+                          'px-3.5 py-1.5 text-xs tracking-luxury uppercase font-body',
+                          'border transition-colors duration-300',
+                          isSelected
+                            ? 'bg-ink text-cream-100 border-ink'
+                            : 'border-cream-400 text-ink/60 hover:border-ink/60 hover:text-ink'
+                        )}
                       >
                         {size}
                       </button>
@@ -618,215 +808,244 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Quantity selector */}
-            <div>
-              <p className="text-sm font-semibold text-leather-700 mb-2">{t('quantity')}</p>
-              <div className="inline-flex items-center gap-1 bg-white border border-leather-200 rounded-xl px-1 py-1">
+            {/* Quantity stepper */}
+            <div className="space-y-2.5">
+              <p className="label-luxury">
+                {lang === 'ar' ? 'الكمية' : 'Quantité'}
+              </p>
+              <div className="flex items-center gap-0">
                 <button
+                  type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-leather-100 transition-colors text-leather-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Decrease quantity"
+                  aria-label={lang === 'ar' ? 'تقليل الكمية' : 'Diminuer la quantité'}
+                  className="w-10 h-10 flex items-center justify-center border-b border-cream-400 text-ink/40 hover:text-ink transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-3.5 h-3.5" strokeWidth={1.5} />
                 </button>
-                <span className="w-10 text-center font-bold text-leather-800">{quantity}</span>
-                <button
-                  onClick={() =>
-                    setQuantity((q) => Math.min(product.stock, q + 1))
-                  }
-                  disabled={quantity >= product.stock || isOutOfStock}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-leather-100 transition-colors text-leather-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Increase quantity"
+                <span
+                  className="w-12 text-center text-sm font-body text-ink tabular-nums border-b border-cream-400 h-10 flex items-center justify-center"
+                  aria-live="polite"
+                  aria-label={`${lang === 'ar' ? 'الكمية' : 'Quantité'}: ${quantity}`}
                 >
-                  <Plus className="w-4 h-4" />
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                  disabled={quantity >= product.stock || isOutOfStock}
+                  aria-label={lang === 'ar' ? 'زيادة الكمية' : 'Augmenter la quantité'}
+                  className="w-10 h-10 flex items-center justify-center border-b border-cream-400 text-ink/40 hover:text-ink transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-3.5 h-3.5" strokeWidth={1.5} />
                 </button>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <motion.button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock}
-                className={classNames(
-                  'flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200',
-                  isOutOfStock
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-leather-500 text-white hover:bg-leather-600 active:scale-98'
-                )}
-                whileTap={isOutOfStock ? {} : { scale: 0.97 }}
-              >
-                <ShoppingBag className="w-4 h-4" />
-                {isOutOfStock ? t('outOfStock') : t('addToCart')}
-              </motion.button>
-
-              {!isOutOfStock && (
-                <motion.button
-                  onClick={handleBuyNow}
-                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-gold-500 text-white hover:bg-gold-600 transition-all duration-200"
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Zap className="w-4 h-4" />
-                  {t('buyNow')}
-                </motion.button>
-              )}
-            </div>
+            {/* Add to cart CTA */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!canAddToCart || addingToCart}
+              className="btn-luxury w-full gap-3"
+              aria-label={
+                isOutOfStock
+                  ? (lang === 'ar' ? 'نفذ من المخزون' : 'Épuisé')
+                  : (lang === 'ar' ? 'أضف إلى السلة' : 'Ajouter au panier')
+              }
+            >
+              <ShoppingBag className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} />
+              {addingToCart
+                ? (lang === 'ar' ? '...' : '...')
+                : isOutOfStock
+                  ? (lang === 'ar' ? 'نفذ من المخزون' : 'Épuisé')
+                  : (lang === 'ar' ? 'أضف إلى السلة' : 'Ajouter au panier')}
+            </button>
 
             {/* WhatsApp share */}
             <button
-              onClick={handleWhatsAppShare}
-              className="flex items-center gap-2 text-sm text-leather-500 hover:text-leather-700 transition-colors self-start"
+              type="button"
+              onClick={handleWhatsApp}
+              className="flex items-center gap-2 text-xs tracking-luxury uppercase font-body text-camel hover:text-camel/70 transition-colors duration-300"
             >
-              <Share2 className="w-4 h-4" />
-              {t('whatsapp')}
+              <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.5} />
+              {lang === 'ar' ? 'شارك على واتساب' : 'Partager sur WhatsApp'}
             </button>
 
-            {/* Short description preview */}
-            {productDesc && (
-              <p className="text-sm text-leather-600 leading-relaxed border-t border-leather-100 pt-4 line-clamp-3">
-                {productDesc}
-              </p>
-            )}
-          </motion.div>
-        </motion.div>
-
-        {/* ── Tabs: Description / Reviews ── */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeIn}
-          className="mt-12"
-        >
-          {/* Tab buttons */}
-          <div className="flex border-b border-leather-200 mb-6">
-            {(['description', 'reviews'] as Tab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={classNames(
-                  'px-6 py-3 text-sm font-semibold transition-all duration-200 border-b-2 -mb-px',
-                  activeTab === tab
-                    ? 'border-leather-500 text-leather-700'
-                    : 'border-transparent text-leather-400 hover:text-leather-600'
-                )}
+            {/* Accordion sections */}
+            <div className="border-t border-cream-300 pt-1">
+              <AccordionItem
+                title={lang === 'ar' ? 'الوصف / Description' : 'Description / الوصف'}
+                defaultOpen
+                lang={lang}
               >
-                {tab === 'description' ? t('description') : `${t('reviews')} (${approvedReviews.length})`}
-              </button>
-            ))}
+                {productDesc
+                  ? <p className="whitespace-pre-line">{productDesc}</p>
+                  : <p className="italic text-ink/30">
+                      {lang === 'ar' ? 'لا يوجد وصف' : 'Aucune description'}
+                    </p>
+                }
+              </AccordionItem>
+
+              <AccordionItem
+                title={lang === 'ar' ? 'التفاصيل / Matériaux' : 'Matériaux / التفاصيل'}
+                lang={lang}
+              >
+                <ul className="space-y-1">
+                  <li>{lang === 'ar' ? 'جلد مغربي أصيل' : 'Cuir marocain authentique'}</li>
+                  <li>{lang === 'ar' ? 'حواف مخيطة يدوياً' : 'Coutures faites à la main'}</li>
+                  <li>{lang === 'ar' ? 'بطانة داخلية قماشية' : 'Doublure intérieure en tissu'}</li>
+                </ul>
+              </AccordionItem>
+
+              <AccordionItem
+                title={lang === 'ar' ? 'الشحن والتوصيل / Livraison' : 'Livraison / الشحن'}
+                lang={lang}
+              >
+                <p>
+                  {lang === 'ar'
+                    ? '2–5 أيام عمل في المغرب / 2–5 jours ouvrés au Maroc'
+                    : '2–5 jours ouvrés au Maroc / 2–5 أيام عمل في المغرب'}
+                </p>
+              </AccordionItem>
+
+              <AccordionItem
+                title={lang === 'ar' ? 'الإرجاع / Retours' : 'Retours / الإرجاع'}
+                lang={lang}
+              >
+                <p>
+                  {lang === 'ar'
+                    ? '7 أيام من تاريخ الاستلام / 7 jours à compter de la réception'
+                    : '7 jours à compter de la réception / 7 أيام من تاريخ الاستلام'}
+                </p>
+              </AccordionItem>
+            </div>
+
+          </div>
+          {/* end right column */}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          PART 2 — Reviews
+      ══════════════════════════════════════════════ */}
+      <section className="bg-cream-200 py-16 md:py-24" aria-label={lang === 'ar' ? 'التقييمات' : 'Avis'}>
+        <div className="container-luxury">
+
+          {/* Section heading */}
+          <div className="mb-12 space-y-2">
+            <p className="section-label">
+              {lang === 'ar' ? '— التقييمات' : '— Avis Clients'}
+            </p>
+            <h2
+              className={classNames(
+                'font-light text-3xl text-ink',
+                lang === 'ar' ? 'font-arabic' : 'font-display'
+              )}
+            >
+              {lang === 'ar' ? 'تقييمات العملاء' : 'Avis Clients'}
+            </h2>
           </div>
 
-          {/* Tab content */}
-          <AnimatePresence mode="wait">
-            {activeTab === 'description' ? (
-              <motion.div
-                key="description"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
-                className={classNames(
-                  'prose prose-sm max-w-none text-leather-700 leading-relaxed',
-                  lang === 'ar' ? 'text-right' : 'text-left'
-                )}
-              >
-                {productDesc ? (
-                  <p className="whitespace-pre-line">{productDesc}</p>
-                ) : (
-                  <p className="text-leather-400 italic">
-                    {lang === 'ar' ? 'لا يوجد وصف متاح' : 'Aucune description disponible'}
+          <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-12 lg:gap-20">
+
+            {/* Rating summary */}
+            {approvedReviews.length > 0 && (
+              <div className="space-y-6">
+                {/* Big number */}
+                <div className="space-y-2">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-6xl font-display font-light text-ink tabular-nums leading-none">
+                      {avgRating.toFixed(1)}
+                    </span>
+                    <span className="text-[11px] tracking-luxury uppercase text-ink/30 font-body">
+                      / 5
+                    </span>
+                  </div>
+                  <StarRating rating={avgRating} size="md" />
+                  <p className="text-[11px] tracking-luxury uppercase text-ink/35 font-body tabular-nums">
+                    {reviewCount} {lang === 'ar' ? 'تقييم' : (reviewCount === 1 ? 'avis' : 'avis')}
                   </p>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="reviews"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
-              >
-                {/* Rating summary */}
-                {approvedReviews.length > 0 && (
-                  <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-leather-100">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-leather-800">{avgRating.toFixed(1)}</div>
-                      <StarRating rating={avgRating} size="sm" />
-                      <div className="text-xs text-leather-400 mt-1">
-                        {approvedReviews.length} {t('reviews')}
-                      </div>
-                    </div>
-                    {/* Rating distribution */}
-                    <div className="flex-1 space-y-1">
-                      {[5, 4, 3, 2, 1].map((star) => {
-                        const count = approvedReviews.filter((r) => Math.round(r.rating) === star).length;
-                        const pct = approvedReviews.length > 0 ? (count / approvedReviews.length) * 100 : 0;
-                        return (
-                          <div key={star} className="flex items-center gap-2 text-xs">
-                            <span className="w-3 text-leather-500 flex-shrink-0">{star}</span>
-                            <Star className="w-3 h-3 text-gold-500 fill-gold-500 flex-shrink-0" />
-                            <div className="flex-1 h-1.5 bg-leather-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gold-500 rounded-full transition-all duration-500"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                            <span className="w-5 text-leather-400">{count}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Reviews list */}
-                {approvedReviews.length === 0 ? (
-                  <p className="text-leather-400 text-sm text-center py-8">{t('noReviews')}</p>
-                ) : (
-                  <div className="space-y-3">
-                    {approvedReviews.map((review) => (
-                      <ReviewCard key={review.id} review={review} />
-                    ))}
-                  </div>
-                )}
-
-                {/* Write review form */}
-                <div className="bg-white rounded-2xl p-5 border border-leather-100">
-                  <h3 className="font-bold text-leather-800 mb-4">{t('writeReview')}</h3>
-                  <ReviewForm productId={product.id} />
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
 
-        {/* ── Related Products ── */}
-        {related.length > 0 && (
-          <motion.section
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            variants={fadeIn}
-            className="mt-16"
-          >
-            <h2 className="text-2xl font-display font-bold text-leather-800 mb-6">
-              {t('relatedProducts')}
-            </h2>
-            <motion.div
-              variants={stagger}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
-            >
-              {related.map((p) => (
-                <motion.div key={p.id} variants={slideUp}>
-                  <ProductCard product={p} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.section>
-        )}
-      </div>
+                {/* Bar chart */}
+                <div className="space-y-2.5">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = approvedReviews.filter((r) => Math.round(r.rating) === star).length;
+                    const pct   = approvedReviews.length > 0 ? (count / approvedReviews.length) * 100 : 0;
+                    return <RatingBar key={star} star={star} pct={pct} count={count} />;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Reviews list + form */}
+            <div>
+              {approvedReviews.length === 0 ? (
+                <p className="text-xs tracking-luxury uppercase text-ink/30 font-body py-4">
+                  {lang === 'ar'
+                    ? 'لا توجد تقييمات بعد — كن الأول'
+                    : 'Aucun avis pour l\'instant — soyez le premier'}
+                </p>
+              ) : (
+                <div className="mb-12">
+                  {approvedReviews.map((review) => (
+                    <ReviewCard key={review.id} review={review} lang={lang} />
+                  ))}
+                </div>
+              )}
+
+              {/* Write a review */}
+              <div className="border-t border-cream-300 pt-8">
+                <p className="section-label mb-6">
+                  {lang === 'ar' ? '— اكتب تقييماً' : '— Laisser un avis'}
+                </p>
+                <ReviewForm productId={product.id} lang={lang} />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          PART 3 — Related products
+      ══════════════════════════════════════════════ */}
+      {(related.length > 0 || isLoading) && (
+        <section className="section-luxury" aria-label={lang === 'ar' ? 'منتجات مشابهة' : 'Suggestions'}>
+          <div className="container-luxury">
+
+            <div className="mb-10 space-y-2">
+              <p className="section-label">
+                {lang === 'ar' ? '— قد يعجبك أيضاً | Suggestions' : '— Suggestions | قد يعجبك'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {isLoading
+                ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+                : related.map((p, i) =>
+                    prefersReduced ? (
+                      <ProductCard key={p.id} product={p} />
+                    ) : (
+                      <motion.div
+                        key={p.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, ease: EASE_LUXURY, delay: i * 0.07 }}
+                      >
+                        <ProductCard product={p} />
+                      </motion.div>
+                    )
+                  )}
+            </div>
+
+          </div>
+        </section>
+      )}
+
     </div>
   );
 }
+
