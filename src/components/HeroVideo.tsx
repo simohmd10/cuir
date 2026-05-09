@@ -30,29 +30,18 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
     ? 'group-hover:-translate-x-1'
     : 'group-hover:translate-x-1';
 
-  /* ── Lazy-load video on desktop, skip on mobile / slow connections / low-end devices ── */
+  /* ── Load video on all devices; skip only on very slow connections ── */
   useEffect(() => {
     if (!videoSrc) return;
 
-    // Mobile: poster + Ken Burns only — never autoplay video
-    const isDesktop = window.matchMedia('(pointer: fine) and (min-width: 768px)').matches;
-    if (!isDesktop) return;
-
-    // Skip video on slow connections or data-saver mode
+    // Only skip on save-data or truly unusable connections (slow-2g / 2g)
     const conn = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
     if (conn?.saveData) return;
-    if (conn?.effectiveType && ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) return;
+    if (conn?.effectiveType && ['slow-2g', '2g'].includes(conn.effectiveType)) return;
 
-    // Skip on low-end CPUs (≤4 cores ≈ budget Android)
-    if (navigator.hardwareConcurrency <= 4) return;
-
-    const load = () => setVideoReady(true);
-    if ('requestIdleCallback' in window) {
-      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void })
-        .requestIdleCallback(load, { timeout: 3000 });
-    } else {
-      setTimeout(load, 2500);
-    }
+    // Small delay so the first paint + poster render before video starts loading
+    const id = setTimeout(() => setVideoReady(true), 300);
+    return () => clearTimeout(id);
   }, [videoSrc]);
 
   /* ── Play video once it's revealed in DOM ── */
