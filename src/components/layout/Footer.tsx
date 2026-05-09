@@ -1,16 +1,17 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '212600000000';
 
 const QUICK_LINKS = [
-  { labelFr: 'Accueil',   labelAr: 'الرئيسية',          path: '/' },
-  { labelFr: 'Boutique',  labelAr: 'المتجر',             path: '/shop' },
-  { labelFr: 'À propos',  labelAr: 'من نحن',             path: '/about' },
-  { labelFr: 'Contact',   labelAr: 'التواصل',            path: '/contact' },
-  { labelFr: 'FAQ',       labelAr: 'الأسئلة الشائعة',   path: '/faq' },
+  { labelFr: 'Accueil',   labelAr: 'الرئيسية',         path: '/' },
+  { labelFr: 'Boutique',  labelAr: 'المتجر',            path: '/shop' },
+  { labelFr: 'À propos',  labelAr: 'من نحن',            path: '/about' },
+  { labelFr: 'Contact',   labelAr: 'التواصل',           path: '/contact' },
+  { labelFr: 'FAQ',       labelAr: 'الأسئلة الشائعة',  path: '/faq' },
 ] as const;
 
 const SERVICE_LINKS = [
@@ -36,7 +37,7 @@ const SERVICE_LINKS = [
   },
 ] as const;
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ─── SectionHeading ───────────────────────────────────────────────────────────
 interface SectionHeadingProps {
   children: React.ReactNode;
   isArabic: boolean;
@@ -46,7 +47,7 @@ function SectionHeading({ children, isArabic }: SectionHeadingProps) {
   return (
     <h3
       className={[
-        'mb-5 text-[10px] tracking-luxury uppercase text-camel/70',
+        'mb-5 text-[10px] tracking-luxury uppercase text-camel/60',
         isArabic
           ? 'font-arabic tracking-normal text-xs text-right'
           : 'font-body',
@@ -57,7 +58,7 @@ function SectionHeading({ children, isArabic }: SectionHeadingProps) {
   );
 }
 
-// ─── Footer ──────────────────────────────────────────────────────────────────
+// ─── Footer ───────────────────────────────────────────────────────────────────
 export default function Footer() {
   const { lang, dir } = useLanguage();
   const isArabic = lang === 'ar';
@@ -65,10 +66,11 @@ export default function Footer() {
   const waMessage = encodeURIComponent(
     isArabic
       ? 'مرحبا، أريد الاستفسار عن منتجاتكم'
-      : 'Bonjour, je voudrais m\'informer sur vos produits'
+      : "Bonjour, je voudrais m'informer sur vos produits"
   );
   const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
 
+  // Shared link style for nav items
   const linkBase = [
     'text-xs text-cream-100/60 hover:text-camel',
     'transition-colors duration-300 ease-luxury',
@@ -79,13 +81,9 @@ export default function Footer() {
     <footer className="bg-ink text-cream-100" dir={dir}>
       {/* ── Main grid ──────────────────────────────────────────────────────── */}
       <div className="max-w-luxury mx-auto px-6 sm:px-10 pt-16 pb-12">
-        <div
-          className={[
-            'grid grid-cols-1 gap-10',
-            'md:grid-cols-3 lg:grid-cols-12',
-          ].join(' ')}
-        >
-          {/* ── Column 1: Brand ─────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 lg:grid-cols-12">
+
+          {/* ── Section 1: Brand ───────────────────────────────────────────── */}
           <div
             className={[
               'col-span-1 lg:col-span-4 flex flex-col',
@@ -103,7 +101,7 @@ export default function Footer() {
             </Link>
 
             {/* Bilingual tagline */}
-            <p className="mb-4 text-[10px] tracking-luxury uppercase text-camel/70 font-body">
+            <p className="mb-5 font-body text-[10px] tracking-luxury uppercase text-camel/70">
               L'Art du Cuir Marocain
               <span className="mx-2 text-camel/30">·</span>
               <span className="font-arabic tracking-normal text-xs">
@@ -111,11 +109,13 @@ export default function Footer() {
               </span>
             </p>
 
-            {/* Description */}
+            {/* Description — localized, 2 lines */}
             <p
               className={[
-                'text-xs text-cream-100/50 leading-relaxed max-w-[26ch] mb-6',
-                isArabic ? 'font-arabic text-sm leading-loose' : 'font-body',
+                'text-xs text-cream-100/50 leading-relaxed max-w-[28ch] mb-6',
+                isArabic
+                  ? 'font-arabic text-sm leading-loose'
+                  : 'font-body',
               ].join(' ')}
             >
               {isArabic
@@ -129,7 +129,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={[
-                'inline-flex items-center gap-2 mb-6 group/wa',
+                'inline-flex items-center gap-2 mb-6',
                 'text-xs text-cream-100/60 hover:text-[#25D366]',
                 'transition-colors duration-300 ease-luxury',
                 isArabic ? 'font-arabic flex-row-reverse' : 'font-body',
@@ -175,11 +175,11 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* ── Column 2: Quick links ───────────────────────────────────── */}
+          {/* ── Section 2: Quick links ──────────────────────────────────────── */}
           <div
             className={[
-              'col-span-1 lg:col-span-3 lg:col-start-6',
-              'flex flex-col items-center text-center md:items-start md:text-start',
+              'col-span-1 lg:col-span-3 lg:col-start-6 flex flex-col',
+              'items-center text-center md:items-start md:text-start',
             ].join(' ')}
           >
             <SectionHeading isArabic={isArabic}>
@@ -189,10 +189,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {QUICK_LINKS.map(({ labelFr, labelAr, path }) => (
                 <li key={path}>
-                  <Link
-                    to={path}
-                    className={linkBase}
-                  >
+                  <Link to={path} className={linkBase}>
                     {isArabic ? labelAr : labelFr}
                   </Link>
                 </li>
@@ -200,11 +197,11 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* ── Column 3: Customer service ──────────────────────────────── */}
+          {/* ── Section 3: Customer service ─────────────────────────────────── */}
           <div
             className={[
-              'col-span-1 lg:col-span-3 lg:col-start-10',
-              'flex flex-col items-center text-center md:items-start md:text-start',
+              'col-span-1 lg:col-span-3 lg:col-start-10 flex flex-col',
+              'items-center text-center md:items-start md:text-start',
             ].join(' ')}
           >
             <SectionHeading isArabic={isArabic}>
@@ -224,17 +221,17 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* ── Divider ──────────────────────────────────────────────────────── */}
+      {/* ── Divider ────────────────────────────────────────────────────────── */}
       <div className="max-w-luxury mx-auto px-6 sm:px-10">
         <div className="border-t border-cream-100/[0.07]" />
       </div>
 
-      {/* ── Bottom bar ───────────────────────────────────────────────────── */}
+      {/* ── Bottom bar ─────────────────────────────────────────────────────── */}
       <div className="max-w-luxury mx-auto px-6 sm:px-10 py-5">
         <div
           className={[
             'flex flex-col gap-2 items-center text-center',
-            'sm:flex-row sm:justify-between sm:text-start',
+            'sm:flex-row sm:justify-between',
           ].join(' ')}
         >
           <span
