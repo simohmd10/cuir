@@ -4,7 +4,6 @@ import { ShoppingBag, Menu } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-
 import NavOverlay from './NavOverlay';
 
 const NAV_LINKS = [
@@ -38,17 +37,6 @@ export default function Header() {
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
-
-  const openMenu = () => setMenuOpen(true);
-  const closeMenu = () => setMenuOpen(false);
-
-  const closeMenu = () => setMenuOpen(false);
-
-  const handleOverlayExited = () => {
-    if (!menuOpen) {
-      setOverlayMounted(false);
-    }
-  };
 
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
@@ -136,7 +124,7 @@ export default function Header() {
             </Link>
 
             <button
-              onClick={openMenu}
+              onClick={() => setMenuOpen(true)}
               aria-expanded={menuOpen}
               aria-controls="nav-overlay"
               className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
@@ -147,11 +135,7 @@ export default function Header() {
         </div>
       </header>
 
-      {overlayMounted && (
-        <Suspense fallback={null}>
-          <NavOverlay isOpen={menuOpen} onClose={closeMenu} onExited={handleOverlayExited} />
-        </Suspense>
-      )}
+      <NavOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </>
   );
 }

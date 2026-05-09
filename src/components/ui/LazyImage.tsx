@@ -54,11 +54,10 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallbac
         </div>
       )}
 
-      {/* Actual image */}
-      {(inView || priority) && !showFallback && (
+      {/* Actual image — native lazy loading, no custom IntersectionObserver needed */}
+      {!showFallback && (
         <img
           src={src}
-          srcSet={srcSet}
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}

@@ -7,79 +7,65 @@ import { useAuth } from '../../context/AuthContext';
 interface NavOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  onExited?: () => void;
 }
 
-const EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
-
-/*
- * Exit is intentionally fast and independent of children.
- * 'when: afterChildren' was removed — it was causing a ~0.85s exit during
- * which the overlay blocked all touch events on mobile.
- */
-const overlayVariants = {
-  hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.35, ease: EASE } },
-  exit:    { opacity: 0, transition: { duration: 0.22, ease: EASE } },
-};
-
-const listVariants = {
-  hidden:  {},                    // defined so initial="hidden" has a target
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } },
-  exit:    { transition: { staggerChildren: 0 } }, // no stagger on close
-};
-
-const itemVariants = {
-  hidden:  { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
-  exit:    { opacity: 0, y: 8,  transition: { duration: 0.15 } },
-};
-
-export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProps) {
+export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
   const { t, lang, setLang, dir } = useLanguage();
   const { isAdmin } = useAuth();
   const location = useLocation();
   const savedScrollY = useRef(0);
 
+  /*
+   * iOS-safe scroll lock.
+   * overflow:hidden alone doesn't prevent scroll on iOS Safari.
+   * position:fixed + negative top keeps the visual position.
+   */
   useEffect(() => {
     if (!isOpen) return;
+
     savedScrollY.current = window.scrollY;
     const { style } = document.body;
     style.overflow = 'hidden';
     style.position = 'fixed';
-    style.inset = '0';
     style.top = `-${savedScrollY.current}px`;
+    style.width = '100%';
 
     return () => {
       style.overflow = '';
       style.position = '';
-      style.inset = '';
       style.top = '';
+      style.width = '';
       window.scrollTo(0, savedScrollY.current);
     };
   }, [isOpen]);
 
+  // Close when the route changes (user tapped a nav link)
   useEffect(() => {
     onClose();
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const links = [
-    { label: t('home'), href: '/' },
-    { label: t('shop'), href: '/shop' },
-    { label: t('about'), href: '/about' },
+    { label: t('home'),    href: '/' },
+    { label: t('shop'),    href: '/shop' },
+    { label: t('about'),   href: '/about' },
     { label: t('contact'), href: '/contact' },
-    { label: t('faq'), href: '/faq' },
+    { label: t('faq'),     href: '/faq' },
   ];
-
-  if (isAdmin) links.push({ label: lang === 'ar' ? 'الإدارة' : 'Admin', href: '/admin/dashboard' });
+  if (isAdmin) {
+    links.push({ label: lang === 'ar' ? 'الإدارة' : 'Admin', href: '/admin/dashboard' });
+  }
 
   return (
+    /*
+     * pointer-events:none when closed so the page is interactive immediately
+     * after close — the 200ms fade-out is purely visual.
+     */
     <div
       id="nav-overlay"
       role="dialog"
-      aria-modal={isOpen ? 'true' : 'false'}
-      aria-hidden={!isOpen}
+      aria-modal="true"
       aria-label={lang === 'ar' ? 'قائمة التنقل' : 'Menu de navigation'}
+      aria-hidden={!isOpen}
       className={[
         'fixed inset-0 z-[999] bg-ink flex flex-col',
         'transition-opacity duration-200 ease-out',
@@ -87,34 +73,16 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
       ].join(' ')}
       dir={dir}
     >
-      <AnimatePresence
-        onExitComplete={() => {
-          if (!isOpen) onExited?.();
-        }}
-      >
-        {isOpen && (
-          <motion.div
-            id="nav-overlay"
-            role="dialog"
-            aria-modal="true"
-            aria-label={lang === 'ar' ? 'قائمة التنقل' : 'Menu de navigation'}
-            className="absolute inset-0 bg-ink flex flex-col"
-            dir={dir}
-            variants={overlayVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            {/* ── Top bar ── */}
-            <div className="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-cream-100/8">
-              <Link to="/" onClick={onClose} className="select-none">
-                <span className="font-display font-light text-2xl text-cream-100 tracking-[0.12em]">
-                  CUIR
-                </span>
-                <span className="block text-[8px] tracking-[0.28em] uppercase text-camel mt-0.5">
-                  MAROC
-                </span>
-              </Link>
+      {/* ── Top bar ── */}
+      <div className="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-cream-100/8">
+        <Link to="/" onClick={onClose} className="select-none">
+          <span className="font-display font-light text-2xl text-cream-100 tracking-[0.12em]">
+            CUIR
+          </span>
+          <span className="block text-[8px] tracking-[0.28em] uppercase text-camel mt-0.5">
+            MAROC
+          </span>
+        </Link>
 
         <button
           onClick={onClose}
@@ -125,14 +93,18 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
         </button>
       </div>
 
+      {/* ── Nav links ── */}
       <nav className="flex-1 flex flex-col justify-center px-6 sm:px-10">
-        <ul className="space-y-1">
+        <ul className="space-y-0">
           {links.map((link) => (
             <li key={link.href}>
               <Link
                 to={link.href}
                 onClick={onClose}
-                className={['nav-item block', location.pathname === link.href ? 'text-camel' : 'text-cream-100'].join(' ')}
+                className={[
+                  'nav-item block',
+                  location.pathname === link.href ? 'text-camel' : 'text-cream-100',
+                ].join(' ')}
               >
                 {link.label}
               </Link>
@@ -141,6 +113,7 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
         </ul>
       </nav>
 
+      {/* ── Bottom bar ── */}
       <div className="px-6 sm:px-10 py-6 border-t border-cream-100/8 flex items-center justify-between">
         <button
           onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
@@ -148,7 +121,9 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
         >
           {lang === 'ar' ? 'Français' : 'العربية'}
         </button>
-        <span className="text-[10px] tracking-[0.2em] text-cream-100/20 select-none">كوير · CUIR · 2026</span>
+        <span className="text-[10px] tracking-[0.2em] text-cream-100/20 select-none">
+          كوير · CUIR · 2026
+        </span>
       </div>
     </div>
   );
