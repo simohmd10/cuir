@@ -1,159 +1,407 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cairo:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════
+   BASE
+═══════════════════════════════════════ */
 @layer base {
   :root {
-    --leather: #8b5e3c;
-    --beige: #f5ebd9;
-    --gold: #c9a84c;
+    --color-ink: #1C1C1C;
+    --color-cream: #FDFCFB;
+    --color-camel: #C4A882;
+    --color-gold: #B8965A;
+    --color-beige: #FAF7F4;
+    --color-border: #E8DFD4;
+    --ease-luxury: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     scroll-behavior: smooth;
+    font-size: 16px;
+    /* Ultra-smooth scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   body {
-    @apply bg-beige-50 text-gray-800 font-body;
+    @apply bg-cream-100 text-ink font-body;
     direction: rtl;
+    line-height: 1.6;
+    /* Prevent text size adjustment on mobile */
+    -webkit-text-size-adjust: 100%;
   }
 
-  body[dir='ltr'] {
-    direction: ltr;
+  body[dir='ltr'] { direction: ltr; }
+
+  /* Headings use display (serif) font */
+  h1, h2, h3, h4 {
+    @apply font-display leading-tight;
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
-  }
-
+  /* Arabic headings use Cairo */
   [dir='rtl'] h1,
   [dir='rtl'] h2,
   [dir='rtl'] h3,
   [dir='rtl'] h4 {
     @apply font-arabic;
+    letter-spacing: 0;
+  }
+
+  img, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Remove tap highlight on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
+/* ═══════════════════════════════════════
+   COMPONENTS
+═══════════════════════════════════════ */
 @layer components {
+
+  /* ── Buttons ── */
+  .btn-luxury {
+    @apply inline-flex items-center justify-center gap-2
+           bg-ink text-cream-100 font-body font-medium
+           text-xs tracking-luxury uppercase
+           px-8 py-4
+           transition-all duration-600 ease-[var(--ease-luxury)]
+           hover:bg-camel-400 hover:text-ink
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-camel
+           disabled:opacity-40 disabled:cursor-not-allowed
+           select-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           bg-transparent text-ink font-body font-medium
+           text-xs tracking-luxury uppercase
+           px-8 py-4 border border-ink
+           transition-all duration-600 ease-[var(--ease-luxury)]
+           hover:bg-ink hover:text-cream-100
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink
+           disabled:opacity-40 disabled:cursor-not-allowed
+           select-none;
+  }
+
+  .btn-camel {
+    @apply inline-flex items-center justify-center gap-2
+           bg-camel text-cream-100 font-body font-medium
+           text-xs tracking-luxury uppercase
+           px-8 py-4
+           transition-all duration-600 ease-[var(--ease-luxury)]
+           hover:bg-camel-400
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-camel
+           disabled:opacity-40 disabled:cursor-not-allowed
+           select-none;
+  }
+
+  /* Legacy aliases for admin panel */
   .btn-primary {
-    @apply bg-leather-500 text-white px-6 py-3 rounded-lg font-medium
-           hover:bg-leather-600 active:bg-leather-700
-           transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-leather-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn-luxury;
   }
 
   .btn-secondary {
-    @apply bg-white text-leather-500 border border-leather-500 px-6 py-3 rounded-lg font-medium
-           hover:bg-leather-50 active:bg-leather-100
-           transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-leather-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn-ghost;
   }
 
   .btn-gold {
-    @apply bg-gold-500 text-white px-6 py-3 rounded-lg font-medium
-           hover:bg-gold-600 active:bg-gold-700
-           transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn-camel;
   }
 
-  .card {
-    @apply bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300;
+  /* ── Inputs ── */
+  .input-luxury {
+    @apply w-full px-4 py-3.5
+           bg-cream-100 border border-cream-400
+           text-ink text-sm font-body
+           placeholder-ink/30
+           transition-all duration-400 ease-[var(--ease-luxury)]
+           focus:outline-none focus:border-camel focus:bg-cream-50
+           rounded-none;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-lg
-           focus:outline-none focus:ring-2 focus:ring-leather-500 focus:border-transparent
-           bg-white text-gray-800 placeholder-gray-400
-           transition-all duration-200;
+    @apply input-luxury rounded-lg;
   }
 
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  /* ── Labels ── */
+  .label-luxury {
+    @apply text-xs tracking-luxury uppercase text-ink/50 font-body;
   }
 
-  .badge-leather {
-    @apply badge bg-leather-100 text-leather-700;
+  /* ── Section headings ── */
+  .heading-display {
+    @apply font-display font-light text-ink;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.05;
   }
 
-  .badge-gold {
-    @apply badge bg-gold-100 text-gold-700;
+  [dir='rtl'] .heading-display {
+    @apply font-arabic font-light;
   }
 
-  .badge-green {
-    @apply badge bg-green-100 text-green-700;
+  .heading-section {
+    @apply font-display font-light text-3xl md:text-4xl lg:text-5xl text-ink;
   }
 
-  .section-title {
-    @apply text-3xl md:text-4xl font-display font-bold text-leather-800 mb-2;
+  [dir='rtl'] .heading-section {
+    @apply font-arabic;
   }
 
-  .section-subtitle {
-    @apply text-gray-500 text-lg mb-8;
+  /* ── Divider ── */
+  .divider-luxury {
+    @apply h-px bg-cream-400 my-section;
+  }
+
+  /* ── Container ── */
+  .container-luxury {
+    @apply max-w-luxury mx-auto px-4 sm:px-6 lg:px-12 xl:px-20;
   }
 
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  /* ── Cards ── */
+  .card {
+    @apply bg-cream-50 border border-cream-300;
   }
 
+  /* ── Skeleton loader ── */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-cream) 25%,
+      #EDE0CF 50%,
+      var(--color-cream) 75%
+    );
+    background-size: 1000px 100%;
+    @apply animate-shimmer;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    @apply inline-flex items-center px-3 py-1
+           text-xs tracking-luxury uppercase font-body;
+  }
+
+  .badge-leather {
+    @apply badge bg-camel-100 text-camel-600;
+  }
+
+  .badge-gold {
+    @apply badge bg-gold/10 text-gold-dark;
+  }
+
+  .badge-green {
+    @apply badge bg-emerald-50 text-emerald-700;
+  }
+
+  /* ── Overlay ── */
+  .overlay-dark {
+    @apply absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent;
+  }
+
+  .overlay-warm {
+    @apply absolute inset-0 bg-gradient-to-t from-ink/80 via-camel-700/20 to-transparent;
+  }
+}
+
+/* ═══════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════ */
+@layer utilities {
+  /* Hide scrollbar */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-}
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  /* Text balance */
+  .text-balance { text-wrap: balance; }
+
+  /* Full viewport height minus header */
+  .h-screen-nav { height: calc(100svh - 4rem); }
+  .min-h-screen-nav { min-height: calc(100svh - 4rem); }
+
+  /* Clip path utilities */
+  .clip-diagonal {
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
   }
 
-  .aspect-product {
-    aspect-ratio: 3/4;
-  }
+  /* Object position */
+  .object-top-center { object-position: center 20%; }
+
+  /* Aspect ratios */
+  .aspect-portrait { aspect-ratio: 3 / 4; }
+  .aspect-cinema { aspect-ratio: 21 / 9; }
+  .aspect-golden { aspect-ratio: 1.618 / 1; }
 }
 
-/* RTL-specific styles */
-[dir='rtl'] .space-x-4 > * + * {
-  margin-right: 1rem;
-  margin-left: 0;
-}
-
-/* Smooth image loading */
-img {
-  transition: opacity 0.3s ease;
-}
-
-img[loading] {
-  opacity: 0;
-}
-
-img.loaded {
-  opacity: 1;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f5ebd9;
-}
-
+/* ═══════════════════════════════════════
+   CUSTOM SCROLLBAR
+═══════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #8b5e3c;
-  border-radius: 3px;
+  background: var(--color-camel);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #7a5234;
+/* ═══════════════════════════════════════
+   VIDEO HERO
+═══════════════════════════════════════ */
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.hero-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ═══════════════════════════════════════
+   PAGE TRANSITIONS
+═══════════════════════════════════════ */
+.page-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms var(--ease-luxury), transform 600ms var(--ease-luxury);
+}
+
+/* ═══════════════════════════════════════
+   FULLSCREEN NAV MENU
+═══════════════════════════════════════ */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-ink);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.nav-item {
+  @apply font-display font-light text-cream-100
+         py-4 border-b border-cream-100/10
+         transition-colors duration-400;
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+[dir='rtl'] .nav-item {
+  @apply font-arabic;
+  font-size: clamp(1.75rem, 6vw, 3.5rem);
+}
+
+.nav-item:hover {
+  color: var(--color-camel);
+}
+
+/* ═══════════════════════════════════════
+   PRODUCT CARD LUXURY
+═══════════════════════════════════════ */
+.product-card {
+  @apply relative bg-cream-100 overflow-hidden;
+  transition: all 0.6s var(--ease-luxury);
+}
+
+.product-card:hover .product-card-image {
+  transform: scale(1.04);
+}
+
+.product-card-image {
+  transition: transform 0.8s var(--ease-luxury);
+  transform-origin: center;
+}
+
+/* ═══════════════════════════════════════
+   LUXURY SECTION STYLES
+═══════════════════════════════════════ */
+.section-luxury {
+  @apply py-20 md:py-28 lg:py-36;
+}
+
+.section-label {
+  @apply text-xs tracking-[0.25em] uppercase text-camel font-body mb-6;
+}
+
+/* ═══════════════════════════════════════
+   REDUCED MOTION
+═══════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════
+   MOBILE PERFORMANCE
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Disable heavy animations on mobile for performance */
+  .motion-safe\:animate-pan-slow {
+    animation: none;
+  }
+
+  /* Use momentum scrolling */
+  .overflow-y-auto,
+  .overflow-y-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ═══════════════════════════════════════
+   LUXURY ACCORDION
+═══════════════════════════════════════ */
+.accordion-content {
+  overflow: hidden;
+  transition: max-height 0.5s var(--ease-luxury), opacity 0.4s var(--ease-luxury);
+}
+
+/* ═══════════════════════════════════════
+   ADMIN PANEL OVERRIDES
+═══════════════════════════════════════ */
+.admin-panel {
+  @apply bg-gray-50 text-gray-800;
 }

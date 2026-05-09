@@ -1,246 +1,462 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingBag,
   Menu,
   X,
-  Globe,
-  User,
-  LogOut,
+  Settings,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
+/* ─────────────────────────────────────────
+   Nav link definitions
+───────────────────────────────────────── */
 const navLinks = [
-  { key: 'home' as const, path: '/' },
-  { key: 'shop' as const, path: '/shop' },
-  { key: 'about' as const, path: '/about' },
+  { key: 'home'    as const, path: '/'        },
+  { key: 'shop'    as const, path: '/shop'    },
+  { key: 'about'   as const, path: '/about'   },
   { key: 'contact' as const, path: '/contact' },
-  { key: 'faq' as const, path: '/faq' },
+  { key: 'faq'     as const, path: '/faq'     },
 ] as const;
 
+/* ─────────────────────────────────────────
+   Shared ease
+───────────────────────────────────────── */
+const EASE = [0.25, 0.46, 0.45, 0.94] as [number, number, number, number];
+
+/* ─────────────────────────────────────────
+   Motion variants — fullscreen overlay
+───────────────────────────────────────── */
+const overlayVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.4,
+      ease: EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.35,
+      ease: EASE,
+      // stagger items out before fading overlay
+      when: 'afterChildren' as const,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.65,
+      delay: 0.12 + i * 0.09,
+      ease: EASE,
+    },
+  }),
+  exit: (i: number) => ({
+    opacity: 0,
+    y: 20,
+    transition: {
+      duration: 0.28,
+      delay: i * 0.04,
+      ease: EASE,
+    },
+  }),
+};
+
+const bottomVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: 0.52,
+      ease: EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.2, ease: EASE },
+  },
+};
+
+/* ─────────────────────────────────────────
+   Component
+───────────────────────────────────────── */
 export default function Header() {
   const { lang, setLang, t, dir } = useLanguage();
   const { totalItems } = useCart();
-  const { isAdmin, user, signOut } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 8);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  /* ── rAF-throttled scroll listener ── */
+  const rafRef = useRef<number | null>(null);
+  const onScroll = useCallback(() => {
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      setScrolled(window.scrollY > 20);
+      rafRef.current = null;
+    });
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
-    setMobileOpen(false);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [onScroll]);
+
+  /* ── Close overlay on route change ── */
+  useEffect(() => {
+    setMenuOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/');
-  };
+  /* ── Lock body scroll while overlay is open ── */
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    await signOut();
+    navigate('/');
+  };
+
+  /* ── Dynamic colour tokens (transparent vs scrolled) ── */
+  const textBase    = scrolled ? 'text-ink'       : 'text-cream-50';
+  const textMuted   = scrolled ? 'text-ink/60'    : 'text-cream-50/70';
+  const textHover   = scrolled ? 'hover:text-ink' : 'hover:text-cream-50';
+  const logoSubClr  = scrolled ? 'text-camel'     : 'text-camel-200';
+
+  /* The label shown on the language toggle button is always the OTHER language */
+  const langLabel = lang === 'ar' ? 'Français' : 'العربية';
+
   return (
     <>
+      {/* ════════════════════════════════════
+          FIXED HEADER BAR
+      ════════════════════════════════════ */}
       <header
         className={[
-          'fixed top-0 inset-x-0 z-50 bg-white transition-shadow duration-300',
-          scrolled ? 'shadow-md' : 'shadow-sm',
+          'fixed top-0 left-0 right-0 z-50 h-16',
+          'transition-all duration-[600ms] ease-[var(--ease-luxury)]',
+          scrolled
+            ? [
+                'bg-cream-100/95 backdrop-blur-md',
+                'border-b border-cream-400',
+                'shadow-[0_1px_24px_rgba(28,28,28,0.06)]',
+              ].join(' ')
+            : 'bg-transparent border-b border-transparent',
         ].join(' ')}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+        <div
+          className="h-full container-luxury flex items-center justify-between gap-4"
+          dir={dir}
+        >
 
-          {/* Hamburger — mobile */}
-          <button
-            className="lg:hidden p-2 -ms-2 rounded-lg text-leather-600 hover:bg-leather-50 transition-colors"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label={mobileOpen ? t('contact') : t('home')}
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-
-          {/* Logo */}
+          {/* ── Logo ── */}
           <Link
             to="/"
-            className="flex items-center gap-2 flex-shrink-0"
-            aria-label="Cuir — Accueil"
+            className="flex-shrink-0 flex flex-col items-start leading-none"
+            aria-label="CUIR — accueil"
           >
-            <span className="font-display text-2xl font-bold text-leather-500 tracking-tight leading-none">
-              Cuir
+            <span
+              className={[
+                'font-display font-light tracking-[0.15em] text-xl md:text-2xl leading-none',
+                'transition-colors duration-[600ms] ease-[var(--ease-luxury)]',
+                textBase,
+              ].join(' ')}
+            >
+              CUIR
             </span>
-            <span className="hidden sm:block w-px h-5 bg-leather-200" />
-            <span className="hidden sm:block font-arabic text-xs text-leather-400 leading-none">
-              كوير
+            <span
+              className={[
+                'font-body text-[9px] tracking-[0.30em] uppercase leading-none mt-[3px]',
+                'transition-colors duration-[600ms] ease-[var(--ease-luxury)]',
+                logoSubClr,
+              ].join(' ')}
+            >
+              MAROC
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center" dir={dir}>
-            {navLinks.map(({ key, path }) => (
-              <Link
-                key={key}
-                to={path}
-                className={[
-                  'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150',
-                  lang === 'ar' ? 'font-arabic' : 'font-display',
-                  isActive(path)
-                    ? 'text-leather-600 bg-leather-50'
-                    : 'text-gray-600 hover:text-leather-600 hover:bg-leather-50',
-                ].join(' ')}
-              >
-                {t(key)}
-              </Link>
-            ))}
-            {isAdmin && (
-              <Link
-                to="/admin/dashboard"
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gold-600 hover:bg-amber-50 transition-colors duration-150"
-              >
-                {t('admin')}
-              </Link>
-            )}
+          {/* ── Desktop centred nav ── */}
+          <nav
+            className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2"
+            aria-label={lang === 'ar' ? 'التنقل الرئيسي' : 'Navigation principale'}
+          >
+            {navLinks.map(({ key, path }) => {
+              const active = isActive(path);
+              return (
+                <Link
+                  key={key}
+                  to={path}
+                  className={[
+                    'relative text-[11px] tracking-[0.15em] uppercase font-body font-light',
+                    'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                    active
+                      ? 'text-camel'
+                      : scrolled
+                        ? 'text-ink/65 hover:text-ink'
+                        : 'text-cream-50/72 hover:text-cream-50',
+                  ].join(' ')}
+                >
+                  {t(key)}
+                  {/* Active underline pill */}
+                  {active && (
+                    <span className="absolute -bottom-0.5 left-0 right-0 h-px bg-camel" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-1 ms-auto">
+          {/* ── Right-side actions ── */}
+          <div className="flex items-center gap-3 md:gap-4 ms-auto lg:ms-0">
+
             {/* Language toggle */}
             <button
               onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-leather-600 hover:bg-leather-50 transition-colors duration-150"
-              aria-label="Toggle language"
+              className={[
+                'hidden sm:block font-body font-light text-[11px] tracking-[0.12em] uppercase',
+                'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                textMuted, textHover,
+              ].join(' ')}
+              aria-label={lang === 'ar' ? 'Changer en français' : 'التبديل إلى العربية'}
             >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:block text-xs">{t('language')}</span>
+              {langLabel}
             </button>
 
-            {/* User / logout */}
-            {user && (
-              <button
-                onClick={handleLogout}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-leather-600 hover:bg-leather-50 transition-colors duration-150"
-                aria-label={t('logout')}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            )}
-            {!user && (
+            {/* Admin settings shortcut */}
+            {isAdmin && (
               <Link
-                to="/admin/login"
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-leather-600 hover:bg-leather-50 transition-colors duration-150"
-                aria-label={t('login')}
+                to="/admin/dashboard"
+                className={[
+                  'hidden sm:flex items-center justify-center w-8 h-8',
+                  'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                  textMuted, textHover,
+                ].join(' ')}
+                aria-label={t('admin')}
               >
-                <User className="w-4 h-4" />
+                <Settings className="w-4 h-4" strokeWidth={1.5} />
               </Link>
             )}
 
-            {/* Cart */}
+            {/* Cart icon + badge */}
             <Link
               to="/cart"
-              className="relative flex items-center justify-center w-10 h-10 rounded-lg text-leather-600 hover:bg-leather-50 transition-colors duration-150"
+              className={[
+                'relative flex items-center justify-center w-9 h-9',
+                'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                textMuted, textHover,
+              ].join(' ')}
               aria-label={`${t('cart')} (${totalItems})`}
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-[19px] h-[19px]" strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] bg-leather-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                <span
+                  className={[
+                    'absolute -top-0.5 -end-0.5',
+                    'min-w-[17px] h-[17px] px-1',
+                    'bg-camel text-cream-50 rounded-full',
+                    'text-[9px] font-body font-medium leading-none',
+                    'flex items-center justify-center',
+                  ].join(' ')}
+                >
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
             </Link>
+
+            {/* Hamburger — always visible */}
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className={[
+                'flex items-center justify-center w-9 h-9',
+                'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                textMuted, textHover,
+              ].join(' ')}
+              aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={menuOpen}
+              aria-controls="nav-overlay"
+            >
+              <Menu className="w-5 h-5" strokeWidth={1.5} />
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile drawer */}
+      {/* ════════════════════════════════════
+          FULLSCREEN OVERLAY NAVIGATION
+      ════════════════════════════════════ */}
       <AnimatePresence>
-        {mobileOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              className="fixed inset-0 z-40 bg-black/30 lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
-            />
+        {menuOpen && (
+          <motion.div
+            id="nav-overlay"
+            key="nav-overlay"
+            className="fixed inset-0 z-[999] bg-ink flex flex-col"
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            dir={dir}
+            role="dialog"
+            aria-modal="true"
+            aria-label={lang === 'ar' ? 'قائمة التنقل' : 'Menu de navigation'}
+          >
 
-            {/* Slide-down panel */}
-            <motion.div
-              className="fixed top-16 inset-x-0 z-40 bg-white border-b border-leather-100 shadow-xl lg:hidden"
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ type: 'tween', duration: 0.2 }}
+            {/* ── Top bar: logo + close ── */}
+            <div className="flex items-center justify-between px-6 md:px-12 h-16 flex-shrink-0 border-b border-cream-50/8">
+              {/* White logo */}
+              <Link
+                to="/"
+                className="flex flex-col items-start leading-none"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className="font-display font-light tracking-[0.15em] text-xl text-cream-50 leading-none">
+                  CUIR
+                </span>
+                <span className="font-body text-[9px] tracking-[0.30em] uppercase text-camel leading-none mt-[3px]">
+                  MAROC
+                </span>
+              </Link>
+
+              {/* Close button */}
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-center w-10 h-10 text-cream-50/60 hover:text-cream-50 transition-colors duration-300"
+                aria-label={lang === 'ar' ? 'إغلاق' : 'Fermer'}
+              >
+                <X className="w-5 h-5" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {/* ── Staggered nav items ── */}
+            <nav
+              className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24"
+              aria-label={lang === 'ar' ? 'قائمة رئيسية' : 'Navigation principale'}
             >
-              <nav className="flex flex-col px-4 py-4 gap-1" dir={dir}>
-                {navLinks.map(({ key, path }) => (
-                  <Link
+              {navLinks.map(({ key, path }, i) => {
+                const active = isActive(path);
+                return (
+                  <motion.div
                     key={key}
-                    to={path}
-                    className={[
-                      'px-4 py-3 rounded-xl text-base font-medium transition-colors duration-150',
-                      lang === 'ar' ? 'font-arabic text-right' : 'font-display',
-                      isActive(path)
-                        ? 'text-leather-600 bg-leather-50 font-semibold'
-                        : 'text-gray-700 hover:bg-leather-50 hover:text-leather-600',
-                    ].join(' ')}
+                    custom={i}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
                   >
-                    {t(key)}
-                  </Link>
-                ))}
-                {isAdmin && (
+                    <Link
+                      to={path}
+                      onClick={() => setMenuOpen(false)}
+                      className={[
+                        'block py-4 border-b border-cream-50/10',
+                        'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                        'font-light leading-[1.1]',
+                        active ? 'text-camel' : 'text-cream-50 hover:text-camel',
+                        lang === 'ar'
+                          ? 'font-arabic text-[clamp(2rem,6vw,3.5rem)]'
+                          : 'font-display text-[clamp(2.5rem,7vw,4rem)]',
+                      ].join(' ')}
+                    >
+                      {t(key)}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
+              {/* Admin link in overlay */}
+              {isAdmin && (
+                <motion.div
+                  custom={navLinks.length}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
                   <Link
                     to="/admin/dashboard"
-                    className="px-4 py-3 rounded-xl text-base font-medium text-gold-600 hover:bg-amber-50 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                    className={[
+                      'block py-4 border-b border-cream-50/10',
+                      'text-camel/65 hover:text-camel',
+                      'transition-colors duration-400 ease-[var(--ease-luxury)]',
+                      'font-light leading-[1.1]',
+                      lang === 'ar'
+                        ? 'font-arabic text-[clamp(1.5rem,4.5vw,2.5rem)]'
+                        : 'font-display text-[clamp(1.75rem,5vw,3rem)]',
+                    ].join(' ')}
                   >
                     {t('admin')}
                   </Link>
-                )}
+                </motion.div>
+              )}
+            </nav>
 
-                <div className="mt-2 pt-2 border-t border-leather-100 flex items-center justify-between px-4">
-                  {/* Language switch */}
+            {/* ── Bottom bar: lang + logout + wordmark ── */}
+            <motion.div
+              variants={bottomVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className={[
+                'flex-shrink-0 px-8 md:px-16 lg:px-24 pb-8 pt-6',
+                'border-t border-cream-50/8',
+                'flex flex-wrap items-center justify-between gap-4',
+              ].join(' ')}
+            >
+              {/* Language toggle + logout */}
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={() => {
+                    setLang(lang === 'ar' ? 'fr' : 'ar');
+                    setMenuOpen(false);
+                  }}
+                  className="font-body font-light text-xs tracking-[0.18em] uppercase text-cream-50/55 hover:text-camel transition-colors duration-300"
+                >
+                  {langLabel}
+                </button>
+
+                {isAdmin && (
                   <button
-                    onClick={() => {
-                      setLang(lang === 'ar' ? 'fr' : 'ar');
-                      setMobileOpen(false);
-                    }}
-                    className="flex items-center gap-2 text-sm text-leather-600 font-medium"
+                    onClick={handleLogout}
+                    className="font-body font-light text-xs tracking-[0.18em] uppercase text-cream-50/35 hover:text-cream-50/65 transition-colors duration-300"
                   >
-                    <Globe className="w-4 h-4" />
-                    {t('language')}
+                    {t('logout')}
                   </button>
+                )}
+              </div>
 
-                  {/* Cart */}
-                  <Link
-                    to="/cart"
-                    className="flex items-center gap-2 text-sm text-leather-600 font-medium"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    {t('cart')}
-                    {totalItems > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 bg-leather-500 text-white text-[10px] font-bold rounded-full px-1">
-                        {totalItems}
-                      </span>
-                    )}
-                  </Link>
-                </div>
-              </nav>
+              {/* Brand wordmark */}
+              <p className="font-body font-light text-[11px] tracking-[0.22em] uppercase text-cream-50/28 select-none">
+                {lang === 'ar' ? 'كوير | CUIR' : 'CUIR | كوير'}
+              </p>
             </motion.div>
-          </>
+
+          </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Spacer so content starts below the fixed header */}
-      <div className="h-16" />
     </>
   );
 }

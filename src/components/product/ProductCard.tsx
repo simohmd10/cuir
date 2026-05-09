@@ -1,290 +1,278 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Heart, Eye, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { formatPrice, getImageUrl } from '../../lib/utils';
 import LazyImage from '../ui/LazyImage';
 import StarRating from '../ui/StarRating';
-import Badge from '../ui/Badge';
 import type { Product } from '../../types';
 
+// ─── Easing ──────────────────────────────────────────────────────────────────
+const EASE_LUXURY = [0.25, 0.46, 0.45, 0.94] as const;
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 interface ProductCardProps {
   product: Product;
+  className?: string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { lang, t } = useLanguage();
+// ─── Shimmer bar helper ───────────────────────────────────────────────────────
+function ShimmerBar({ className }: { className: string }) {
+  return (
+    <div
+      className={`rounded-sm bg-cream-200 animate-shimmer ${className}`}
+      style={{
+        backgroundImage:
+          'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 42%, #EDE0CF 58%, #F5EDE0 100%)',
+        backgroundSize: '800px 100%',
+      }}
+    />
+  );
+}
+
+// ─── ProductCardSkeleton ──────────────────────────────────────────────────────
+export function ProductCardSkeleton({ className = '' }: { className?: string }) {
+  return (
+    <div className={`relative flex flex-col ${className}`} aria-hidden="true">
+      {/* Image placeholder — 3/4 ratio */}
+      <div
+        className="w-full overflow-hidden bg-cream-200 animate-shimmer"
+        style={{
+          aspectRatio: '3 / 4',
+          backgroundImage:
+            'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 42%, #EDE0CF 58%, #F5EDE0 100%)',
+          backgroundSize: '800px 100%',
+        }}
+      />
+      {/* Info */}
+      <div className="pt-3 pb-2 space-y-2.5">
+        <ShimmerBar className="h-[14px] w-3/4" />
+        <ShimmerBar className="h-[12px] w-5/12" />
+        <ShimmerBar className="h-[10px] w-1/3" />
+      </div>
+    </div>
+  );
+}
+
+// ─── ProductCard ──────────────────────────────────────────────────────────────
+const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
+  const { lang, dir } = useLanguage();
   const { addItem } = useCart();
-  const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
-  const [wishListed, setWishListed] = useState(false);
-  const [addedFeedback, setAddedFeedback] = useState(false);
+  const navigate = useNavigate();
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  // ── Derived values ──────────────────────────────────────────────────────────
   const name = lang === 'ar' ? product.name_ar : product.name;
-  const image = getImageUrl(product.images?.[0], '');
-  const hasOptions = product.colors.length > 1 || product.sizes.length > 1;
-  const isOutOfStock = product.stock === 0;
-  const isLowStock = product.stock > 0 && product.stock <= 5;
+  const badgeLabel =
+    lang === 'ar'
+      ? (product.badge_ar ?? product.badge)
+      : product.badge;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const image = getImageUrl(product.images?.[0], '/placeholder-bag.jpg');
+
+  // A product "has variants" if it offers more than one choice in either dimension.
+  const hasVariants = product.colors.length > 1 || product.sizes.length > 1;
+  const isLowStock = product.stock > 0 && product.stock <= 5;
+  const isOutOfStock = product.stock === 0;
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+  const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (isOutOfStock) return;
 
-    if (hasOptions && !showQuickAdd) {
-      setSelectedColor(product.colors[0] || '');
-      setSelectedSize(product.sizes[0] || '');
-      setShowQuickAdd(true);
+    // Navigate to product page so user can pick variants
+    if (hasVariants) {
+      navigate(`/product/${product.id}`);
       return;
     }
 
-    const color = selectedColor || product.colors[0] || '';
-    const size = selectedSize || product.sizes[0] || '';
+    const color = product.colors[0] ?? '';
+    const size = product.sizes[0] ?? '';
     addItem(product, 1, color, size);
-    setShowQuickAdd(false);
-    setAddedFeedback(true);
-    setTimeout(() => setAddedFeedback(false), 2000);
+
+    toast.success(
+      lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Ajouté au panier',
+      {
+        description: name,
+        position: 'bottom-center',
+        duration: 2500,
+      }
+    );
   };
 
-  const handleConfirmAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem(product, 1, selectedColor, selectedSize);
-    setShowQuickAdd(false);
-    setAddedFeedback(true);
-    setTimeout(() => setAddedFeedback(false), 2000);
-  };
-
-  const badgeVariantMap: Record<string, 'gold' | 'red' | 'leather' | 'green' | 'blue'> = {
-    new: 'gold',
-    sale: 'red',
-    bestseller: 'leather',
-    featured: 'blue',
-  };
-
-  const getBadgeVariant = (badge: string) =>
-    badgeVariantMap[badge.toLowerCase()] || 'leather';
+  const viewLabel = lang === 'ar' ? 'عرض المنتج' : 'Voir le produit';
 
   return (
-    <motion.div
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300"
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    <div
+      className={`group relative flex flex-col ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to={`/product/${product.id}`} className="block">
-        {/* Image container */}
-        <div className="relative" style={{ aspectRatio: '3/4' }}>
-          <LazyImage
-            src={image}
-            alt={name}
-            className="w-full h-full"
-          />
+      {/* ── Image container ────────────────────────────────────────────────── */}
+      <Link
+        to={`/product/${product.id}`}
+        className="relative block overflow-hidden bg-cream-100"
+        style={{ aspectRatio: '3 / 4' }}
+        aria-label={name}
+        tabIndex={0}
+      >
+        {/* Luxury scale on hover */}
+        <motion.div
+          className="w-full h-full"
+          animate={{ scale: isHovered ? 1.04 : 1 }}
+          transition={{ duration: 0.8, ease: EASE_LUXURY }}
+        >
+          <LazyImage src={image} alt={name} className="w-full h-full" />
+        </motion.div>
 
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Badges */}
-          <div className="absolute top-3 start-3 flex flex-col gap-1.5 z-10">
-            {product.badge && (
-              <Badge variant={getBadgeVariant(product.badge)}>
-                {product.badge}
-              </Badge>
-            )}
-            {product.is_best_seller && !product.badge && (
-              <Badge variant="leather">{t('bestseller')}</Badge>
-            )}
-            {product.is_featured && !product.badge && !product.is_best_seller && (
-              <Badge variant="gold">{t('featured')}</Badge>
-            )}
-            {isOutOfStock && (
-              <Badge variant="red">{t('outOfStock')}</Badge>
-            )}
-            {isLowStock && !isOutOfStock && (
-              <Badge variant="gold">{t('lowStock')}</Badge>
-            )}
+        {/* Badge — top-start corner */}
+        {badgeLabel && (
+          <div
+            className={[
+              'absolute top-3 z-10',
+              dir === 'rtl' ? 'right-3' : 'left-3',
+            ].join(' ')}
+          >
+            <span
+              className={[
+                'inline-block px-2 py-0.5 text-[10px] tracking-luxury uppercase',
+                'bg-cream-50/90 text-camel border border-camel/20 backdrop-blur-xs',
+                lang === 'ar' ? 'font-arabic tracking-normal text-[11px]' : 'font-body',
+              ].join(' ')}
+            >
+              {badgeLabel}
+            </span>
           </div>
+        )}
 
-          {/* Wishlist button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setWishListed(!wishListed);
-            }}
-            className="absolute top-3 end-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 z-10"
-            aria-label={t('addToWishlist')}
-          >
-            <Heart
-              className={`w-4 h-4 transition-colors duration-200 ${wishListed ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
-            />
-          </button>
-
-          {/* Quick view icon */}
-          <Link
-            to={`/product/${product.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-3 end-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 z-10"
-            aria-label={t('quickView')}
-          >
-            <Eye className="w-4 h-4 text-gray-500" />
-          </Link>
-
-          {/* Quick Add overlay */}
-          <AnimatePresence>
-            {showQuickAdd && (
-              <motion.div
-                className="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col p-4 z-20"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                onClick={(e) => e.preventDefault()}
+        {/* "Voir le produit" overlay on hover */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              className="absolute inset-0 z-10 flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(28,28,28,0.60)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: EASE_LUXURY }}
+            >
+              <motion.span
+                className={[
+                  'text-cream-50 text-[11px] tracking-luxury uppercase',
+                  lang === 'ar'
+                    ? 'font-arabic tracking-normal text-sm'
+                    : 'font-body',
+                ].join(' ')}
+                initial={{ y: 8, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 4, opacity: 0 }}
+                transition={{ duration: 0.3, ease: EASE_LUXURY, delay: 0.06 }}
               >
-                <button
-                  className="self-end text-gray-400 hover:text-gray-600 mb-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowQuickAdd(false);
-                  }}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {viewLabel}
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                {product.colors.length > 1 && (
-                  <div className="mb-3">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">{t('color')}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.colors.map((color) => (
-                        <button
-                          key={color}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedColor(color);
-                          }}
-                          className={[
-                            'px-2 py-1 text-xs rounded-md border transition-colors duration-150',
-                            selectedColor === color
-                              ? 'border-leather-500 bg-leather-50 text-leather-700 font-semibold'
-                              : 'border-gray-200 text-gray-600 hover:border-leather-300',
-                          ].join(' ')}
-                        >
-                          {color}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {product.sizes.length > 1 && (
-                  <div className="mb-3">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">{t('size')}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.sizes.map((size) => (
-                        <button
-                          key={size}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedSize(size);
-                          }}
-                          className={[
-                            'px-2 py-1 text-xs rounded-md border transition-colors duration-150',
-                            selectedSize === size
-                              ? 'border-leather-500 bg-leather-50 text-leather-700 font-semibold'
-                              : 'border-gray-200 text-gray-600 hover:border-leather-300',
-                          ].join(' ')}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleConfirmAdd}
-                  className="mt-auto w-full py-2 bg-leather-500 text-white text-sm font-semibold rounded-xl hover:bg-leather-600 transition-colors duration-200"
-                >
-                  {t('addToCart')}
-                </button>
-              </motion.div>
+        {/* Quick-add "+" — bottom-end corner, desktop only */}
+        {!isOutOfStock && (
+          <AnimatePresence>
+            {isHovered && (
+              <motion.button
+                onClick={handleQuickAdd}
+                aria-label={lang === 'ar' ? 'أضف للسلة' : 'Ajouter au panier'}
+                className={[
+                  'absolute bottom-3 z-20 hidden md:flex',
+                  'items-center justify-center w-8 h-8',
+                  'bg-cream-50 text-ink',
+                  'hover:bg-camel hover:text-cream-50',
+                  'transition-colors duration-300 ease-luxury',
+                  dir === 'rtl' ? 'left-3' : 'right-3',
+                ].join(' ')}
+                initial={{ opacity: 0, scale: 0.75 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.75 }}
+                transition={{ duration: 0.22, ease: EASE_LUXURY }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Plus className="w-4 h-4" strokeWidth={1.5} />
+              </motion.button>
             )}
           </AnimatePresence>
-        </div>
+        )}
+      </Link>
 
-        {/* Product info */}
-        <div className="p-4">
-          <h3
-            className={`font-semibold text-gray-800 mb-1 line-clamp-2 leading-snug ${lang === 'ar' ? 'font-arabic text-right' : 'font-display'}`}
-          >
-            {name}
-          </h3>
+      {/* ── Info area ──────────────────────────────────────────────────────── */}
+      <Link
+        to={`/product/${product.id}`}
+        className="flex flex-col gap-1.5 pt-3 pb-1 focus:outline-none"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        {/* Product name */}
+        <h3
+          className={[
+            'truncate font-light text-base text-ink leading-snug',
+            lang === 'ar' ? 'font-arabic text-right' : 'font-display',
+          ].join(' ')}
+        >
+          {name}
+        </h3>
 
-          {/* Rating */}
-          {(product.rating > 0 || (product.review_count ?? 0) > 0) && (
-            <div className="flex items-center gap-1.5 mb-2">
-              <StarRating rating={product.rating} size="sm" />
-              {product.review_count != null && product.review_count > 0 && (
-                <span className="text-xs text-gray-400">({product.review_count})</span>
-              )}
-            </div>
-          )}
-
-          {/* Price */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-lg font-bold text-leather-600">
-              {formatPrice(product.price, lang)}
-            </span>
-            {product.original_price && product.original_price > product.price && (
-              <span className="text-sm text-gray-400 line-through">
+        {/* Price row */}
+        <div
+          className={[
+            'flex items-baseline gap-2',
+            dir === 'rtl' ? 'flex-row-reverse justify-end' : 'flex-row',
+          ].join(' ')}
+        >
+          <span className="text-sm text-ink font-body tabular-nums">
+            {formatPrice(product.price, lang)}
+          </span>
+          {product.original_price != null &&
+            product.original_price > product.price && (
+              <span className="text-xs text-ink/40 font-body line-through tabular-nums">
                 {formatPrice(product.original_price, lang)}
               </span>
             )}
-            {product.original_price && product.original_price > product.price && (
-              <span className="text-xs font-semibold text-red-500">
-                -{Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+        </div>
+
+        {/* Stars + low-stock indicator */}
+        <div
+          className={[
+            'flex items-center gap-2',
+            dir === 'rtl' ? 'flex-row-reverse justify-end' : 'flex-row',
+          ].join(' ')}
+        >
+          {product.rating > 0 && (
+            <div className="flex items-center gap-1">
+              <StarRating rating={product.rating} size="sm" />
+              <span className="text-[11px] text-ink/50 font-body tabular-nums">
+                {product.rating.toFixed(1)}
               </span>
-            )}
-          </div>
+            </div>
+          )}
+
+          {isLowStock && (
+            <span
+              className={[
+                'text-[10px] text-camel',
+                lang === 'ar'
+                  ? 'font-arabic tracking-normal'
+                  : 'font-body uppercase tracking-luxury',
+              ].join(' ')}
+            >
+              {lang === 'ar' ? 'كمية محدودة' : 'Stock limité'}
+            </span>
+          )}
         </div>
       </Link>
-
-      {/* Add to cart button */}
-      <div className="px-4 pb-4">
-        <motion.button
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={[
-            'w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200',
-            isOutOfStock
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : addedFeedback
-              ? 'bg-emerald-500 text-white'
-              : 'bg-leather-500 text-white hover:bg-leather-600 active:scale-95',
-          ].join(' ')}
-          whileTap={isOutOfStock ? {} : { scale: 0.97 }}
-        >
-          {addedFeedback ? (
-            <>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              {t('added')}
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="w-4 h-4" />
-              {isOutOfStock ? t('outOfStock') : t('addToCart')}
-            </>
-          )}
-        </motion.button>
-      </div>
-    </motion.div>
+    </div>
   );
 };
 

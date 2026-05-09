@@ -1,218 +1,256 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
-const quickLinks = [
-  { key: 'home' as const, path: '/' },
-  { key: 'shop' as const, path: '/shop' },
-  { key: 'about' as const, path: '/about' },
-  { key: 'contact' as const, path: '/contact' },
-  { key: 'faq' as const, path: '/faq' },
-] as const;
-
-const customerServiceLinks = [
-  { key: 'trackOrder' as const, path: '/track-order' },
-  { key: 'returnPolicy' as const, path: '/return-policy' },
-  { key: 'privacyPolicy' as const, path: '/privacy-policy' },
-] as const;
-
+// ─── Constants ───────────────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '212600000000';
-const WHATSAPP_MESSAGE = encodeURIComponent(
-  'مرحباً، أريد الاستفسار عن منتجاتكم | Bonjour, je voudrais des renseignements sur vos produits'
-);
 
+const QUICK_LINKS = [
+  { labelFr: 'Accueil',   labelAr: 'الرئيسية',          path: '/' },
+  { labelFr: 'Boutique',  labelAr: 'المتجر',             path: '/shop' },
+  { labelFr: 'À propos',  labelAr: 'من نحن',             path: '/about' },
+  { labelFr: 'Contact',   labelAr: 'التواصل',            path: '/contact' },
+  { labelFr: 'FAQ',       labelAr: 'الأسئلة الشائعة',   path: '/faq' },
+] as const;
+
+const SERVICE_LINKS = [
+  {
+    labelFr: 'Suivi de commande',
+    labelAr: 'تتبع الطلب',
+    path: '/order-status',
+  },
+  {
+    labelFr: 'Politique de retour',
+    labelAr: 'سياسة الإرجاع',
+    path: '/return-policy',
+  },
+  {
+    labelFr: 'Politique de confidentialité',
+    labelAr: 'سياسة الخصوصية',
+    path: '/privacy-policy',
+  },
+  {
+    labelFr: 'FAQ',
+    labelAr: 'الأسئلة الشائعة',
+    path: '/faq',
+  },
+] as const;
+
+// ─── Sub-components ──────────────────────────────────────────────────────────
+interface SectionHeadingProps {
+  children: React.ReactNode;
+  isArabic: boolean;
+}
+
+function SectionHeading({ children, isArabic }: SectionHeadingProps) {
+  return (
+    <h3
+      className={[
+        'mb-5 text-[10px] tracking-luxury uppercase text-camel/70',
+        isArabic
+          ? 'font-arabic tracking-normal text-xs text-right'
+          : 'font-body',
+      ].join(' ')}
+    >
+      {children}
+    </h3>
+  );
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
 export default function Footer() {
-  const { lang, t, dir } = useLanguage();
+  const { lang, dir } = useLanguage();
+  const isArabic = lang === 'ar';
+
+  const waMessage = encodeURIComponent(
+    isArabic
+      ? 'مرحبا، أريد الاستفسار عن منتجاتكم'
+      : 'Bonjour, je voudrais m\'informer sur vos produits'
+  );
+  const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
+
+  const linkBase = [
+    'text-xs text-cream-100/60 hover:text-camel',
+    'transition-colors duration-300 ease-luxury',
+    isArabic ? 'font-arabic' : 'font-body',
+  ].join(' ');
 
   return (
-    <footer
-      className="bg-stone-900 text-stone-300"
-      dir={dir}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-
-          {/* Column 1 — Brand */}
-          <div className="lg:col-span-1">
-            <Link to="/" className="inline-flex items-baseline gap-2 mb-4">
-              <span className="font-display text-2xl font-bold text-white tracking-tight">
-                Cuir
-              </span>
-              <span className="font-arabic text-sm text-stone-400">كوير</span>
-            </Link>
-            <p
-              className={[
-                'text-sm text-stone-400 leading-relaxed mb-5',
-                lang === 'ar' ? 'font-arabic' : '',
-              ].join(' ')}
+    <footer className="bg-ink text-cream-100" dir={dir}>
+      {/* ── Main grid ──────────────────────────────────────────────────────── */}
+      <div className="max-w-luxury mx-auto px-6 sm:px-10 pt-16 pb-12">
+        <div
+          className={[
+            'grid grid-cols-1 gap-10',
+            'md:grid-cols-3 lg:grid-cols-12',
+          ].join(' ')}
+        >
+          {/* ── Column 1: Brand ─────────────────────────────────────────── */}
+          <div
+            className={[
+              'col-span-1 lg:col-span-4 flex flex-col',
+              'items-center text-center md:items-start md:text-start',
+            ].join(' ')}
+          >
+            {/* Logo wordmark */}
+            <Link
+              to="/"
+              className="inline-block mb-4 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
-              {t('footerDesc')}
+              <span className="font-display font-light text-3xl text-cream-100 tracking-wider">
+                CUIR
+              </span>
+            </Link>
+
+            {/* Bilingual tagline */}
+            <p className="mb-4 text-[10px] tracking-luxury uppercase text-camel/70 font-body">
+              L'Art du Cuir Marocain
+              <span className="mx-2 text-camel/30">·</span>
+              <span className="font-arabic tracking-normal text-xs">
+                فن الجلد المغربي
+              </span>
             </p>
 
-            {/* Contact details */}
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2 text-stone-400">
-                <Phone className="w-4 h-4 flex-shrink-0 text-gold-500" />
-                <span dir="ltr">+212 600-000000</span>
-              </li>
-              <li className="flex items-center gap-2 text-stone-400">
-                <Mail className="w-4 h-4 flex-shrink-0 text-gold-500" />
-                <span>contact@cuir.ma</span>
-              </li>
-              <li className="flex items-center gap-2 text-stone-400">
-                <MapPin className="w-4 h-4 flex-shrink-0 text-gold-500" />
-                <span className={lang === 'ar' ? 'font-arabic' : ''}>
-                  {lang === 'ar' ? 'مراكش، المغرب' : 'Marrakech, Maroc'}
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 2 — Quick links */}
-          <div>
-            <h3
+            {/* Description */}
+            <p
               className={[
-                'text-white font-semibold text-sm uppercase tracking-wider mb-4',
-                lang === 'ar' ? 'font-arabic' : 'font-display',
+                'text-xs text-cream-100/50 leading-relaxed max-w-[26ch] mb-6',
+                isArabic ? 'font-arabic text-sm leading-loose' : 'font-body',
               ].join(' ')}
             >
-              {t('quickLinks')}
-            </h3>
-            <ul className="space-y-2">
-              {quickLinks.map(({ key, path }) => (
-                <li key={key}>
-                  <Link
-                    to={path}
-                    className={[
-                      'text-sm text-stone-400 hover:text-gold-400 transition-colors duration-150',
-                      lang === 'ar' ? 'font-arabic' : '',
-                    ].join(' ')}
-                  >
-                    {t(key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+              {isArabic
+                ? 'حقائب جلدية فاخرة مصنوعة يدوياً من قلب المغرب'
+                : 'Maroquinerie de luxe façonnée à la main au cœur du Maroc.'}
+            </p>
 
-          {/* Column 3 — Customer service */}
-          <div>
-            <h3
+            {/* WhatsApp CTA */}
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
               className={[
-                'text-white font-semibold text-sm uppercase tracking-wider mb-4',
-                lang === 'ar' ? 'font-arabic' : 'font-display',
+                'inline-flex items-center gap-2 mb-6 group/wa',
+                'text-xs text-cream-100/60 hover:text-[#25D366]',
+                'transition-colors duration-300 ease-luxury',
+                isArabic ? 'font-arabic flex-row-reverse' : 'font-body',
               ].join(' ')}
             >
-              {t('customerService')}
-            </h3>
-            <ul className="space-y-2">
-              {customerServiceLinks.map(({ key, path }) => (
-                <li key={key}>
-                  <Link
-                    to={path}
-                    className={[
-                      'text-sm text-stone-400 hover:text-gold-400 transition-colors duration-150',
-                      lang === 'ar' ? 'font-arabic' : '',
-                    ].join(' ')}
-                  >
-                    {t(key)}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={[
-                    'text-sm text-stone-400 hover:text-gold-400 transition-colors duration-150 inline-flex items-center gap-1.5',
-                    lang === 'ar' ? 'font-arabic' : '',
-                  ].join(' ')}
-                >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                  {t('whatsapp')}
-                </a>
-              </li>
-            </ul>
-          </div>
+              <MessageCircle
+                className="w-4 h-4 text-[#25D366] flex-shrink-0"
+                strokeWidth={1.5}
+              />
+              <span dir="ltr">+212 600-000000</span>
+            </a>
 
-          {/* Column 4 — Social */}
-          <div>
-            <h3
-              className={[
-                'text-white font-semibold text-sm uppercase tracking-wider mb-4',
-                lang === 'ar' ? 'font-arabic' : 'font-display',
-              ].join(' ')}
-            >
-              {t('followUs')}
-            </h3>
-
-            <div className="flex gap-3 mb-6">
-              {/* Instagram */}
+            {/* Social icons */}
+            <div className="flex items-center gap-3">
               <a
                 href="https://instagram.com/cuir.ma"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-stone-800 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 flex items-center justify-center text-stone-300 hover:text-white transition-all duration-200"
                 aria-label="Instagram"
+                className={[
+                  'w-8 h-8 flex items-center justify-center rounded-full',
+                  'border border-cream-100/10 text-cream-100/40',
+                  'hover:border-camel/40 hover:text-camel',
+                  'transition-all duration-300 ease-luxury',
+                ].join(' ')}
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-3.5 h-3.5" strokeWidth={1.5} />
               </a>
-
-              {/* Facebook */}
               <a
                 href="https://facebook.com/cuir.ma"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-stone-800 hover:bg-blue-600 flex items-center justify-center text-stone-300 hover:text-white transition-all duration-200"
                 aria-label="Facebook"
+                className={[
+                  'w-8 h-8 flex items-center justify-center rounded-full',
+                  'border border-cream-100/10 text-cream-100/40',
+                  'hover:border-camel/40 hover:text-camel',
+                  'transition-all duration-300 ease-luxury',
+                ].join(' ')}
               >
-                <Facebook className="w-5 h-5" />
-              </a>
-
-              {/* WhatsApp */}
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-stone-800 hover:bg-[#25D366] flex items-center justify-center text-stone-300 hover:text-white transition-all duration-200"
-                aria-label="WhatsApp"
-              >
-                <MessageCircle className="w-5 h-5" />
+                <Facebook className="w-3.5 h-3.5" strokeWidth={1.5} />
               </a>
             </div>
+          </div>
 
-            {/* Working hours */}
-            <p className={`text-xs text-stone-500 ${lang === 'ar' ? 'font-arabic' : ''}`}>
-              {t('workingHours')}
-            </p>
-            <p className={`text-xs text-stone-400 mt-0.5 ${lang === 'ar' ? 'font-arabic' : ''}`}>
-              {t('workingHoursValue')}
-            </p>
+          {/* ── Column 2: Quick links ───────────────────────────────────── */}
+          <div
+            className={[
+              'col-span-1 lg:col-span-3 lg:col-start-6',
+              'flex flex-col items-center text-center md:items-start md:text-start',
+            ].join(' ')}
+          >
+            <SectionHeading isArabic={isArabic}>
+              {isArabic ? 'روابط سريعة' : 'Navigation'}
+            </SectionHeading>
+
+            <ul className="space-y-3">
+              {QUICK_LINKS.map(({ labelFr, labelAr, path }) => (
+                <li key={path}>
+                  <Link
+                    to={path}
+                    className={linkBase}
+                  >
+                    {isArabic ? labelAr : labelFr}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* ── Column 3: Customer service ──────────────────────────────── */}
+          <div
+            className={[
+              'col-span-1 lg:col-span-3 lg:col-start-10',
+              'flex flex-col items-center text-center md:items-start md:text-start',
+            ].join(' ')}
+          >
+            <SectionHeading isArabic={isArabic}>
+              {isArabic ? 'خدمة العملاء' : 'Service Client'}
+            </SectionHeading>
+
+            <ul className="space-y-3">
+              {SERVICE_LINKS.map(({ labelFr, labelAr, path }) => (
+                <li key={path}>
+                  <Link to={path} className={linkBase}>
+                    {isArabic ? labelAr : labelFr}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-stone-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
-          <span className={lang === 'ar' ? 'font-arabic' : ''}>
-            &copy; {new Date().getFullYear()} Cuir. {t('allRightsReserved')}
+      {/* ── Divider ──────────────────────────────────────────────────────── */}
+      <div className="max-w-luxury mx-auto px-6 sm:px-10">
+        <div className="border-t border-cream-100/[0.07]" />
+      </div>
+
+      {/* ── Bottom bar ───────────────────────────────────────────────────── */}
+      <div className="max-w-luxury mx-auto px-6 sm:px-10 py-5">
+        <div
+          className={[
+            'flex flex-col gap-2 items-center text-center',
+            'sm:flex-row sm:justify-between sm:text-start',
+          ].join(' ')}
+        >
+          <span
+            className={[
+              'text-[11px] text-cream-100/30',
+              isArabic ? 'font-arabic' : 'font-body',
+            ].join(' ')}
+          >
+            © 2026 Cuir Maroc.{' '}
+            {isArabic ? 'جميع الحقوق محفوظة.' : 'Tous droits réservés.'}
           </span>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/privacy-policy"
-              className={`hover:text-gold-400 transition-colors ${lang === 'ar' ? 'font-arabic' : ''}`}
-            >
-              {t('privacyPolicy')}
-            </Link>
-            <Link
-              to="/return-policy"
-              className={`hover:text-gold-400 transition-colors ${lang === 'ar' ? 'font-arabic' : ''}`}
-            >
-              {t('returnPolicy')}
-            </Link>
-          </div>
+
+          <span className="text-[11px] text-cream-100/25 font-body select-none">
+            🇲🇦{' '}
+            {isArabic ? 'صُنع في المغرب' : 'Fait au Maroc'}
+          </span>
         </div>
       </div>
     </footer>
