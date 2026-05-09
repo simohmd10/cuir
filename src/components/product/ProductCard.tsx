@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
-import { formatPrice, getImageUrl } from '../../lib/utils';
+import { formatPrice, getImageUrl, getProductImageSrcSet } from '../../lib/utils';
 import LazyImage from '../ui/LazyImage';
 import StarRating from '../ui/StarRating';
 import type { Product } from '../../types';
@@ -55,6 +55,7 @@ const ProductCard: React.FC<{ product: Product; className?: string }> = ({
   const name = lang === 'ar' ? product.name_ar : product.name;
   const badgeLabel = lang === 'ar' ? (product.badge_ar ?? product.badge) : product.badge;
   const image = getImageUrl(product.images?.[0], '/placeholder-bag.jpg');
+  const imageSrcSet = getProductImageSrcSet(product.images?.[0], '/placeholder-bag.jpg');
   const hasVariants = product.colors.length > 1 || product.sizes.length > 1;
   const isLowStock   = product.stock > 0 && product.stock <= 5;
   const isOutOfStock = product.stock === 0;

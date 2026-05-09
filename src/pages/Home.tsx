@@ -171,7 +171,7 @@ export default function Home() {
       <section className="section-luxury bg-cream-100">
         <div className="container-luxury">
 
-          <div ref={catHeadingRef} className="reveal mb-14 text-center">
+          <div ref={catHeadingRef} className="reveal mb-10 md:mb-12 text-center">
             <SectionLabel>
               {isAr ? 'الفئات — Catégories' : 'Catégories — الفئات'}
             </SectionLabel>
@@ -180,7 +180,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={catGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
+          <div ref={catGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
             {categoriesLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="skeleton rounded-none reveal" style={{ aspectRatio: '4/5' }} aria-hidden="true" />
@@ -231,7 +231,7 @@ export default function Home() {
       <section className="section-luxury bg-cream-200">
         <div className="container-luxury">
 
-          <div ref={featuredHeadingRef} className="reveal mb-14 text-center">
+          <div ref={featuredHeadingRef} className="reveal mb-10 md:mb-12 text-center">
             <SectionLabel>
               {isAr ? 'منتجات مميزة — Sélection' : 'Sélection — منتجات مميزة'}
             </SectionLabel>
@@ -240,7 +240,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
+          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
             {featuredLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
@@ -252,7 +252,7 @@ export default function Home() {
                 ))}
           </div>
 
-          <div ref={featuredCtaRef} className="reveal mt-14 flex justify-center">
+          <div ref={featuredCtaRef} className="reveal mt-10 md:mt-12 flex justify-center">
             <Link to="/shop" className="btn-ghost inline-flex items-center gap-3">
               <span>{isAr ? 'عرض جميع المنتجات' : 'Voir tous les produits'}</span>
               <ArrowIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -264,7 +264,7 @@ export default function Home() {
       {/* ══ Editorial Story ══════════════════════════════════════════════════ */}
       <section className="section-luxury bg-ink text-cream-100">
         <div className="container-luxury">
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
 
             <div ref={storyLeftRef} className="reveal">
               <SectionLabel className="text-camel">
@@ -295,7 +295,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div ref={storyRightRef} className="space-y-10 reveal-group">
+            <div ref={storyRightRef} className="space-y-7 md:space-y-8 reveal-group">
               {EDITORIAL_FEATURES.map((feat) => (
                 <div key={feat.num} className="flex gap-6 md:gap-8 items-start reveal">
                   <span
@@ -323,7 +323,7 @@ export default function Home() {
       <section className="section-luxury bg-cream-100">
         <div className="container-luxury">
 
-          <div ref={bestHeadingRef} className="reveal mb-14 text-center">
+          <div ref={bestHeadingRef} className="reveal mb-10 md:mb-12 text-center">
             <SectionLabel>
               {isAr ? 'الأكثر مبيعاً — Best-sellers' : 'Best-sellers — الأكثر مبيعاً'}
             </SectionLabel>
@@ -332,7 +332,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
+          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
             {bestSellersLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
@@ -353,7 +353,7 @@ export default function Home() {
       <section className="section-luxury bg-cream-200">
         <div className="container-luxury">
 
-          <div ref={testimonialsHeadingRef} className="reveal mb-14 text-center">
+          <div ref={testimonialsHeadingRef} className="reveal mb-10 md:mb-12 text-center">
             <SectionLabel>
               {isAr ? 'آراء عملائنا — Avis Clients' : 'Avis Clients — آراء عملائنا'}
             </SectionLabel>
@@ -362,7 +362,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={testimonialsGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-5 reveal-group">
+          <div ref={testimonialsGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 reveal-group">
             {TESTIMONIALS.map((t, i) => (
               <article
                 key={i}

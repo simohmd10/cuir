@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -42,61 +41,51 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
   const location = useLocation();
   const savedScrollY = useRef(0);
 
-  /*
-   * iOS-safe scroll lock.
-   * On iOS Safari, overflow:hidden on <body> does NOT prevent scroll.
-   * The correct fix: position:fixed + negative top offset to keep the
-   * visual position, then restore scrollY on unlock.
-   */
   useEffect(() => {
     if (!isOpen) return;
-
     savedScrollY.current = window.scrollY;
     const { style } = document.body;
     style.overflow = 'hidden';
     style.position = 'fixed';
-    style.top      = `-${savedScrollY.current}px`;
-    style.width    = '100%';
+    style.inset = '0';
+    style.top = `-${savedScrollY.current}px`;
 
     return () => {
       style.overflow = '';
       style.position = '';
-      style.top      = '';
-      style.width    = '';
+      style.inset = '';
+      style.top = '';
       window.scrollTo(0, savedScrollY.current);
     };
   }, [isOpen]);
 
-  // Close when the route changes (e.g. user taps a nav link)
   useEffect(() => {
     onClose();
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const links = [
-    { label: t('home'),    href: '/' },
-    { label: t('shop'),    href: '/shop' },
-    { label: t('about'),   href: '/about' },
+    { label: t('home'), href: '/' },
+    { label: t('shop'), href: '/shop' },
+    { label: t('about'), href: '/about' },
     { label: t('contact'), href: '/contact' },
-    { label: t('faq'),     href: '/faq' },
+    { label: t('faq'), href: '/faq' },
   ];
-  if (isAdmin) {
-    links.push({ label: lang === 'ar' ? 'الإدارة' : 'Admin', href: '/admin/dashboard' });
-  }
+
+  if (isAdmin) links.push({ label: lang === 'ar' ? 'الإدارة' : 'Admin', href: '/admin/dashboard' });
 
   return (
-    /*
-     * Pointer-events wrapper — this is a separate concern from the animation.
-     * When isOpen flips to false, this div immediately gets pointer-events:none
-     * BEFORE the AnimatePresence exit animation starts. This means the 220ms
-     * fade-out is purely visual — the page is interactive again instantly.
-     *
-     * The wrapper stays in the DOM (NavOverlay stays mounted for lazy-load
-     * perf reasons) but is invisible to interactions when closed.
-     */
     <div
-      className="fixed inset-0 z-[999]"
-      style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+      id="nav-overlay"
+      role="dialog"
+      aria-modal={isOpen ? 'true' : 'false'}
       aria-hidden={!isOpen}
+      aria-label={lang === 'ar' ? 'قائمة التنقل' : 'Menu de navigation'}
+      className={[
+        'fixed inset-0 z-[999] bg-ink flex flex-col',
+        'transition-opacity duration-200 ease-out',
+        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+      ].join(' ')}
+      dir={dir}
     >
       <AnimatePresence
         onExitComplete={() => {
@@ -127,56 +116,40 @@ export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProp
                 </span>
               </Link>
 
-              <button
+        <button
+          onClick={onClose}
+          aria-label="Fermer / إغلاق"
+          className="w-10 h-10 flex items-center justify-center text-cream-100/60 hover:text-cream-100 transition-colors duration-200"
+        >
+          <X size={20} strokeWidth={1.5} />
+        </button>
+      </div>
+
+      <nav className="flex-1 flex flex-col justify-center px-6 sm:px-10">
+        <ul className="space-y-1">
+          {links.map((link) => (
+            <li key={link.href}>
+              <Link
+                to={link.href}
                 onClick={onClose}
-                aria-label="Fermer / إغلاق"
-                className="w-10 h-10 flex items-center justify-center text-cream-100/60 hover:text-cream-100 transition-colors duration-300"
+                className={['nav-item block', location.pathname === link.href ? 'text-camel' : 'text-cream-100'].join(' ')}
               >
-                <X size={20} strokeWidth={1.5} />
-              </button>
-            </div>
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-            {/* ── Nav links ── */}
-            <nav className="flex-1 flex flex-col justify-center px-6 sm:px-10">
-              <motion.ul
-                variants={listVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="space-y-0"
-              >
-                {links.map((link) => (
-                  <motion.li key={link.href} variants={itemVariants}>
-                    <Link
-                      to={link.href}
-                      onClick={onClose}
-                      className={[
-                        'nav-item block',
-                        location.pathname === link.href ? 'text-camel' : 'text-cream-100',
-                      ].join(' ')}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.li>
-                ))}
-              </motion.ul>
-            </nav>
-
-            {/* ── Bottom bar ── */}
-            <div className="px-6 sm:px-10 py-6 border-t border-cream-100/8 flex items-center justify-between">
-              <button
-                onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
-                className="text-xs tracking-[0.2em] uppercase text-cream-100/50 hover:text-camel transition-colors duration-300"
-              >
-                {lang === 'ar' ? 'Français' : 'العربية'}
-              </button>
-              <span className="text-[10px] tracking-[0.2em] text-cream-100/20 select-none">
-                كوير · CUIR · 2026
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="px-6 sm:px-10 py-6 border-t border-cream-100/8 flex items-center justify-between">
+        <button
+          onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
+          className="text-xs tracking-[0.2em] uppercase text-cream-100/50 hover:text-camel transition-colors duration-200"
+        >
+          {lang === 'ar' ? 'Français' : 'العربية'}
+        </button>
+        <span className="text-[10px] tracking-[0.2em] text-cream-100/20 select-none">كوير · CUIR · 2026</span>
+      </div>
     </div>
   );
 }
