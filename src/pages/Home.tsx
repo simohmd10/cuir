@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { Truck, Leaf, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
-import { useProducts, useCategories } from '../hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { getImageUrl } from '../lib/utils';
 import { useReveal, useRevealGroup } from '../hooks/useReveal';
 import HeroVideo from '../components/HeroVideo';
+import CollectionsSection from '../components/CollectionsSection';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -134,7 +135,6 @@ export default function Home() {
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   /* ── Data fetching ─────────────────────────────────────────────────────── */
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: featured, isLoading: featuredLoading } = useProducts({ isFeatured: true, limit: 8 });
   const { data: bestSellers, isLoading: bestSellersLoading } = useProducts({ isBestSeller: true, limit: 4 });
 
@@ -146,8 +146,6 @@ export default function Home() {
   }, [isAr]);
 
   /* ── Reveal refs ───────────────────────────────────────────────────────── */
-  const catHeadingRef    = useReveal({ delay: 0 });
-  const catGridRef       = useRevealGroup();
   const featuredHeadingRef = useReveal({ delay: 0 });
   const featuredGridRef  = useRevealGroup();
   const featuredCtaRef   = useReveal({ delay: 200 });
@@ -167,65 +165,8 @@ export default function Home() {
       {/* ══ Trust Bar ════════════════════════════════════════════════════════ */}
       <TrustBar lang={lang} />
 
-      {/* ══ Shop by Category ════════════════════════════════════════════════ */}
-      <section className="section-luxury bg-cream-100">
-        <div className="container-luxury">
-
-          <div ref={catHeadingRef} className="reveal mb-10 md:mb-12 text-center">
-            <SectionLabel>
-              {isAr ? 'الفئات — Catégories' : 'Catégories — الفئات'}
-            </SectionLabel>
-            <h2 className="heading-section mt-2">
-              {isAr ? 'تسوق حسب الفئة' : 'Explorer par Catégorie'}
-            </h2>
-          </div>
-
-          <div ref={catGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
-            {categoriesLoading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="skeleton rounded-none reveal" style={{ aspectRatio: '4/5' }} aria-hidden="true" />
-                ))
-              : categories?.map((cat) => (
-                  <div key={cat.id} className="reveal">
-                    <Link
-                      to={`/shop?category=${cat.slug}`}
-                      className="group relative block overflow-hidden"
-                      aria-label={isAr ? cat.name_ar : cat.name}
-                    >
-                      <div className="relative overflow-hidden" style={{ aspectRatio: '4/5' }}>
-                        {cat.image ? (
-                          <img
-                            src={getImageUrl(cat.image)}
-                            alt={isAr ? cat.name_ar : cat.name}
-                            loading="lazy"
-                            decoding="async"
-                            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
-                            className="w-full h-full object-cover transition-transform duration-[800ms] ease-[var(--ease-luxury)] group-hover:scale-105"
-                          />
-                        ) : (
-                          <div
-                            className="w-full h-full"
-                            style={{ background: 'linear-gradient(135deg, #C4A882 0%, #9A7A52 50%, #7D6040 100%)' }}
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent transition-opacity duration-[600ms] group-hover:from-ink/80" />
-                        <div className="absolute bottom-0 inset-x-0 p-5">
-                          <p className="font-display text-xl text-cream-50 font-light leading-snug">
-                            {isAr ? cat.name_ar : cat.name}
-                          </p>
-                          {cat.product_count != null && cat.product_count > 0 && (
-                            <p className="mt-1 text-[11px] tracking-luxury uppercase text-camel font-body">
-                              {cat.product_count}{' '}{isAr ? 'منتج' : 'produits'}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
-          </div>
-        </div>
-      </section>
+      {/* ══ Collections ══════════════════════════════════════════════════════ */}
+      <CollectionsSection />
 
       {/* ══ Featured Products ═══════════════════════════════════════════════ */}
       <section className="section-luxury bg-cream-200">
