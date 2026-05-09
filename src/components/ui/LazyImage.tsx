@@ -5,9 +5,11 @@ interface LazyImageProps {
   alt: string;
   className?: string;
   fallback?: string;
+  sizes?: string;
+  priority?: boolean;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback }) => {
+const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback, sizes, priority = false }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [inView, setInView] = useState(false);
@@ -73,12 +75,16 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallbac
       )}
 
       {/* Actual image */}
-      {inView && !showFallback && (
+      {(inView || priority) && !showFallback && (
         <img
           src={src}
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'auto'}
+          sizes={sizes}
           className={[
             'w-full h-full object-cover transition-opacity duration-500',
             loaded ? 'opacity-100' : 'opacity-0',

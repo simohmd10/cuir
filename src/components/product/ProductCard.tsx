@@ -84,7 +84,12 @@ const ProductCard: React.FC<{ product: Product; className?: string }> = ({
       >
         {/* Image — CSS scale on hover */}
         <div className="w-full h-full transition-transform duration-[800ms] ease-[var(--ease-luxury)] group-hover:scale-[1.04]">
-          <LazyImage src={image} alt={name} className="w-full h-full" />
+          <LazyImage
+            src={image}
+            alt={name}
+            className="w-full h-full"
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
+          />
         </div>
 
         {/* Badge */}
