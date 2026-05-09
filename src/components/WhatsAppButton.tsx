@@ -20,12 +20,14 @@ export default function WhatsAppButton() {
   }, []);
 
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(MESSAGES[lang])}`;
-  const positionCls = dir === 'rtl' ? 'bottom-6 left-6' : 'bottom-6 right-6';
+  const positionCls = dir === 'rtl'
+    ? 'bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 md:bottom-6 md:left-6'
+    : 'bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6';
 
   return (
     <div
       className={[
-        'fixed z-50',
+        'fixed z-40',
         positionCls,
         'transition-all duration-500 ease-[var(--ease-luxury)]',
         visible ? 'opacity-100 scale-100' : 'opacity-0 scale-0 pointer-events-none',
@@ -44,7 +46,7 @@ export default function WhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={lang === 'ar' ? 'تواصل عبر واتساب' : 'Contacter via WhatsApp'}
-        className="relative flex items-center justify-center w-14 h-14 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366] hover:scale-110 active:scale-95 transition-transform duration-300"
+        className="relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366] hover:scale-110 active:scale-95 transition-transform duration-300"
         style={{
           backgroundColor: WA_GREEN,
           boxShadow: '0 4px 24px rgba(37, 211, 102, 0.40)',
@@ -61,7 +63,7 @@ export default function WhatsAppButton() {
         >
           1
         </span>
-        <MessageCircle className="w-6 h-6 text-white relative z-10" strokeWidth={1.75} />
+        <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-white relative z-10" strokeWidth={1.75} />
       </a>
     </div>
   );
