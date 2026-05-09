@@ -198,6 +198,8 @@ export default function Home() {
                             src={getImageUrl(cat.image)}
                             alt={isAr ? cat.name_ar : cat.name}
                             loading="lazy"
+                            decoding="async"
+                            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
                             className="w-full h-full object-cover transition-transform duration-[800ms] ease-[var(--ease-luxury)] group-hover:scale-105"
                           />
                         ) : (

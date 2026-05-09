@@ -53,6 +53,14 @@ export default function Header() {
     setMenuOpen(true);
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
+  const handleOverlayExited = () => {
+    if (!menuOpen) {
+      setOverlayMounted(false);
+    }
+  };
+
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
 
@@ -152,7 +160,7 @@ export default function Header() {
 
       {overlayMounted && (
         <Suspense fallback={null}>
-          <NavOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+          <NavOverlay isOpen={menuOpen} onClose={closeMenu} onExited={handleOverlayExited} />
         </Suspense>
       )}
     </>
