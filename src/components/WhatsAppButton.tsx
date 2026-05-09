@@ -3,21 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '212600000000';
 const WA_GREEN = '#25D366';
 
 const MESSAGES: Record<'ar' | 'fr', string> = {
   ar: 'مرحبا، أريد الاستفسار عن منتجاتكم',
-  fr: 'Bonjour, je voudrais m\'informer sur vos produits',
+  fr: "Bonjour, je voudrais m'informer sur vos produits",
 };
 
-// ─── WhatsAppButton ──────────────────────────────────────────────────────────
+// ─── WhatsAppButton ───────────────────────────────────────────────────────────
 export default function WhatsAppButton() {
   const { lang, dir } = useLanguage();
   const [visible, setVisible] = useState(false);
 
-  // Delay appearance by 2 s after mount
+  // Delay appearance by 2 s after mount — subtle, non-intrusive
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 2000);
     return () => clearTimeout(timer);
@@ -27,8 +27,8 @@ export default function WhatsAppButton() {
     MESSAGES[lang]
   )}`;
 
-  // RTL: anchor to bottom-left; LTR: bottom-right
-  const anchorStyle =
+  // RTL → bottom-left; LTR → bottom-right
+  const positionStyle =
     dir === 'rtl'
       ? { bottom: '1.5rem', left: '1.5rem' }
       : { bottom: '1.5rem', right: '1.5rem' };
@@ -38,34 +38,34 @@ export default function WhatsAppButton() {
       {visible && (
         <motion.div
           className="fixed z-50"
-          style={anchorStyle}
+          style={positionStyle}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{
             type: 'spring',
-            stiffness: 280,
-            damping: 22,
+            stiffness: 300,
+            damping: 24,
           }}
         >
-          {/* ── Pulse ring ──────────────────────────────────────────────── */}
+          {/* ── Pulse ring — radiates outward every 3 s ──────────────────── */}
           <motion.span
             aria-hidden="true"
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{ backgroundColor: WA_GREEN }}
             animate={{
-              scale: [1, 1.55, 1.55],
-              opacity: [0.55, 0, 0],
+              scale: [1, 1.6, 1.6],
+              opacity: [0.5, 0, 0],
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
               ease: 'easeOut',
-              repeatDelay: 0.5,
+              repeatDelay: 0.4,
             }}
           />
 
-          {/* ── Button ──────────────────────────────────────────────────── */}
+          {/* ── Button ───────────────────────────────────────────────────── */}
           <motion.a
             href={href}
             target="_blank"
@@ -82,12 +82,15 @@ export default function WhatsAppButton() {
             }}
             whileHover={{
               scale: 1.08,
-              boxShadow: '0 6px 32px rgba(37, 211, 102, 0.58)',
+              boxShadow: '0 6px 36px rgba(37, 211, 102, 0.58)',
             }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileTap={{ scale: 0.94 }}
+            transition={{
+              duration: 0.25,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
           >
-            {/* Notification badge */}
+            {/* Notification badge "1" */}
             <span
               aria-label="1 new message"
               className={[
