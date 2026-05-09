@@ -5,12 +5,11 @@ interface LazyImageProps {
   alt: string;
   className?: string;
   fallback?: string;
-  srcSet?: string;
   sizes?: string;
   priority?: boolean;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback, srcSet, sizes, priority = false }) => {
+const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallback, sizes, priority = false }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -56,7 +55,7 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className = '', fallbac
       )}
 
       {/* Actual image */}
-      {!showFallback && (
+      {(inView || priority) && !showFallback && (
         <img
           src={src}
           srcSet={srcSet}

@@ -7,9 +7,35 @@ import { useAuth } from '../../context/AuthContext';
 interface NavOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onExited?: () => void;
 }
 
-export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
+const EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
+
+/*
+ * Exit is intentionally fast and independent of children.
+ * 'when: afterChildren' was removed — it was causing a ~0.85s exit during
+ * which the overlay blocked all touch events on mobile.
+ */
+const overlayVariants = {
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.35, ease: EASE } },
+  exit:    { opacity: 0, transition: { duration: 0.22, ease: EASE } },
+};
+
+const listVariants = {
+  hidden:  {},                    // defined so initial="hidden" has a target
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } },
+  exit:    { transition: { staggerChildren: 0 } }, // no stagger on close
+};
+
+const itemVariants = {
+  hidden:  { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  exit:    { opacity: 0, y: 8,  transition: { duration: 0.15 } },
+};
+
+export default function NavOverlay({ isOpen, onClose, onExited }: NavOverlayProps) {
   const { t, lang, setLang, dir } = useLanguage();
   const { isAdmin } = useAuth();
   const location = useLocation();
@@ -61,11 +87,34 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
       ].join(' ')}
       dir={dir}
     >
-      <div className="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-cream-100/8">
-        <Link to="/" onClick={onClose} className="select-none">
-          <span className="font-display font-light text-2xl text-cream-100 tracking-[0.12em]">CUIR</span>
-          <span className="block text-[8px] tracking-[0.28em] uppercase text-camel mt-0.5">MAROC</span>
-        </Link>
+      <AnimatePresence
+        onExitComplete={() => {
+          if (!isOpen) onExited?.();
+        }}
+      >
+        {isOpen && (
+          <motion.div
+            id="nav-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={lang === 'ar' ? 'قائمة التنقل' : 'Menu de navigation'}
+            className="absolute inset-0 bg-ink flex flex-col"
+            dir={dir}
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* ── Top bar ── */}
+            <div className="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-cream-100/8">
+              <Link to="/" onClick={onClose} className="select-none">
+                <span className="font-display font-light text-2xl text-cream-100 tracking-[0.12em]">
+                  CUIR
+                </span>
+                <span className="block text-[8px] tracking-[0.28em] uppercase text-camel mt-0.5">
+                  MAROC
+                </span>
+              </Link>
 
         <button
           onClick={onClose}
