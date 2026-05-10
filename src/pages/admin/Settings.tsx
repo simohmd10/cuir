@@ -186,7 +186,7 @@ const Settings: React.FC = () => {
                 <input
                   {...register('whatsapp_number')}
                   className={inputClass(!!errors.whatsapp_number)}
-                  placeholder="+212600000000"
+                  placeholder="+212691553120"
                   dir="ltr"
                 />
               </Field>
@@ -213,7 +213,7 @@ const Settings: React.FC = () => {
                 <input
                   {...register('store_phone')}
                   className={inputClass(!!errors.store_phone)}
-                  placeholder="+212522000000"
+                  placeholder="0691553120"
                   dir="ltr"
                 />
               </Field>

@@ -650,11 +650,11 @@ $$;
 
 INSERT INTO settings (key, value) VALUES
   ('store_name',               'Cuir Maroc'),
-  ('whatsapp_number',          '+212600000000'),
+  ('whatsapp_number',          '+212691553120'),
   ('delivery_fee',             '30'),
   ('free_delivery_threshold',  '500'),
   ('store_email',              'contact@cuir.ma'),
-  ('store_phone',              '+212522000000')
+  ('store_phone',              '0691553120')
 ON CONFLICT (key) DO NOTHING;
 
 -- ============================================================

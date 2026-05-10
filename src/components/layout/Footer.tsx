@@ -138,7 +138,7 @@ export default function Footer() {
                 className="w-4 h-4 text-[#25D366] flex-shrink-0"
                 strokeWidth={1.5}
               />
-              <span dir="ltr">+212 691-553120</span>
+              <span dir="ltr">0691553120</span>
             </a>
 
             {/* Social icons */}
