@@ -4,6 +4,7 @@ import type { Product, Category } from '../types';
 
 export function useProducts(options?: {
   category?: string;
+  categories?: string[];   // multi-slug (parent + children)
   search?: string;
   sortBy?: string;
   isFeatured?: boolean;
@@ -15,7 +16,9 @@ export function useProducts(options?: {
     queryFn: async () => {
       let query = supabase.from('products').select('*');
 
-      if (options?.category && options.category !== 'all') {
+      if (options?.categories && options.categories.length > 0) {
+        query = query.in('category', options.categories);
+      } else if (options?.category && options.category !== 'all') {
         query = query.eq('category', options.category);
       }
       if (options?.search) {

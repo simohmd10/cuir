@@ -26,6 +26,7 @@ export interface Category {
   name_ar: string;
   slug: string;
   image: string;
+  parent_slug: string | null;
   product_count?: number;
 }
 

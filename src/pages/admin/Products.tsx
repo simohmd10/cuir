@@ -454,9 +454,30 @@ const Products: React.FC = () => {
                   <label className="block text-xs font-medium text-leather-600 mb-1">Catégorie *</label>
                   <select {...register('category')} className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 bg-white text-leather-700">
                     <option value="">Sélectionner...</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.slug}>{c.name}</option>
-                    ))}
+                    {(() => {
+                      const parents  = categories.filter((c) => !c.parent_slug);
+                      const orphans  = categories.filter((c) => c.parent_slug && !parents.find((p) => p.slug === c.parent_slug));
+                      return (
+                        <>
+                          {parents.map((parent) => {
+                            const children = categories.filter((c) => c.parent_slug === parent.slug);
+                            return children.length > 0 ? (
+                              <optgroup key={parent.slug} label={`▸ ${parent.name}`}>
+                                <option value={parent.slug}>{parent.name} (général)</option>
+                                {children.map((c) => (
+                                  <option key={c.id} value={c.slug}>{'  '}↳ {c.name}</option>
+                                ))}
+                              </optgroup>
+                            ) : (
+                              <option key={parent.slug} value={parent.slug}>{parent.name}</option>
+                            );
+                          })}
+                          {orphans.map((c) => (
+                            <option key={c.id} value={c.slug}>{c.name}</option>
+                          ))}
+                        </>
+                      );
+                    })()}
                   </select>
                   {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>}
                 </div>

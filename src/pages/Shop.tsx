@@ -180,10 +180,25 @@ export default function Shop() {
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: categories, isLoading: catLoading } = useCategories();
+
+  // When a parent category is selected, also include its children so products
+  // assigned to sub-categories still appear in the parent listing.
+  const categoryFilter = (() => {
+    if (!categoryParam || categoryParam === 'all') return undefined;
+    const children = (categories ?? [])
+      .filter((c) => c.parent_slug === categoryParam)
+      .map((c) => c.slug);
+    return children.length > 0 ? [categoryParam, ...children] : undefined;
+  })();
+
   const { data: products, isLoading: productsLoading } = useProducts({
-    category: categoryParam === 'all' ? undefined : categoryParam,
-    search:   searchParam || undefined,
-    sortBy:   sortParam,
+    ...(categoryFilter
+      ? { categories: categoryFilter }
+      : categoryParam && categoryParam !== 'all'
+        ? { category: categoryParam }
+        : {}),
+    search: searchParam || undefined,
+    sortBy: sortParam,
   });
 
   // ── URL helpers ───────────────────────────────────────────────────────────

@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS categories (
   name_ar TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   image TEXT,
+  parent_slug TEXT REFERENCES categories(slug) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
