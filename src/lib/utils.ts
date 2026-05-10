@@ -60,6 +60,11 @@ export function classNames(...classes: (string | boolean | undefined | null)[]):
   return classes.filter(Boolean).join(' ');
 }
 
+
+function shouldUseSupabaseTransforms(): boolean {
+  return import.meta.env.VITE_SUPABASE_USE_IMAGE_TRANSFORMS === 'true';
+}
+
 export function getImageUrl(path: string, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
   if (path.startsWith('http')) return path;
@@ -77,7 +82,7 @@ export function getResponsiveImageUrl(path: string, width: number, fallback?: st
 }
 
 export function getProductImageSrcSet(path: string, fallback?: string): string | undefined {
-  if (!path) return undefined;
+  if (!path || !shouldUseSupabaseTransforms()) return undefined;
   const widths = [240, 320, 400, 520];
   return widths.map((w) => `${getResponsiveImageUrl(path, w, fallback)} ${w}w`).join(', ');
 }
