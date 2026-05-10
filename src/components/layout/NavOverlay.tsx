@@ -104,6 +104,7 @@ function CategoryRow({
   isAr: boolean;
   onClose: () => void;
 }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const hasSub = !!cat.sub?.length;
   const label  = isAr ? cat.labelAr : cat.labelFr;
@@ -134,7 +135,7 @@ function CategoryRow({
           <span>{label}</span>
           {badge && (
             <span className="inline-flex items-center px-1.5 py-0.5 text-[9px] tracking-[0.16em] uppercase font-body text-camel border border-camel/60 leading-none">
-              {isAr ? 'جديد' : badge}
+              {t('newBadge')}
             </span>
           )}
         </Link>
@@ -199,7 +200,7 @@ interface NavOverlayProps {
 }
 
 export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
-  const { lang, setLang, dir } = useLanguage();
+  const { lang, setLang, dir, t } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { totalItems } = useCart();
   const location = useLocation();
@@ -344,7 +345,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                   onClick={onClose}
                   className="block py-[15px] px-6 text-[13px] text-ink/40 tracking-[0.08em] uppercase font-body hover:text-camel transition-colors duration-200"
                 >
-                  Admin
+                  {t('admin')}
                 </Link>
               </li>
             )}
@@ -370,7 +371,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <User size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {isAr ? 'تواصل معنا' : 'Nous contacter'}
+                  {t('contact')}
                 </span>
               </Link>
             </li>
@@ -391,7 +392,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                   'flex-1',
                   isAr ? 'font-arabic text-[14px] text-right' : 'font-body',
                 ].join(' ')}>
-                  {isAr ? 'سلة التسوق' : 'Panier'}
+                  {t('cart')}
                 </span>
                 {totalItems > 0 && (
                   <span className="flex-none text-[11px] font-body text-camel tabular-nums">
@@ -414,7 +415,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <Heart size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {isAr ? 'جميع المنتجات' : 'Toute la Collection'}
+                  {t('allProducts')}
                 </span>
               </Link>
             </li>
@@ -432,7 +433,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <Phone size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {isAr ? 'اتصل بنا' : 'Nous contacter'}
+                  {t('contact')}
                 </span>
               </Link>
             </li>
@@ -449,7 +450,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <Globe size={17} strokeWidth={1.5} className="flex-none text-ink/35" />
                 <span className="font-body flex-1 text-start">
-                  {isAr ? 'Maroc / Français' : 'المغرب / العربية'}
+                  {t('language')}
                 </span>
                 <ChevronRight size={13} strokeWidth={1.5} className="flex-none text-ink/25" />
               </button>

@@ -41,7 +41,7 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { signOut, user } = useAuth();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -63,7 +63,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </div>
           <div>
             <p className="font-bold text-leather-800 text-sm font-display tracking-wide">CUIR</p>
-            <p className="text-leather-400 text-xs">Admin Panel</p>
+            <p className="text-leather-400 text-xs">{t('adminPanelLabel')}</p>
           </div>
         </Link>
       </div>
@@ -102,7 +102,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </div>
           <div className="min-w-0">
             <p className="text-xs font-medium text-leather-700 truncate">{user?.email}</p>
-            <p className="text-xs text-leather-400">Admin</p>
+            <p className="text-xs text-leather-400">{t('adminUserLabel')}</p>
           </div>
         </div>
         <button
@@ -110,7 +110,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
         >
           <LogOut size={16} />
-          <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}</span>
+          <span>{t('logout')}</span>
         </button>
       </div>
     </div>
@@ -163,7 +163,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             target="_blank"
             className="text-xs text-leather-400 hover:text-leather-600 transition-colors hidden sm:block"
           >
-            View Store →
+            {t('viewStore')} {lang === 'ar' ? '←' : '→'}
           </Link>
         </header>
 

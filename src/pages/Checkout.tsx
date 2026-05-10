@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,20 +18,31 @@ import { formatPrice, getImageUrl, MOROCCAN_CITIES, generateIdempotencyKey } fro
 import LazyImage from '../components/ui/LazyImage';
 import type { CheckoutFormData, PlaceOrderResult, Coupon } from '../types';
 
-// ── Zod schema ───────────────────────────────────────────────────────────────
+// ── Zod schema (type-only, messages injected per language at runtime) ─────────
 
-const schema = z.object({
-  name: z.string().min(2, 'الاسم يجب أن يكون حرفين على الأقل / Le nom doit contenir au moins 2 caractères'),
-  phone: z
-    .string()
-    .regex(/^(06|07)\d{8}$/, 'رقم هاتف غير صالح (06/07XXXXXXXX) / Numéro invalide (06/07XXXXXXXX)'),
-  email: z.string().email('بريد إلكتروني غير صالح / Email invalide').optional().or(z.literal('')),
-  address: z.string().min(5, 'العنوان يجب أن يكون 5 أحرف على الأقل / L\'adresse doit contenir au moins 5 caractères'),
-  city: z.string().min(1, 'يرجى اختيار المدينة / Veuillez choisir une ville'),
+const _typeSchema = z.object({
+  name: z.string(),
+  phone: z.string(),
+  email: z.string().optional().or(z.literal('')),
+  address: z.string(),
+  city: z.string(),
   notes: z.string().optional(),
 });
+type FormData = z.infer<typeof _typeSchema>;
 
-type FormData = z.infer<typeof schema>;
+function buildSchema(msgs: {
+  nameMin: string; phoneInvalid: string; emailInvalid: string;
+  addressMin: string; cityReq: string;
+}) {
+  return z.object({
+    name: z.string().min(2, msgs.nameMin),
+    phone: z.string().regex(/^(06|07)\d{8}$/, msgs.phoneInvalid),
+    email: z.string().email(msgs.emailInvalid).optional().or(z.literal('')),
+    address: z.string().min(5, msgs.addressMin),
+    city: z.string().min(1, msgs.cityReq),
+    notes: z.string().optional(),
+  });
+}
 
 const DELIVERY_FEE = 30;
 
@@ -67,6 +78,15 @@ const inputClass =
 
 export default function Checkout() {
   const { t, lang, dir } = useLanguage();
+  // Build schema once per language (messages in the active language)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const schema = useMemo(() => buildSchema({
+    nameMin: t('nameMinError'),
+    phoneInvalid: t('phoneFormatError'),
+    emailInvalid: t('invalidEmail'),
+    addressMin: t('addressMinError'),
+    cityReq: t('cityRequiredError'),
+  }), [lang]); // rebuild when language changes
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
 
@@ -234,7 +254,7 @@ export default function Checkout() {
                   </Field>
 
                   {/* Email */}
-                  <Field label={`${t('email')} (${lang === 'ar' ? 'اختياري' : 'optionnel'})`} error={errors.email?.message}>
+                  <Field label={`${t('email')} (${t('optional')})`} error={errors.email?.message}>
                     <div className="relative">
                       <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-leather-400" />
                       <input

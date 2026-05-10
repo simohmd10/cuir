@@ -232,6 +232,20 @@ export const translations = {
     size: 'المقاس',
     added: 'تمت الإضافة',
 
+    // Section labels (single-language)
+    testimonials: 'آراء العملاء',
+    allProducts: 'جميع المنتجات',
+    deliveryDays: 'توصيل 2–5 أيام',
+    newBadge: 'جديد',
+    adminPanelLabel: 'لوحة الإدارة',
+    adminUserLabel: 'مدير',
+    viewStore: 'عرض المتجر',
+    optional: 'اختياري',
+    nameMinError: 'الاسم يجب أن يكون حرفين على الأقل',
+    phoneFormatError: 'رقم هاتف غير صالح (06/07XXXXXXXX)',
+    addressMinError: 'العنوان يجب أن يكون 5 أحرف على الأقل',
+    cityRequiredError: 'يرجى اختيار المدينة',
+
     // Messages
     addedToCart: 'تمت الإضافة إلى السلة',
     removedFromCart: 'تمت الإزالة من السلة',
@@ -478,6 +492,20 @@ export const translations = {
     color: 'Couleur',
     size: 'Taille',
     added: 'Ajouté',
+
+    // Section labels (single-language)
+    testimonials: 'Avis Clients',
+    allProducts: 'Toute la Collection',
+    deliveryDays: 'Livraison 2–5 jours',
+    newBadge: 'Nouveau',
+    adminPanelLabel: 'Admin Panel',
+    adminUserLabel: 'Admin',
+    viewStore: 'Voir la boutique',
+    optional: 'optionnel',
+    nameMinError: 'Le nom doit contenir au moins 2 caractères',
+    phoneFormatError: 'Numéro invalide (06/07XXXXXXXX)',
+    addressMinError: "L'adresse doit contenir au moins 5 caractères",
+    cityRequiredError: 'Veuillez choisir une ville',
 
     // Messages
     addedToCart: 'Ajouté au panier',

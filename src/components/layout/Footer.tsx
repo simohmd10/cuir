@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { translations } from '../../i18n';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '212600000000';
@@ -62,6 +63,7 @@ function SectionHeading({ children, isArabic }: SectionHeadingProps) {
 export default function Footer() {
   const { lang, dir } = useLanguage();
   const isArabic = lang === 'ar';
+  const t = (key: keyof typeof translations.ar) => translations[lang][key] as string;
 
   const waMessage = encodeURIComponent(
     isArabic
@@ -100,13 +102,12 @@ export default function Footer() {
               </span>
             </Link>
 
-            {/* Bilingual tagline */}
-            <p className="mb-5 font-body text-[10px] tracking-luxury uppercase text-camel/70">
-              L'Art du Cuir Marocain
-              <span className="mx-2 text-camel/30">·</span>
-              <span className="font-arabic tracking-normal text-xs">
-                فن الجلد المغربي
-              </span>
+            {/* Brand tagline — single language */}
+            <p className={[
+              'mb-5 text-[10px] tracking-luxury uppercase text-camel/70',
+              isArabic ? 'font-arabic tracking-normal text-xs' : 'font-body',
+            ].join(' ')}>
+              {isArabic ? 'فن الجلد المغربي' : "L'Art du Cuir Marocain"}
             </p>
 
             {/* Description — localized, 2 lines */}
@@ -118,9 +119,7 @@ export default function Footer() {
                   : 'font-body',
               ].join(' ')}
             >
-              {isArabic
-                ? 'حقائب جلدية فاخرة مصنوعة يدوياً من قلب المغرب'
-                : 'Maroquinerie de luxe façonnée à la main au cœur du Maroc.'}
+              {t('footerDesc')}
             </p>
 
             {/* WhatsApp CTA */}
@@ -183,7 +182,7 @@ export default function Footer() {
             ].join(' ')}
           >
             <SectionHeading isArabic={isArabic}>
-              {isArabic ? 'روابط سريعة' : 'Navigation'}
+              {t('quickLinks')}
             </SectionHeading>
 
             <ul className="space-y-3">
@@ -205,7 +204,7 @@ export default function Footer() {
             ].join(' ')}
           >
             <SectionHeading isArabic={isArabic}>
-              {isArabic ? 'خدمة العملاء' : 'Service Client'}
+              {t('customerService')}
             </SectionHeading>
 
             <ul className="space-y-3">
@@ -240,8 +239,7 @@ export default function Footer() {
               isArabic ? 'font-arabic' : 'font-body',
             ].join(' ')}
           >
-            © 2026 Cuir Maroc.{' '}
-            {isArabic ? 'جميع الحقوق محفوظة.' : 'Tous droits réservés.'}
+            © 2026 Cuir Maroc.{' '}{t('allRightsReserved')}.
           </span>
 
           <span className="text-[11px] text-cream-100/25 font-body select-none">

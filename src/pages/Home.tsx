@@ -91,11 +91,12 @@ const Stars = memo(function Stars({ count = 5 }: { count?: number }) {
   );
 });
 
-const TrustBar = memo(function TrustBar({ lang }: { lang: 'ar' | 'fr' }) {
+const TrustBar = memo(function TrustBar() {
+  const { t } = useLanguage();
   const items = [
-    { icon: <Truck className="w-4 h-4" />, label: lang === 'ar' ? 'توصيل 2-5 أيام' : 'Livraison 2–5 jours' },
-    { icon: <Leaf className="w-4 h-4" />, label: lang === 'ar' ? 'جلد طبيعي أصيل' : 'Cuir naturel authentique' },
-    { icon: <Shield className="w-4 h-4" />, label: lang === 'ar' ? 'الدفع عند الاستلام' : 'Paiement à la livraison' },
+    { icon: <Truck className="w-4 h-4" />, label: t('deliveryDays') },
+    { icon: <Leaf className="w-4 h-4" />, label: t('authenticLeather') },
+    { icon: <Shield className="w-4 h-4" />, label: t('cashOnDelivery') },
   ];
   return (
     <div className="bg-cream-200 py-5">
@@ -113,13 +114,12 @@ const TrustBar = memo(function TrustBar({ lang }: { lang: 'ar' | 'fr' }) {
   );
 });
 
-const DeliveryBanner = memo(function DeliveryBanner({ lang }: { lang: 'ar' | 'fr' }) {
+const DeliveryBanner = memo(function DeliveryBanner() {
+  const { t } = useLanguage();
   return (
     <div className="bg-camel py-5 text-center">
       <p className="font-display italic text-2xl text-ink px-4">
-        {lang === 'ar'
-          ? 'توصيل مجاني للطلبات فوق 500 درهم | Livraison gratuite dès 500 DH'
-          : 'Livraison gratuite dès 500 DH | توصيل مجاني فوق 500 درهم'}
+        {t('freeDelivery')}
       </p>
     </div>
   );
@@ -130,7 +130,7 @@ const DeliveryBanner = memo(function DeliveryBanner({ lang }: { lang: 'ar' | 'fr
 ───────────────────────────────────────────────────────────────────────────── */
 
 export default function Home() {
-  const { lang, dir } = useLanguage();
+  const { lang, dir, t } = useLanguage();
   const isAr = lang === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
@@ -163,7 +163,7 @@ export default function Home() {
       <HeroVideo videoSrc="/hero.webm" posterSrc="/hero-poster.jpg" />
 
       {/* ══ Trust Bar ════════════════════════════════════════════════════════ */}
-      <TrustBar lang={lang} />
+      <TrustBar />
 
       {/* ══ Collections ══════════════════════════════════════════════════════ */}
       <CollectionsSection />
@@ -173,9 +173,7 @@ export default function Home() {
         <div className="container-luxury">
 
           <div ref={featuredHeadingRef} className="reveal mb-10 md:mb-12 text-center">
-            <SectionLabel>
-              {isAr ? 'منتجات مميزة — Sélection' : 'Sélection — منتجات مميزة'}
-            </SectionLabel>
+            <SectionLabel>{t('featuredProducts')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'حصري ومميز' : "Pièces d'Exception"}
             </h2>
@@ -195,7 +193,7 @@ export default function Home() {
 
           <div ref={featuredCtaRef} className="reveal mt-10 md:mt-12 flex justify-center">
             <Link to="/shop" className="btn-ghost inline-flex items-center gap-3">
-              <span>{isAr ? 'عرض جميع المنتجات' : 'Voir tous les produits'}</span>
+              <span>{t('allProducts')}</span>
               <ArrowIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
             </Link>
           </div>
@@ -208,9 +206,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
 
             <div ref={storyLeftRef} className="reveal">
-              <SectionLabel className="text-camel">
-                {isAr ? 'قصتنا — Notre Histoire' : 'Notre Histoire — قصتنا'}
-              </SectionLabel>
+              <SectionLabel className="text-camel">{t('ourStory')}</SectionLabel>
               <blockquote
                 className={[
                   'mt-8 font-light leading-[1.15] text-cream-100',
@@ -247,7 +243,7 @@ export default function Home() {
                   </span>
                   <div>
                     <h3 className="font-display text-xl font-light text-cream-100 mb-1">
-                      {isAr ? `${feat.title_ar} / ${feat.title_fr}` : `${feat.title_fr} / ${feat.title_ar}`}
+                      {isAr ? feat.title_ar : feat.title_fr}
                     </h3>
                     <p className="font-body text-sm text-cream-100/60 leading-relaxed">
                       {isAr ? feat.desc_ar : feat.desc_fr}
@@ -265,9 +261,7 @@ export default function Home() {
         <div className="container-luxury">
 
           <div ref={bestHeadingRef} className="reveal mb-10 md:mb-12 text-center">
-            <SectionLabel>
-              {isAr ? 'الأكثر مبيعاً — Best-sellers' : 'Best-sellers — الأكثر مبيعاً'}
-            </SectionLabel>
+            <SectionLabel>{t('bestSellers')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يعشقه عملاؤنا' : 'Nos Favoris'}
             </h2>
@@ -288,16 +282,14 @@ export default function Home() {
       </section>
 
       {/* ══ Delivery Banner ══════════════════════════════════════════════════ */}
-      <DeliveryBanner lang={lang} />
+      <DeliveryBanner />
 
       {/* ══ Testimonials ══════════════════════════════════════════════════════ */}
       <section className="section-luxury bg-cream-200">
         <div className="container-luxury">
 
           <div ref={testimonialsHeadingRef} className="reveal mb-10 md:mb-12 text-center">
-            <SectionLabel>
-              {isAr ? 'آراء عملائنا — Avis Clients' : 'Avis Clients — آراء عملائنا'}
-            </SectionLabel>
+            <SectionLabel>{t('testimonials')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يقوله عملاؤنا' : 'Ce que disent nos clients'}
             </h2>
