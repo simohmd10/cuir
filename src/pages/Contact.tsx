@@ -357,7 +357,7 @@ export default function Contact() {
                   : 'Discutez avec nous directement sur WhatsApp pour une réponse immédiate'}
               </p>
               <a
-                href="https://wa.me/212600000000"
+                href="https://wa.me/212691553120"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#128C7E] rounded-full font-bold text-sm hover:bg-green-50 transition-colors"
