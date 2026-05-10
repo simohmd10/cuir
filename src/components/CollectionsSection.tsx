@@ -9,16 +9,15 @@ interface Collection {
   labelFr: string;
   titleAr: string;
   titleFr: string;
-  bg: string;
+  subtitleAr: string;
+  subtitleFr: string;
+  image: string;
+  objectPosition?: string;
+  bg: string; // gradient shown while image loads
 }
 
-/*
- * Each collection is presented as a curated editorial space, not a product filter.
- * Backgrounds are cinematic CSS gradients; replace bg with a real image URL
- * by adding  style={{ backgroundImage: `url(${img})`, backgroundSize: 'cover' }}
- * to the inner div once photography is available.
- */
 const COLLECTIONS: Collection[] = [
+  // ① HERO — woman carrying brown leather tote
   {
     id: 'handbags',
     href: '/shop?category=handbags',
@@ -26,8 +25,13 @@ const COLLECTIONS: Collection[] = [
     labelFr: 'La Maroquinerie',
     titleAr: 'حقائب ومحافظ',
     titleFr: 'Sacs & Pièces',
+    subtitleAr: 'القطع المميزة',
+    subtitleFr: 'Pièces Maîtresses',
+    image: '/collections/hero.jpg',
+    objectPosition: 'center 15%',
     bg: 'linear-gradient(155deg, #2A1C14 0%, #3D2720 42%, #4D3428 72%, #5C3E30 100%)',
   },
+  // ② TOP-RIGHT — travel duffel, Koutoubia backdrop
   {
     id: 'travel',
     href: '/shop?category=travel-bags',
@@ -35,8 +39,13 @@ const COLLECTIONS: Collection[] = [
     labelFr: 'Collection Voyage',
     titleAr: 'حقائب السفر',
     titleFr: 'Bagagerie Cuir',
+    subtitleAr: 'رحلة',
+    subtitleFr: 'Voyage',
+    image: '/collections/voyage.jpg',
+    objectPosition: 'center 30%',
     bg: 'linear-gradient(160deg, #1C1C1C 0%, #2D2420 48%, #3A2E28 78%, #4A3A30 100%)',
   },
+  // ③ BOTTOM-RIGHT (hero row) — accessories flatlay
   {
     id: 'atelier',
     href: '/shop?category=accessories',
@@ -44,26 +53,13 @@ const COLLECTIONS: Collection[] = [
     labelFr: "L'Atelier",
     titleAr: 'إكسسوارات فاخرة',
     titleFr: 'Artisanat & Essentiels',
+    subtitleAr: 'الأناقة في التفاصيل',
+    subtitleFr: "L'Élégance des Détails",
+    image: '/collections/atelier.jpg',
+    objectPosition: 'center 40%',
     bg: 'linear-gradient(145deg, #181410 0%, #262018 52%, #342A20 82%, #3E3028 100%)',
   },
-  {
-    id: 'backpacks',
-    href: '/shop?category=leather-backpacks',
-    labelAr: 'حقائب الظهر',
-    labelFr: 'Sacs à Dos',
-    titleAr: 'جلد طبيعي',
-    titleFr: 'Collection Quotidien',
-    bg: 'linear-gradient(150deg, #1A1C1E 0%, #242422 47%, #2E2A24 72%, #3A3028 100%)',
-  },
-  {
-    id: 'cardholders',
-    href: '/shop?category=card-holders',
-    labelAr: 'الأساسيات',
-    labelFr: 'Cartes & Passeports',
-    titleAr: 'محافظ البطاقات',
-    titleFr: 'Essentiels Cuir',
-    bg: 'linear-gradient(140deg, #1C1814 0%, #2E2420 52%, #3C3028 82%, #4A3C30 100%)',
-  },
+  // ④ ROW 2 LEFT — briefcase on a desk
   {
     id: 'briefcases',
     href: '/shop?category=briefcases',
@@ -71,17 +67,41 @@ const COLLECTIONS: Collection[] = [
     labelFr: 'Collection Mallette',
     titleAr: 'حقائب الأعمال',
     titleFr: 'Business Élégant',
+    subtitleAr: 'رفيق العمل',
+    subtitleFr: 'Compagnon de Travail',
+    image: '/collections/briefcase.jpg',
+    objectPosition: 'center 35%',
     bg: 'linear-gradient(155deg, #141618 0%, #1E2022 47%, #26241E 72%, #302C26 100%)',
   },
+  // ⑤ ROW 2 CENTER — leather wallet flatlay
   {
-    id: 'limited',
-    href: '/shop?category=limited-collection',
-    labelAr: 'إصدار خاص',
-    labelFr: 'Collection Limitée',
-    titleAr: 'أعداد محدودة',
-    titleFr: 'Atelier Edition',
-    bg: 'linear-gradient(145deg, #0E0C0A 0%, #18140E 42%, #221C14 67%, #2E2418 100%)',
+    id: 'cardholders',
+    href: '/shop?category=card-holders',
+    labelAr: 'الأساسيات',
+    labelFr: 'Cartes & Passeports',
+    titleAr: 'حاملات البطاقات',
+    titleFr: 'Porte-Cartes',
+    subtitleAr: 'ضروريات يومية',
+    subtitleFr: 'Essentiels du Quotidien',
+    image: '/collections/cards.jpg',
+    objectPosition: 'center 40%',
+    bg: 'linear-gradient(140deg, #1C1814 0%, #2E2420 52%, #3C3028 82%, #4A3C30 100%)',
   },
+  // ⑥ ROW 2 RIGHT — leather belt
+  {
+    id: 'belts',
+    href: '/shop?category=belts',
+    labelAr: 'الأحزمة',
+    labelFr: 'Les Ceintures',
+    titleAr: 'الأحزمة',
+    titleFr: 'Ceintures Cuir',
+    subtitleAr: 'جلد طبيعي',
+    subtitleFr: 'Cuir Naturel',
+    image: '/collections/belts.jpg',
+    objectPosition: 'center 45%',
+    bg: 'linear-gradient(150deg, #2A1C10 0%, #3A2418 50%, #4A3020 100%)',
+  },
+  // ⑦ BOTTOM LEFT LARGE — gift box set
   {
     id: 'gifts',
     href: '/shop?category=gift-sets',
@@ -89,85 +109,156 @@ const COLLECTIONS: Collection[] = [
     labelFr: 'Cadeaux Cuir',
     titleAr: 'صناديق الهدايا',
     titleFr: 'Coffrets Artisanaux',
+    subtitleAr: 'هدية فاخرة',
+    subtitleFr: 'Coffret de Luxe',
+    image: '/collections/gifts.jpg',
+    objectPosition: '40% center',
     bg: 'linear-gradient(155deg, #1E1610 0%, #2C2016 47%, #3A2A1C 72%, #4A3824 100%)',
   },
+  // ⑧ BOTTOM RIGHT LARGE — moody dark travel bag (cinematic)
+  {
+    id: 'limited',
+    href: '/shop?category=limited-collection',
+    labelAr: 'إصدار خاص',
+    labelFr: 'Collection Limitée',
+    titleAr: 'أعداد محدودة',
+    titleFr: 'Atelier Edition',
+    subtitleAr: 'إصدار محدود',
+    subtitleFr: 'Édition Limitée',
+    image: '/collections/limited.jpg',
+    objectPosition: 'center 40%',
+    bg: 'linear-gradient(145deg, #0E0C0A 0%, #18140E 42%, #221C14 67%, #2E2418 100%)',
+  },
 ];
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CollectionCard
+───────────────────────────────────────────────────────────────────────────── */
 
 function CollectionCard({
   collection,
   isLarge = false,
+  isHero = false,
   className = '',
 }: {
   collection: Collection;
   isLarge?: boolean;
+  isHero?: boolean;
   className?: string;
 }) {
   const { lang } = useLanguage();
   const isAr = lang === 'ar';
-  const label = isAr ? collection.labelAr : collection.labelFr;
-  const title = isAr ? collection.titleAr : collection.titleFr;
+  const label    = isAr ? collection.labelAr    : collection.labelFr;
+  const title    = isAr ? collection.titleAr    : collection.titleFr;
+  const subtitle = isAr ? collection.subtitleAr : collection.subtitleFr;
 
   return (
     <Link
       to={collection.href}
       className={`group relative overflow-hidden block bg-ink ${className}`}
     >
-      {/* Cinematic background — slow zoom on hover */}
+      {/* ── Gradient fallback (visible while image loads) ── */}
       <div
-        className="absolute inset-0 transition-transform duration-[1400ms] ease-[var(--ease-luxury)] group-hover:scale-[1.07]"
-        style={{ background: collection.bg, willChange: 'transform' }}
+        className="absolute inset-0"
+        style={{ background: collection.bg }}
         aria-hidden="true"
       />
 
-      {/* Gradient overlay — bottom to top for text legibility */}
+      {/* ── Cinematic photo ── slow-zoom on hover ── */}
+      <img
+        src={collection.image}
+        alt=""
+        aria-hidden="true"
+        loading={isHero ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={isHero ? 'high' : 'auto'}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] ease-[var(--ease-luxury)] group-hover:scale-[1.07]"
+        style={{
+          objectPosition: collection.objectPosition ?? 'center',
+          willChange: 'transform',
+        }}
+      />
+
+      {/* ── Overlays (z above image) ── */}
+
+      {/* Bottom-to-top gradient for text readability */}
       <div
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(to top, rgba(10,6,3,0.92) 0%, rgba(10,6,3,0.22) 44%, transparent 68%)',
+            'linear-gradient(to top, rgba(8,4,2,0.96) 0%, rgba(8,4,2,0.40) 38%, rgba(0,0,0,0.10) 65%, transparent 100%)',
         }}
         aria-hidden="true"
       />
 
-      {/* Subtle edge vignette */}
+      {/* Top dark veil — prevents blown-out sky */}
       <div
-        className="absolute inset-0 z-[1] opacity-35"
+        className="absolute inset-0 z-[1]"
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.22) 0%, transparent 30%)' }}
+        aria-hidden="true"
+      />
+
+      {/* Peripheral vignette — draws eye to center */}
+      <div
+        className="absolute inset-0 z-[1] opacity-40"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 30%, transparent 45%, rgba(0,0,0,0.55) 100%)',
+            'radial-gradient(ellipse at 50% 40%, transparent 42%, rgba(0,0,0,0.60) 100%)',
         }}
         aria-hidden="true"
       />
 
-      {/* Text content */}
+      {/* ── Typography ── */}
       <div
         className={[
           'absolute bottom-0 z-[2] w-full',
-          isLarge ? 'p-8 md:p-11' : 'p-5 md:p-7',
+          isLarge || isHero ? 'p-8 md:p-10' : 'p-5 md:p-6',
         ].join(' ')}
       >
+        {/* Collection label */}
         <p className="text-camel text-[10px] tracking-[0.28em] uppercase font-body mb-2 md:mb-3">
           {label}
         </p>
+
+        {/* Main title */}
         <h3
           className={[
-            'font-light text-cream-100 leading-[1.1]',
+            'font-light text-cream-100 leading-[1.08]',
             isAr ? 'font-arabic' : 'font-display',
-            isLarge ? 'text-2xl md:text-[2.4rem]' : 'text-[1.15rem] md:text-xl',
+            isHero
+              ? 'text-[1.75rem] md:text-[2.6rem]'
+              : isLarge
+              ? 'text-xl md:text-[1.9rem]'
+              : 'text-base md:text-[1.15rem]',
           ].join(' ')}
         >
           {title}
         </h3>
 
-        {/* Animated underline on hover */}
+        {/* Subtitle — softer, smaller */}
+        <p
+          className={[
+            'mt-1.5 text-cream-100/50 font-body font-light leading-snug',
+            isHero ? 'text-[13px] md:text-sm' : 'text-[11px] md:text-[12px]',
+            isAr ? 'font-arabic' : '',
+          ].join(' ')}
+        >
+          {subtitle}
+        </p>
+
+        {/* Animated camel underline on hover */}
         <div
-          className="mt-4 h-px bg-camel/55 w-0 group-hover:w-9 transition-[width] duration-700 ease-[var(--ease-luxury)]"
+          className="mt-4 h-px bg-camel/50 w-0 group-hover:w-8 transition-[width] duration-700 ease-[var(--ease-luxury)]"
           aria-hidden="true"
         />
       </div>
     </Link>
   );
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CollectionsSection
+───────────────────────────────────────────────────────────────────────────── */
 
 export default function CollectionsSection() {
   const { lang, dir } = useLanguage();
@@ -194,40 +285,44 @@ export default function CollectionsSection() {
         </div>
 
         {/* ── Editorial grid ── */}
-        <div className="space-y-2 md:space-y-2.5">
+        <div className="space-y-1.5 md:space-y-2">
 
-          {/* ── Row 1: Hero (7fr) + 2 stacked (5fr) ── */}
-          <div className="flex flex-col md:flex-row gap-2 md:gap-2.5 md:min-h-[580px]">
+          {/* ── ROW 1: Hero (58%) + 2 stacked right (42%) ── */}
+          <div className="flex flex-col md:flex-row gap-1.5 md:gap-2 md:min-h-[580px]">
+
+            {/* ① Hero — tall portrait, eager-loaded */}
             <div className="w-full md:w-[58.33%] aspect-[3/4] md:aspect-auto">
               <CollectionCard
                 collection={COLLECTIONS[0]}
-                isLarge
+                isHero
                 className="h-full"
               />
             </div>
-            <div className="w-full md:w-[41.67%] flex flex-col gap-2 md:gap-2.5">
-              <div className="flex-1 min-h-[200px]">
+
+            {/* ② + ③ stacked right */}
+            <div className="w-full md:w-[41.67%] flex flex-col gap-1.5 md:gap-2">
+              <div className="flex-1 min-h-[220px] md:min-h-0 aspect-[4/3] md:aspect-auto">
                 <CollectionCard collection={COLLECTIONS[1]} className="h-full" />
               </div>
-              <div className="flex-1 min-h-[200px]">
+              <div className="flex-1 min-h-[220px] md:min-h-0 aspect-[4/3] md:aspect-auto">
                 <CollectionCard collection={COLLECTIONS[2]} className="h-full" />
               </div>
             </div>
           </div>
 
-          {/* ── Row 2: 3 equal cards ── */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-2.5">
+          {/* ── ROW 2: 3 equal cards ── */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-2">
             <CollectionCard collection={COLLECTIONS[3]} className="aspect-[4/3]" />
             <CollectionCard collection={COLLECTIONS[4]} className="aspect-[4/3]" />
-            {/* Last card is full-width on mobile, 1/3 on desktop */}
+            {/* Full-width on mobile so the third doesn't look orphaned */}
             <CollectionCard
               collection={COLLECTIONS[5]}
               className="aspect-[4/3] col-span-2 md:col-span-1"
             />
           </div>
 
-          {/* ── Row 3: Dramatic wide (7fr) + gift (5fr) ── */}
-          <div className="flex flex-col md:flex-row gap-2 md:gap-2.5 md:min-h-[360px]">
+          {/* ── ROW 3: Wide dark (58%) + narrow (42%) ── */}
+          <div className="flex flex-col md:flex-row gap-1.5 md:gap-2 md:min-h-[360px]">
             <div className="w-full md:w-[58.33%] aspect-[16/9] md:aspect-auto">
               <CollectionCard
                 collection={COLLECTIONS[6]}
@@ -235,13 +330,17 @@ export default function CollectionsSection() {
                 className="h-full"
               />
             </div>
-            <div className="w-full md:w-[41.67%] min-h-[220px] md:min-h-0">
-              <CollectionCard collection={COLLECTIONS[7]} className="h-full" />
+            <div className="w-full md:w-[41.67%] min-h-[240px] md:min-h-0">
+              <CollectionCard
+                collection={COLLECTIONS[7]}
+                isLarge
+                className="h-full"
+              />
             </div>
           </div>
         </div>
 
-        {/* ── Footer link ── */}
+        {/* ── Editorial footer link ── */}
         <div className="mt-14 md:mt-20 text-center">
           <Link
             to="/shop"
