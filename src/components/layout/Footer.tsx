@@ -5,7 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { translations } from '../../i18n';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const WHATSAPP_NUMBER = '212600000000';
+const WHATSAPP_NUMBER = '212691553120';
 
 const QUICK_LINKS = [
   { labelFr: 'Accueil',   labelAr: 'الرئيسية',         path: '/' },
