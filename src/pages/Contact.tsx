@@ -120,8 +120,8 @@ export default function Contact() {
     {
       icon: <Phone className="w-5 h-5 text-leather-500" />,
       label: lang === 'ar' ? 'الهاتف' : 'Téléphone',
-      value: '+212 600-000000',
-      href: 'tel:+212600000000',
+      value: '+212 691-553120',
+      href: 'tel:+212691553120',
     },
     {
       icon: <Mail className="w-5 h-5 text-leather-500" />,
