@@ -70,10 +70,10 @@ export function getImageUrl(path: string, fallback?: string): string {
 
 export function getResponsiveImageUrl(path: string, width: number, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
-  if (path.startsWith('http')) return `${path}${path.includes('?') ? '&' : '?'}width=${width}`;
+  if (path.startsWith('http')) return `${path}${path.includes('?') ? '&' : '?'}width=${width}&quality=72&format=webp`;
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) return fallback || '/placeholder-bag.jpg';
-  return `${supabaseUrl}/storage/v1/render/image/public/products/${path}?width=${width}&quality=72`;
+  return `${supabaseUrl}/storage/v1/render/image/public/products/${path}?width=${width}&quality=72&format=webp`;
 }
 
 export function getProductImageSrcSet(path: string, fallback?: string): string | undefined {

@@ -1,10 +1,11 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import { warmCommonRoutes } from './lib/routePreload';
 
 // Customer pages
 const Home = lazy(() => import('./pages/Home'));
@@ -60,6 +61,10 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { dir } = useLanguage();
+
+  useEffect(() => {
+    warmCommonRoutes();
+  }, []);
 
   return (
     <div dir={dir} className="min-h-screen bg-beige-50">

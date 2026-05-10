@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import NavOverlay from './NavOverlay';
+import { preloadRoute } from '../../lib/routePreload';
 
 const NAV_LINKS = [
   { key: 'home' as const, href: '/' },
@@ -76,6 +77,8 @@ export default function Header() {
                 <Link
                   key={href}
                   to={href}
+                  onMouseEnter={() => preloadRoute(href as '/' | '/shop' | '/about' | '/contact')}
+                  onFocus={() => preloadRoute(href as '/' | '/shop' | '/about' | '/contact')}
                   className={[
                     'text-[11px] tracking-[0.2em] uppercase font-body relative group',
                     'transition-colors duration-300',
@@ -112,6 +115,8 @@ export default function Header() {
 
             <Link
               to="/cart"
+              onMouseEnter={() => preloadRoute('/cart')}
+              onFocus={() => preloadRoute('/cart')}
               className={`relative flex items-center justify-center w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
               aria-label={`${t('cart')} — ${totalItems}`}
             >
