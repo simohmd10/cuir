@@ -87,7 +87,7 @@ export default function Cart() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {lang === 'ar' ? 'سلتك / Votre Panier' : 'Votre Panier / سلتك'}
+          {lang === 'ar' ? 'سلتك' : 'Votre Panier'}
         </motion.h1>
 
         {/* ── Free delivery banner ── */}

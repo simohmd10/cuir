@@ -501,6 +501,12 @@ export default function ProductPage() {
     !(hasSizes  && !selectedSize);
 
   // ── Effects ───────────────────────────────────────────────────────────────
+
+  // Scroll to top on product navigation (related products click)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [id]);
+
   useEffect(() => {
     if (product) {
       setSelectedColor(product.colors[0] ?? '');
@@ -788,17 +794,17 @@ export default function ProductPage() {
             <p className="text-[11px] tracking-luxury uppercase font-body">
               {isOutOfStock ? (
                 <span className="text-red-400">
-                  {lang === 'ar' ? 'نفذ من المخزون | Épuisé' : 'Épuisé | نفذ'}
+                  {lang === 'ar' ? 'نفذ من المخزون' : 'Épuisé'}
                 </span>
               ) : isLowStock ? (
                 <span className="text-amber-500">
                   {lang === 'ar'
-                    ? `آخر ${product.stock} قطع | Dernières ${product.stock} pièces`
-                    : `Dernières ${product.stock} pièces | آخر ${product.stock} قطع`}
+                    ? `آخر ${product.stock} قطع`
+                    : `Dernières ${product.stock} pièces`}
                 </span>
               ) : (
                 <span className="text-emerald-600">
-                  {lang === 'ar' ? 'متوفر | En stock' : 'En stock | متوفر'}
+                  {lang === 'ar' ? 'متوفر' : 'En stock'}
                 </span>
               )}
             </p>
@@ -865,7 +871,7 @@ export default function ProductPage() {
             {hasSizes && (
               <div className="space-y-2.5">
                 <p className="label-luxury">
-                  {lang === 'ar' ? 'المقاس / Taille' : 'Taille / المقاس'}
+                  {lang === 'ar' ? 'المقاس' : 'Taille'}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((size) => {
@@ -958,7 +964,7 @@ export default function ProductPage() {
             {/* Accordion sections */}
             <div className="border-t border-cream-300 pt-1">
               <AccordionItem
-                title={lang === 'ar' ? 'الوصف / Description' : 'Description / الوصف'}
+                title={lang === 'ar' ? 'الوصف' : 'Description'}
                 defaultOpen
                 lang={lang}
               >
@@ -971,7 +977,7 @@ export default function ProductPage() {
               </AccordionItem>
 
               <AccordionItem
-                title={lang === 'ar' ? 'التفاصيل / Matériaux' : 'Matériaux / التفاصيل'}
+                title={lang === 'ar' ? 'المواد' : 'Matériaux'}
                 lang={lang}
               >
                 <ul className="space-y-1">
@@ -982,24 +988,24 @@ export default function ProductPage() {
               </AccordionItem>
 
               <AccordionItem
-                title={lang === 'ar' ? 'الشحن والتوصيل / Livraison' : 'Livraison / الشحن'}
+                title={lang === 'ar' ? 'الشحن والتوصيل' : 'Livraison'}
                 lang={lang}
               >
                 <p>
                   {lang === 'ar'
-                    ? '2–5 أيام عمل في المغرب / 2–5 jours ouvrés au Maroc'
-                    : '2–5 jours ouvrés au Maroc / 2–5 أيام عمل في المغرب'}
+                    ? '2–5 أيام عمل في جميع أنحاء المغرب'
+                    : '2–5 jours ouvrés au Maroc'}
                 </p>
               </AccordionItem>
 
               <AccordionItem
-                title={lang === 'ar' ? 'الإرجاع / Retours' : 'Retours / الإرجاع'}
+                title={lang === 'ar' ? 'الإرجاع' : 'Retours'}
                 lang={lang}
               >
                 <p>
                   {lang === 'ar'
-                    ? '7 أيام من تاريخ الاستلام / 7 jours à compter de la réception'
-                    : '7 jours à compter de la réception / 7 أيام من تاريخ الاستلام'}
+                    ? '7 أيام من تاريخ الاستلام'
+                    : '7 jours à compter de la réception'}
                 </p>
               </AccordionItem>
             </div>
@@ -1100,7 +1106,7 @@ export default function ProductPage() {
 
             <div className="mb-10 space-y-2">
               <p className="section-label">
-                {lang === 'ar' ? '— قد يعجبك أيضاً | Suggestions' : '— Suggestions | قد يعجبك'}
+                {lang === 'ar' ? '— قد يعجبك' : '— Suggestions'}
               </p>
             </div>
 

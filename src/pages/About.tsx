@@ -185,26 +185,29 @@ export default function About() {
             </div>
           </motion.div>
 
-          {/* Image placeholder / decorative */}
+          {/* Artisan image */}
           <motion.div
             variants={fadeUp}
             className={`${lang === 'ar' ? 'lg:order-1' : 'lg:order-2'} relative`}
           >
             <div
-              className="rounded-3xl overflow-hidden shadow-xl"
-              style={{
-                background: 'linear-gradient(135deg, #2D2926 0%, #1C1C1C 100%)',
-                minHeight: 'clamp(300px, 52vw, 380px)',
-              }}
+              className="rounded-3xl overflow-hidden shadow-xl relative"
+              style={{ minHeight: 'clamp(300px, 52vw, 380px)' }}
             >
-              <div className="absolute inset-0 flex items-center justify-center px-8 py-10">
-                <div className="text-center text-white/30">
-                  <Hammer className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4" />
-                  <p className="text-lg md:text-xl font-display">
-                    {lang === 'ar' ? 'صناعة يدوية أصيلة' : 'Artisanat authentique'}
-                  </p>
-                </div>
-              </div>
+              <img
+                src="/artisan.jpg"
+                alt={lang === 'ar' ? 'حرفي مغربي يصنع الجلود' : 'Artisan marocain travaillant le cuir'}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center 25%' }}
+                loading="lazy"
+                decoding="async"
+              />
+              {/* Subtle darkening at bottom for card legibility */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 55%)' }}
+                aria-hidden="true"
+              />
 
               {/* Floating accent cards */}
               <div className="absolute bottom-5 start-5 bg-white rounded-xl p-3.5 shadow-lg max-w-[150px]">

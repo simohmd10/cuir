@@ -195,7 +195,7 @@ export default function Contact() {
                       <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                     </div>
                     <h3 className="text-2xl font-bold text-leather-800">
-                      {lang === 'ar' ? 'شكراً / Merci' : 'Merci / شكراً'}
+                      {lang === 'ar' ? 'شكراً' : 'Merci'}
                     </h3>
                     <p className="text-leather-500">{t('messageSent')}</p>
                     <button

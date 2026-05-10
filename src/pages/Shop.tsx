@@ -254,7 +254,7 @@ export default function Shop() {
       <header className="bg-cream-200 py-16 md:py-20">
         <div className="container-luxury text-center space-y-4">
           <p className="section-label">
-            {lang === 'ar' ? '— المتجر | Boutique —' : '— Boutique | المتجر —'}
+            {lang === 'ar' ? '— المتجر —' : '— Boutique —'}
           </p>
           <h1 className="heading-section text-balance">
             {lang === 'ar' ? 'جميع التصاميم' : 'Toute la Collection'}
