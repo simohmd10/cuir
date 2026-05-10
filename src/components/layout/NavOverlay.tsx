@@ -206,10 +206,12 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
   const location = useLocation();
   const isAr = lang === 'ar';
   const savedScrollY = useRef(0);
+  const shouldRestoreScroll = useRef(true);
 
   // ── iOS-safe scroll lock ──────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
+    shouldRestoreScroll.current = true;
     savedScrollY.current = window.scrollY;
     const { style } = document.body;
     style.overflow  = 'hidden';
@@ -221,12 +223,17 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
       style.position  = '';
       style.top       = '';
       style.width     = '';
-      window.scrollTo(0, savedScrollY.current);
+      if (shouldRestoreScroll.current) {
+        window.scrollTo(0, savedScrollY.current);
+      }
     };
   }, [isOpen]);
 
   // ── Close on route change ─────────────────────────────────────────────────
-  useEffect(() => { onClose(); }, [location.pathname]); // eslint-disable-line
+  useEffect(() => {
+    if (isOpen) shouldRestoreScroll.current = false;
+    onClose();
+  }, [location.pathname]); // eslint-disable-line
 
   // ── Keyboard close ────────────────────────────────────────────────────────
   useEffect(() => {
