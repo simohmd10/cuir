@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
 import Header from './components/layout/Header';
@@ -40,6 +40,31 @@ function PageLoader() {
   );
 }
 
+function ScrollToTopOnRouteChange() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    return undefined;
+  }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
+    return () => {
+      window.history.scrollRestoration = previousRestoration;
+    };
+  }, []);
+
+  return null;
+}
+
 function CustomerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
@@ -61,6 +86,7 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { dir } = useLanguage();
+  const location = useLocation();
 
   useEffect(() => {
     warmCommonRoutes();
@@ -68,13 +94,14 @@ export default function App() {
 
   return (
     <div dir={dir} className="min-h-screen bg-beige-50">
+      <ScrollToTopOnRouteChange />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Customer routes */}
           <Route
             path="/"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Home />
               </CustomerLayout>
             }
@@ -82,7 +109,7 @@ export default function App() {
           <Route
             path="/shop"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Shop />
               </CustomerLayout>
             }
@@ -90,7 +117,7 @@ export default function App() {
           <Route
             path="/product/:id"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Product />
               </CustomerLayout>
             }
@@ -98,7 +125,7 @@ export default function App() {
           <Route
             path="/cart"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Cart />
               </CustomerLayout>
             }
@@ -106,7 +133,7 @@ export default function App() {
           <Route
             path="/checkout"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Checkout />
               </CustomerLayout>
             }
@@ -114,7 +141,7 @@ export default function App() {
           <Route
             path="/order-status"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <OrderStatus />
               </CustomerLayout>
             }
@@ -122,7 +149,7 @@ export default function App() {
           <Route
             path="/contact"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Contact />
               </CustomerLayout>
             }
@@ -130,7 +157,7 @@ export default function App() {
           <Route
             path="/about"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <About />
               </CustomerLayout>
             }
@@ -138,7 +165,7 @@ export default function App() {
           <Route
             path="/faq"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <FAQ />
               </CustomerLayout>
             }
