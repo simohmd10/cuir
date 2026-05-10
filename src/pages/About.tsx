@@ -197,7 +197,7 @@ export default function About() {
               <img
                 src="/artisan.jpg"
                 alt={lang === 'ar' ? 'حرفي مغربي يصنع الجلود' : 'Artisan marocain travaillant le cuir'}
-                className="w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 style={{ objectPosition: 'center 25%' }}
                 loading="lazy"
                 decoding="async"
