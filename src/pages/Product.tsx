@@ -29,80 +29,102 @@ import type { Review } from '../types';
  * Returns undefined when no mapping exists → render as a text pill instead.
  */
 const COLOR_MAP: Record<string, string> = {
-  // Neutrals
-  noir:        '#1C1C1C',
-  black:       '#1C1C1C',
-  أسود:        '#1C1C1C',
-  blanc:       '#F5F0E8',
-  white:       '#F5F0E8',
-  أبيض:        '#F5F0E8',
-  ivoire:      '#FFFFF0',
-  crème:       '#FAF7F4',
-  creme:       '#FAF7F4',
-  gris:        '#9E9E9E',
-  grey:        '#9E9E9E',
-  gray:        '#9E9E9E',
-  رمادي:       '#9E9E9E',
-  // Browns & leather tones
-  marron:      '#6B4423',
-  brun:        '#6B4423',
-  brown:       '#6B4423',
-  بني:         '#6B4423',
-  camel:       '#C4A882',
-  كاميل:       '#C4A882',
-  cognac:      '#9B4319',
-  كونياك:      '#9B4319',
-  havane:      '#8B5A2B',
-  chocolat:    '#4A2810',
-  tabac:       '#8B6914',
-  sable:       '#C2A572',
-  tan:         '#C8A96E',
-  fauve:       '#B5651D',
-  // Reds
-  rouge:       '#C0392B',
-  red:         '#C0392B',
-  أحمر:        '#C0392B',
-  bordeaux:    '#722F37',
-  burgundy:    '#722F37',
-  // Blues
-  marine:      '#1C2E4A',
-  bleu:        '#2B5797',
-  blue:        '#2B5797',
-  أزرق:        '#2B5797',
-  navy:        '#1C2E4A',
-  cobalt:      '#0047AB',
-  // Greens
-  vert:        '#2D6A4F',
-  green:       '#2D6A4F',
-  أخضر:        '#2D6A4F',
-  kaki:        '#8B864E',
-  khaki:       '#8B864E',
-  olive:       '#6B6B2A',
-  // Metallics
-  or:          '#B8965A',
-  gold:        '#B8965A',
-  ذهبي:        '#B8965A',
-  bronze:      '#8B6914',
-  argent:      '#A8A9AD',
-  silver:      '#A8A9AD',
-  // Pinks & Purples
-  rose:        '#F48FB1',
-  pink:        '#F48FB1',
-  vieux_rose:  '#C9837A',
-  prune:       '#7B3F5E',
-  // Yellows
-  miel:        '#D4A017',
-  honey:       '#D4A017',
+  // ── Whites & off-whites ──────────────────────────────────────────────────────
+  noir:           '#1C1C1C',
+  black:          '#1C1C1C',
+  أسود:           '#1C1C1C',
+  blanc:          '#F5F0E8',
+  white:          '#F5F0E8',
+  أبيض:           '#F5F0E8',
+  'blanc casse':  '#F0EAE0',   // Blanc cassé
+  'off white':    '#F0EAE0',
+  ivoire:         '#FFFFF0',
+  ecru:           '#F5F0DC',
+  creme:          '#FAF7F4',
+  cream:          '#FAF7F4',
+  // ── Greys ───────────────────────────────────────────────────────────────────
+  gris:           '#9E9E9E',
+  grey:           '#9E9E9E',
+  gray:           '#9E9E9E',
+  رمادي:          '#9E9E9E',
+  // ── Beige & sand tones ──────────────────────────────────────────────────────
+  beige:          '#D4B896',
+  بيج:            '#D4B896',
+  sable:          '#C2A572',
+  sand:           '#C2A572',
+  رملي:           '#C2A572',
+  naturel:        '#C8A97A',
+  nude:           '#D9B99B',
+  // ── Browns & leather tones ───────────────────────────────────────────────────
+  marron:         '#6B4423',
+  brun:           '#6B4423',
+  brown:          '#6B4423',
+  بني:            '#6B4423',
+  camel:          '#C4A882',
+  كاميل:          '#C4A882',
+  caramel:        '#C6956A',   // Caramel
+  كراميل:         '#C6956A',
+  cognac:         '#9B4319',
+  كونياك:         '#9B4319',
+  havane:         '#8B5A2B',
+  chocolat:       '#4A2810',
+  chocolate:      '#4A2810',
+  tabac:          '#8B6914',
+  tan:            '#C8A96E',
+  fauve:          '#B5651D',
+  noisette:       '#8B5A2B',
+  // ── Reds ────────────────────────────────────────────────────────────────────
+  rouge:          '#C0392B',
+  red:            '#C0392B',
+  أحمر:           '#C0392B',
+  bordeaux:       '#722F37',
+  burgundy:       '#722F37',
+  // ── Blues ───────────────────────────────────────────────────────────────────
+  marine:         '#1C2E4A',
+  bleu:           '#2B5797',
+  blue:           '#2B5797',
+  أزرق:           '#2B5797',
+  navy:           '#1C2E4A',
+  cobalt:         '#0047AB',
+  // ── Greens ──────────────────────────────────────────────────────────────────
+  vert:           '#2D6A4F',
+  green:          '#2D6A4F',
+  أخضر:           '#2D6A4F',
+  kaki:           '#8B864E',
+  khaki:          '#8B864E',
+  olive:          '#6B6B2A',
+  // ── Metallics ───────────────────────────────────────────────────────────────
+  or:             '#B8965A',
+  gold:           '#B8965A',
+  ذهبي:           '#B8965A',
+  bronze:         '#8B6914',
+  argent:         '#A8A9AD',
+  silver:         '#A8A9AD',
+  // ── Pinks & Purples ─────────────────────────────────────────────────────────
+  rose:           '#F4A0A0',
+  pink:           '#F4A0A0',
+  'vieux rose':   '#C9837A',
+  prune:          '#7B3F5E',
+  // ── Yellows & Ambers ────────────────────────────────────────────────────────
+  miel:           '#D4A017',
+  honey:          '#D4A017',
+  ambre:          '#CC7722',
+  amber:          '#CC7722',
 };
 
 /** Returns a CSS color value for a product color name, or undefined if none. */
 function resolveColor(name: string): string | undefined {
+  if (!name) return undefined;
   // Direct hex value
-  if (/^#[0-9a-fA-F]{3,8}$/.test(name)) return name;
-  // Named CSS color from map (case-insensitive, accent-insensitive)
-  const key = name.toLowerCase().replace(/[éèêëàâùûîïôç]/g, (c) =>
-    ({ é:'e',è:'e',ê:'e',ë:'e',à:'a',â:'a',ù:'u',û:'u',î:'i',ï:'i',ô:'o',ç:'c' })[c] ?? c
-  );
+  if (/^#[0-9a-fA-F]{3,8}$/.test(name.trim())) return name.trim();
+  // Normalise: trim, lowercase, strip accents, collapse whitespace
+  const key = name
+    .trim()
+    .toLowerCase()
+    .replace(/[éèêëàâùûîïôçñ]/g, (c) =>
+      ({ é:'e',è:'e',ê:'e',ë:'e',à:'a',â:'a',ù:'u',û:'u',î:'i',ï:'i',ô:'o',ç:'c',ñ:'n' })[c] ?? c
+    )
+    .replace(/\s+/g, ' ');   // collapse multiple spaces → single space
   return COLOR_MAP[key];
 }
 
