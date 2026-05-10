@@ -83,6 +83,7 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { dir } = useLanguage();
+  const location = useLocation();
 
   useEffect(() => {
     warmCommonRoutes();
@@ -97,7 +98,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Home />
               </CustomerLayout>
             }
@@ -105,7 +106,7 @@ export default function App() {
           <Route
             path="/shop"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Shop />
               </CustomerLayout>
             }
@@ -113,7 +114,7 @@ export default function App() {
           <Route
             path="/product/:id"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Product />
               </CustomerLayout>
             }
@@ -121,7 +122,7 @@ export default function App() {
           <Route
             path="/cart"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Cart />
               </CustomerLayout>
             }
@@ -129,7 +130,7 @@ export default function App() {
           <Route
             path="/checkout"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Checkout />
               </CustomerLayout>
             }
@@ -137,7 +138,7 @@ export default function App() {
           <Route
             path="/order-status"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <OrderStatus />
               </CustomerLayout>
             }
@@ -145,7 +146,7 @@ export default function App() {
           <Route
             path="/contact"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <Contact />
               </CustomerLayout>
             }
@@ -153,7 +154,7 @@ export default function App() {
           <Route
             path="/about"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <About />
               </CustomerLayout>
             }
@@ -161,7 +162,7 @@ export default function App() {
           <Route
             path="/faq"
             element={
-              <CustomerLayout>
+              <CustomerLayout key={location.pathname}>
                 <FAQ />
               </CustomerLayout>
             }
