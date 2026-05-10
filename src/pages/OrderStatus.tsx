@@ -205,7 +205,7 @@ export default function OrderStatus() {
 
           <motion.button
             type="submit"
-            className="mt-4 w-full py-3 bg-leather-500 text-white rounded-xl font-bold hover:bg-leather-600 transition-colors flex items-center justify-center gap-2"
+            className="mt-4 w-full py-3 bg-ink text-white rounded-xl font-bold hover:bg-ink/80 transition-colors flex items-center justify-center gap-2"
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
           >

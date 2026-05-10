@@ -13,10 +13,10 @@ export default {
         cream: {
           DEFAULT: '#FDFCFB',
           50: '#FDFCFB',
-          100: '#FAF7F4',
-          200: '#F5EDE0',
-          300: '#EDE0CF',
-          400: '#DDD0BE',
+          100: '#FAFAF7',
+          200: '#F4F2EC',
+          300: '#ECEAE5',
+          400: '#D8D6CE',
         },
         camel: {
           DEFAULT: '#C4A882',
@@ -50,8 +50,8 @@ export default {
         },
         beige: {
           50: '#FDFCFB',
-          100: '#FAF7F4',
-          200: '#F5EDE0',
+          100: '#FAFAF7',
+          200: '#F4F2EC',
         },
       },
 

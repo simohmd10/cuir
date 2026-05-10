@@ -52,7 +52,7 @@ export default function Cart() {
             </div>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 bg-leather-500 text-white px-8 py-3.5 rounded-full font-semibold hover:bg-leather-600 transition-colors duration-200 shadow-md"
+              className="inline-flex items-center gap-2 bg-ink text-white px-8 py-3.5 rounded-full font-semibold hover:bg-ink/80 transition-colors duration-200 shadow-md"
             >
               <ShoppingBag className="w-5 h-5" />
               {t('continueShopping')}
@@ -288,7 +288,7 @@ export default function Cart() {
 
               <motion.button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3.5 bg-leather-500 text-white rounded-xl font-bold text-base hover:bg-leather-600 transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-ink text-white rounded-xl font-bold text-base hover:bg-ink/80 transition-colors duration-200 flex items-center justify-center gap-2"
                 whileTap={{ scale: 0.97 }}
               >
                 {t('checkout')}

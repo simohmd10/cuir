@@ -147,7 +147,7 @@ function PillSkeleton() {
     <div
       className="flex-none h-9 w-20 skeleton"
       style={{
-        backgroundImage: 'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 40%, #EDE0CF 60%, #F5EDE0 100%)',
+        backgroundImage: 'linear-gradient(90deg, #F4F2EC 0%, #FAFAF7 40%, #ECEAE5 60%, #F4F2EC 100%)',
         backgroundSize: '200% 100%',
       }}
       aria-hidden="true"

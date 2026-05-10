@@ -368,7 +368,7 @@ export default function Checkout() {
                             alt={name}
                             className="w-14 h-14 rounded-lg"
                           />
-                          <span className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-leather-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
+                          <span className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-ink text-white rounded-full text-xs flex items-center justify-center font-bold">
                             {item.quantity}
                           </span>
                         </div>
@@ -408,7 +408,7 @@ export default function Checkout() {
                         type="button"
                         onClick={handleApplyCoupon}
                         disabled={couponLoading || !couponInput.trim()}
-                        className="px-4 py-2.5 bg-leather-500 text-white rounded-xl text-sm font-semibold hover:bg-leather-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        className="px-4 py-2.5 bg-ink text-white rounded-xl text-sm font-semibold hover:bg-ink/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                       >
                         {couponLoading ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -481,7 +481,7 @@ export default function Checkout() {
                 <motion.button
                   type="submit"
                   disabled={placeOrderMutation.isPending}
-                  className="w-full py-4 bg-leather-500 text-white rounded-xl font-bold text-base hover:bg-leather-600 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full py-4 bg-ink text-white rounded-xl font-bold text-base hover:bg-ink/80 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   whileTap={{ scale: 0.98 }}
                 >
                   {placeOrderMutation.isPending ? (

@@ -101,7 +101,7 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, rgba(28,28,28,0.82) 0%, rgba(28,28,28,0.44) 40%, rgba(28,28,28,0.12) 72%, transparent 100%)',
+            'linear-gradient(to top, rgba(28,28,28,0.65) 0%, rgba(28,28,28,0.30) 40%, rgba(28,28,28,0.08) 72%, transparent 100%)',
         }}
         aria-hidden="true"
       />

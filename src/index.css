@@ -13,8 +13,8 @@
     --color-cream: #FDFCFB;
     --color-camel: #C4A882;
     --color-gold: #B8965A;
-    --color-beige: #FAF7F4;
-    --color-border: #E8DFD4;
+    --color-beige: #FAFAF7;
+    --color-border: #E5E2DC;
     --ease-luxury: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -187,7 +187,7 @@
     background: linear-gradient(
       90deg,
       var(--color-cream) 25%,
-      #EDE0CF 50%,
+      #ECEAE5 50%,
       var(--color-cream) 75%
     );
     background-size: 1000px 100%;

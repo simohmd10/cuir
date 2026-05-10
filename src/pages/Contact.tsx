@@ -147,7 +147,7 @@ export default function Contact() {
       <div
         className="relative py-20 px-4 text-center overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #8B5E3C 0%, #63432a 60%, #4e3421 100%)',
+          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
         }}
       >
         {/* Decorative circles */}
@@ -200,7 +200,7 @@ export default function Contact() {
                     <p className="text-leather-500">{t('messageSent')}</p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-2 px-6 py-2.5 bg-leather-500 text-white rounded-full text-sm font-semibold hover:bg-leather-600 transition-colors"
+                      className="mt-2 px-6 py-2.5 bg-ink text-white rounded-full text-sm font-semibold hover:bg-ink/80 transition-colors"
                     >
                       {lang === 'ar' ? 'إرسال رسالة أخرى' : 'Envoyer un autre message'}
                     </button>
@@ -314,7 +314,7 @@ export default function Contact() {
                     <motion.button
                       type="submit"
                       disabled={mutation.isPending}
-                      className="w-full py-3.5 bg-leather-500 text-white rounded-xl font-bold hover:bg-leather-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                      className="w-full py-3.5 bg-ink text-white rounded-xl font-bold hover:bg-ink/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                       whileTap={{ scale: 0.98 }}
                     >
                       {mutation.isPending ? (

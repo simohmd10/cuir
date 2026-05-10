@@ -186,7 +186,7 @@ function CollectionCard({
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(to top, rgba(8,4,2,0.96) 0%, rgba(8,4,2,0.40) 38%, rgba(0,0,0,0.10) 65%, transparent 100%)',
+            'linear-gradient(to top, rgba(8,4,2,0.78) 0%, rgba(8,4,2,0.30) 38%, rgba(0,0,0,0.06) 65%, transparent 100%)',
         }}
         aria-hidden="true"
       />

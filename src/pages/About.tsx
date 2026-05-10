@@ -104,7 +104,7 @@ export default function About() {
       <motion.div
         className="relative overflow-hidden py-28 px-4 text-center"
         style={{
-          background: 'linear-gradient(135deg, #4e3421 0%, #63432a 40%, #8B5E3C 80%, #c49a62 100%)',
+          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
         }}
         initial="hidden"
         animate="visible"
@@ -193,7 +193,7 @@ export default function About() {
             <div
               className="rounded-3xl overflow-hidden shadow-xl"
               style={{
-                background: 'linear-gradient(135deg, #8B5E3C 0%, #63432a 100%)',
+                background: 'linear-gradient(135deg, #2D2926 0%, #1C1C1C 100%)',
                 minHeight: 'clamp(300px, 52vw, 380px)',
               }}
             >
@@ -263,7 +263,7 @@ export default function About() {
       <motion.section
         className="py-20 px-4"
         style={{
-          background: 'linear-gradient(135deg, #8B5E3C 0%, #63432a 60%, #4e3421 100%)',
+          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 60%, #1C1C1C 100%)',
         }}
         initial="hidden"
         whileInView="visible"
@@ -374,7 +374,7 @@ export default function About() {
           <motion.div whileTap={{ scale: 0.97 }}>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-leather-500 text-white rounded-full font-bold hover:bg-leather-600 transition-colors shadow-md"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-ink text-white rounded-full font-bold hover:bg-ink/80 transition-colors shadow-md"
             >
               <ShoppingBag className="w-5 h-5" />
               {lang === 'ar' ? 'تسوق الآن' : 'Acheter Maintenant'}

@@ -233,7 +233,7 @@ export default function FAQ() {
       <div
         className="relative py-20 px-4 text-center"
         style={{
-          background: 'linear-gradient(135deg, #8B5E3C 0%, #63432a 60%, #4e3421 100%)',
+          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
         }}
       >
         <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-white/5 pointer-events-none" />
@@ -340,7 +340,7 @@ export default function FAQ() {
 
         {/* ── Still have questions ── */}
         <motion.div
-          className="mt-10 bg-gradient-to-br from-leather-500 to-leather-700 rounded-2xl p-8 text-center text-white"
+          className="mt-10 bg-ink rounded-2xl p-8 text-center text-white"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}

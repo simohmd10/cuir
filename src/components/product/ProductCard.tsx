@@ -15,7 +15,7 @@ function ShimmerBar({ className }: { className: string }) {
     <div
       className={`rounded-sm bg-cream-200 animate-shimmer ${className}`}
       style={{
-        backgroundImage: 'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 42%, #EDE0CF 58%, #F5EDE0 100%)',
+        backgroundImage: 'linear-gradient(90deg, #F4F2EC 0%, #FAFAF7 42%, #ECEAE5 58%, #F4F2EC 100%)',
         backgroundSize: '800px 100%',
       }}
     />
@@ -30,7 +30,7 @@ export function ProductCardSkeleton({ className = '' }: { className?: string }) 
         className="w-full overflow-hidden bg-cream-200 animate-shimmer"
         style={{
           aspectRatio: '3 / 4',
-          backgroundImage: 'linear-gradient(90deg, #F5EDE0 0%, #FAF7F4 42%, #EDE0CF 58%, #F5EDE0 100%)',
+          backgroundImage: 'linear-gradient(90deg, #F4F2EC 0%, #FAFAF7 42%, #ECEAE5 58%, #F4F2EC 100%)',
           backgroundSize: '800px 100%',
         }}
       />
