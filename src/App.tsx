@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
@@ -17,6 +17,8 @@ const OrderStatus = lazy(() => import('./pages/OrderStatus'));
 const Contact = lazy(() => import('./pages/Contact'));
 const About = lazy(() => import('./pages/About'));
 const FAQ = lazy(() => import('./pages/FAQ'));
+const ReturnsPolicy = lazy(() => import('./pages/ReturnsPolicy'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 // Admin pages
 const AdminLogin = lazy(() => import('./pages/admin/Login'));
@@ -40,33 +42,120 @@ function PageLoader() {
   );
 }
 
-function ScrollToTopOnRouteChange() {
+function NavigationResetManager() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const previousRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = 'manual';
+  }, []);
 
-    const frame = window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    const body = document.body;
+    const prevRootBehavior = root.style.scrollBehavior;
+    const prevBodyBehavior = body.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    body.style.scrollBehavior = 'auto';
+
+    const resetTop = () => {
+      window.scrollTo(0, 0);
+      root.scrollTop = 0;
+      body.scrollTop = 0;
+    };
+
+    resetTop();
+    const raf = window.requestAnimationFrame(resetTop);
+    const timeout = window.setTimeout(resetTop, 75);
 
     return () => {
-      window.cancelAnimationFrame(frame);
-      window.history.scrollRestoration = previousRestoration;
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timeout);
+      root.style.scrollBehavior = prevRootBehavior;
+      body.style.scrollBehavior = prevBodyBehavior;
     };
   }, [pathname]);
 
   return null;
 }
 
+function RouteDocumentMeta() {
+  const { pathname } = useLocation();
+  const { lang } = useLanguage();
+
+  useEffect(() => {
+    const routeMeta: Record<string, { ar: { title: string; description: string }; fr: { title: string; description: string } }> = {
+      '/': {
+        ar: { title: 'Cuir - متجر الحقائب الجلدية الفاخرة', description: 'حقائب جلدية يدوية فاخرة من المغرب' },
+        fr: { title: 'Cuir - Maroquinerie de luxe', description: 'Sacs en cuir artisanaux du Maroc' },
+      },
+      '/shop': {
+        ar: { title: 'المتجر — Cuir', description: 'تسوق تشكيلة Cuir الكاملة من الحقائب والإكسسوارات الجلدية.' },
+        fr: { title: 'Boutique — Cuir', description: 'Explorez la collection complète de sacs et accessoires Cuir.' },
+      },
+      '/about': {
+        ar: { title: 'من نحن — Cuir', description: 'تعرف على قصة Cuir وحرفية الجلد المغربي الأصيل.' },
+        fr: { title: 'À propos — Cuir', description: 'Découvrez l’histoire de Cuir et son artisanat marocain.' },
+      },
+      '/contact': {
+        ar: { title: 'اتصل بنا — Cuir', description: 'تواصل مع فريق Cuir لخدمة العملاء والطلبات.' },
+        fr: { title: 'Contact — Cuir', description: 'Contactez l’équipe Cuir pour toute demande ou assistance.' },
+      },
+      '/faq': {
+        ar: { title: 'الأسئلة الشائعة — Cuir', description: 'إجابات على الأسئلة الشائعة حول الطلبات، الشحن، والإرجاع.' },
+        fr: { title: 'FAQ — Cuir', description: 'Réponses aux questions fréquentes sur commandes, livraison et retours.' },
+      },
+      '/returns': {
+        ar: { title: 'سياسة الإرجاع — Cuir', description: 'سياسة الإرجاع والاستبدال واسترداد المبالغ في Cuir.' },
+        fr: { title: 'Politique de retour — Cuir', description: 'Conditions de retour, échange et remboursement chez Cuir.' },
+      },
+      '/privacy': {
+        ar: { title: 'سياسة الخصوصية — Cuir', description: 'تفاصيل جمع واستخدام وحماية بيانات العملاء في Cuir.' },
+        fr: { title: 'Confidentialité — Cuir', description: 'Collecte, utilisation et protection des données clients chez Cuir.' },
+      },
+      '/cart': {
+        ar: { title: 'السلة — Cuir', description: 'راجع المنتجات التي أضفتها إلى سلة التسوق.' },
+        fr: { title: 'Panier — Cuir', description: 'Vérifiez les articles ajoutés à votre panier.' },
+      },
+      '/checkout': {
+        ar: { title: 'الدفع — Cuir', description: 'أكمل طلبك بأمان عبر صفحة الدفع الخاصة بـ Cuir.' },
+        fr: { title: 'Paiement — Cuir', description: 'Finalisez votre commande en toute sécurité.' },
+      },
+      '/order-status': {
+        ar: { title: 'حالة الطلب — Cuir', description: 'تابع حالة طلبك في Cuir.' },
+        fr: { title: 'Suivi de commande — Cuir', description: 'Consultez le statut de votre commande Cuir.' },
+      },
+    };
+
+    const route = routeMeta[pathname];
+    if (route) {
+      const selected = lang === 'ar' ? route.ar : route.fr;
+      document.title = selected.title;
+      const desc = document.querySelector('meta[name="description"]');
+      if (desc) desc.setAttribute('content', selected.description);
+    }
+
+    const canonicalHref = `${window.location.origin}${pathname}`;
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', canonicalHref);
+  }, [pathname, lang]);
+
+  return null;
+}
+
 function CustomerLayout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main key={location.pathname} className="flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
     </div>
@@ -83,7 +172,6 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { dir } = useLanguage();
-  const location = useLocation();
 
   useEffect(() => {
     warmCommonRoutes();
@@ -91,14 +179,15 @@ export default function App() {
 
   return (
     <div dir={dir} className="min-h-screen bg-beige-50">
-      <ScrollToTopOnRouteChange />
+      <NavigationResetManager />
+      <RouteDocumentMeta />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Customer routes */}
           <Route
             path="/"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Home />
               </CustomerLayout>
             }
@@ -106,7 +195,7 @@ export default function App() {
           <Route
             path="/shop"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Shop />
               </CustomerLayout>
             }
@@ -114,7 +203,7 @@ export default function App() {
           <Route
             path="/product/:id"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Product />
               </CustomerLayout>
             }
@@ -122,7 +211,7 @@ export default function App() {
           <Route
             path="/cart"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Cart />
               </CustomerLayout>
             }
@@ -130,7 +219,7 @@ export default function App() {
           <Route
             path="/checkout"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Checkout />
               </CustomerLayout>
             }
@@ -138,7 +227,7 @@ export default function App() {
           <Route
             path="/order-status"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <OrderStatus />
               </CustomerLayout>
             }
@@ -146,7 +235,7 @@ export default function App() {
           <Route
             path="/contact"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <Contact />
               </CustomerLayout>
             }
@@ -154,7 +243,7 @@ export default function App() {
           <Route
             path="/about"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <About />
               </CustomerLayout>
             }
@@ -162,10 +251,34 @@ export default function App() {
           <Route
             path="/faq"
             element={
-              <CustomerLayout key={location.pathname}>
+              <CustomerLayout>
                 <FAQ />
               </CustomerLayout>
             }
+          />
+          <Route
+            path="/returns"
+            element={
+              <CustomerLayout>
+                <ReturnsPolicy />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/politique-de-retour"
+            element={<Navigate to="/returns" replace />}
+          />
+          <Route
+            path="/privacy"
+            element={
+              <CustomerLayout>
+                <PrivacyPolicy />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/confidentialite"
+            element={<Navigate to="/privacy" replace />}
           />
 
           {/* Admin routes */}
