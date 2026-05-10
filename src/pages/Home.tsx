@@ -186,9 +186,9 @@ export default function Home() {
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
                 ))
-              : featured?.map((product) => (
+              : featured?.map((product, index) => (
                   <div key={product.id} className="reveal">
-                    <ProductCard product={product} />
+                    <ProductCard product={product} priority={index < 2} />
                   </div>
                 ))}
           </div>
@@ -278,9 +278,9 @@ export default function Home() {
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
                 ))
-              : bestSellers?.map((product) => (
+              : bestSellers?.map((product, index) => (
                   <div key={product.id} className="reveal">
-                    <ProductCard product={product} />
+                    <ProductCard product={product} priority={index < 2} />
                   </div>
                 ))}
           </div>

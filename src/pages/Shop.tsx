@@ -378,9 +378,9 @@ export default function Shop() {
               ref={gridRef}
               className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 reveal-group"
             >
-              {visibleProducts.map((product) => (
+              {visibleProducts.map((product, index) => (
                 <div key={product.id} className="reveal">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} priority={index < 4} />
                 </div>
               ))}
             </div>
