@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-const WHATSAPP_NUMBER = '212600000000';
+const WHATSAPP_NUMBER = '212691553120';
 const WA_GREEN = '#25D366';
 
 const MESSAGES: Record<'ar' | 'fr', string> = {
