@@ -60,6 +60,11 @@ export function classNames(...classes: (string | boolean | undefined | null)[]):
   return classes.filter(Boolean).join(' ');
 }
 
+
+function shouldUseSupabaseTransforms(): boolean {
+  return import.meta.env.VITE_SUPABASE_USE_IMAGE_TRANSFORMS === 'true';
+}
+
 export function getImageUrl(path: string, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
   if (path.startsWith('http')) return path;
@@ -70,14 +75,19 @@ export function getImageUrl(path: string, fallback?: string): string {
 
 export function getResponsiveImageUrl(path: string, width: number, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
-  if (path.startsWith('http')) return `${path}${path.includes('?') ? '&' : '?'}width=${width}`;
+  if (path.startsWith('http')) return path;
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) return fallback || '/placeholder-bag.jpg';
+
+  if (!shouldUseSupabaseTransforms()) {
+    return `${supabaseUrl}/storage/v1/object/public/products/${path}`;
+  }
+
   return `${supabaseUrl}/storage/v1/render/image/public/products/${path}?width=${width}&quality=72`;
 }
 
 export function getProductImageSrcSet(path: string, fallback?: string): string | undefined {
-  if (!path) return undefined;
+  if (!path || !shouldUseSupabaseTransforms()) return undefined;
   const widths = [240, 320, 400, 520];
   return widths.map((w) => `${getResponsiveImageUrl(path, w, fallback)} ${w}w`).join(', ');
 }
