@@ -460,21 +460,24 @@ const Products: React.FC = () => {
                       return (
                         <>
                           {parents.map((parent) => {
+                            const pName = lang === 'ar' ? (parent.name_ar || parent.name) : parent.name;
                             const children = categories.filter((c) => c.parent_slug === parent.slug);
                             return children.length > 0 ? (
-                              <optgroup key={parent.slug} label={`▸ ${parent.name}`}>
-                                <option value={parent.slug}>{parent.name} (général)</option>
-                                {children.map((c) => (
-                                  <option key={c.id} value={c.slug}>{'  '}↳ {c.name}</option>
-                                ))}
+                              <optgroup key={parent.slug} label={`▸ ${pName}`}>
+                                <option value={parent.slug}>{pName} ({lang === 'ar' ? 'عام' : 'général'})</option>
+                                {children.map((c) => {
+                                  const cName = lang === 'ar' ? (c.name_ar || c.name) : c.name;
+                                  return <option key={c.id} value={c.slug}>{'  '}↳ {cName}</option>;
+                                })}
                               </optgroup>
                             ) : (
-                              <option key={parent.slug} value={parent.slug}>{parent.name}</option>
+                              <option key={parent.slug} value={parent.slug}>{pName}</option>
                             );
                           })}
-                          {orphans.map((c) => (
-                            <option key={c.id} value={c.slug}>{c.name}</option>
-                          ))}
+                          {orphans.map((c) => {
+                            const cName = lang === 'ar' ? (c.name_ar || c.name) : c.name;
+                            return <option key={c.id} value={c.slug}>{cName}</option>;
+                          })}
                         </>
                       );
                     })()}

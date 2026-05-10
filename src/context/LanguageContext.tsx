@@ -13,7 +13,10 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Language>(() => {
     const saved = localStorage.getItem('cuir-lang');
-    return (saved as Language) || 'ar';
+    if (saved === 'ar' || saved === 'fr') return saved;
+    // Auto-detect from browser/device language
+    const browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+    return browserLang.toLowerCase().startsWith('ar') ? 'ar' : 'fr';
   });
 
   const setLang = (newLang: Language) => {

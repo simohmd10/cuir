@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,10 +16,18 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
-  const { signIn } = useAuth();
+  const { signIn, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [awaitingRedirect, setAwaitingRedirect] = useState(false);
+
+  // Navigate only after onAuthStateChange has fetched the profile and isAdmin is confirmed
+  useEffect(() => {
+    if (awaitingRedirect && isAdmin) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [isAdmin, awaitingRedirect, navigate]);
 
   const {
     register,
@@ -37,7 +45,7 @@ const Login: React.FC = () => {
         toast.error('Email ou mot de passe incorrect');
       } else {
         toast.success('Connexion réussie');
-        navigate('/admin/dashboard');
+        setAwaitingRedirect(true); // navigate once isAdmin becomes true
       }
     } catch {
       toast.error('Une erreur est survenue');
