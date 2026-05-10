@@ -187,7 +187,7 @@ export default function Footer() {
 
             <ul className="space-y-2.5">
               {QUICK_LINKS.map(({ labelFr, labelAr, path }) => (
-                <li key={path}>
+                <li key={`${path}-${labelFr}`}>
                   <Link to={path} className={linkBase}>
                     {isArabic ? labelAr : labelFr}
                   </Link>
@@ -209,7 +209,7 @@ export default function Footer() {
 
             <ul className="space-y-2.5">
               {SERVICE_LINKS.map(({ labelFr, labelAr, path }) => (
-                <li key={path}>
+                <li key={`${path}-${labelFr}`}>
                   <Link to={path} className={linkBase}>
                     {isArabic ? labelAr : labelFr}
                   </Link>
