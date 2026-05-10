@@ -24,12 +24,12 @@ const SERVICE_LINKS = [
   {
     labelFr: 'Politique de retour',
     labelAr: 'سياسة الإرجاع',
-    path: '/faq',
+    path: '/returns',
   },
   {
     labelFr: 'Confidentialité',
     labelAr: 'الخصوصية',
-    path: '/faq',
+    path: '/privacy',
   },
   {
     labelFr: 'FAQ',

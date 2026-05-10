@@ -17,6 +17,8 @@ const OrderStatus = lazy(() => import('./pages/OrderStatus'));
 const Contact = lazy(() => import('./pages/Contact'));
 const About = lazy(() => import('./pages/About'));
 const FAQ = lazy(() => import('./pages/FAQ'));
+const ReturnsPolicy = lazy(() => import('./pages/ReturnsPolicy'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 // Admin pages
 const AdminLogin = lazy(() => import('./pages/admin/Login'));
@@ -245,6 +247,30 @@ export default function App() {
                 <FAQ />
               </CustomerLayout>
             }
+          />
+          <Route
+            path="/returns"
+            element={
+              <CustomerLayout>
+                <ReturnsPolicy />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/politique-de-retour"
+            element={<Navigate to="/returns" replace />}
+          />
+          <Route
+            path="/privacy"
+            element={
+              <CustomerLayout>
+                <PrivacyPolicy />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/confidentialite"
+            element={<Navigate to="/privacy" replace />}
           />
 
           {/* Admin routes */}

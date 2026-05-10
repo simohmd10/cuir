@@ -84,6 +84,30 @@ const FAQ_ITEMS: FaqItem[] = [
     },
   },
 
+  // ── Orders ──
+  {
+    category: { ar: 'الطلبات', fr: 'Commandes' },
+    question: {
+      ar: 'كيف يمكنني تتبع طلبي؟',
+      fr: 'Comment suivre ma commande ?',
+    },
+    answer: {
+      ar: 'بعد تأكيد الطلب ستحصل على مرجع الطلب. يمكنك متابعة الحالة عبر صفحة تتبع الطلب أو التواصل مع خدمة العملاء.',
+      fr: 'Après confirmation, vous recevez une référence de commande. Vous pouvez suivre le statut via la page de suivi ou contacter notre service client.',
+    },
+  },
+  {
+    category: { ar: 'الطلبات', fr: 'Commandes' },
+    question: {
+      ar: 'هل يمكن تعديل الطلب بعد تأكيده؟',
+      fr: 'Puis-je modifier ma commande après confirmation ?',
+    },
+    answer: {
+      ar: 'يمكن تعديل الطلب قبل الشحن فقط. تواصل معنا سريعاً مع رقم الطلب لتأكيد إمكانية التعديل.',
+      fr: 'La modification est possible uniquement avant l’expédition. Contactez-nous rapidement avec votre référence de commande.',
+    },
+  },
+
   // ── Product care ──
   {
     category: { ar: 'العناية بالمنتجات', fr: 'Entretien des produits' },
@@ -108,31 +132,6 @@ const FAQ_ITEMS: FaqItem[] = [
     },
   },
 
-  // ── Authenticity ──
-  {
-    category: { ar: 'الأصالة والجودة', fr: 'Authenticité & Qualité' },
-    question: {
-      ar: 'كيف أتحقق من أصالة الجلد؟',
-      fr: 'Comment vérifier l\'authenticité du cuir ?',
-    },
-    answer: {
-      ar: `يمكنك التحقق من الجلد الطبيعي بعدة طرق:\n• رائحته النفاذة والمميزة — البلاستيك لا رائحة له\n• ملمسه غير المتساوي تماماً — الجلد الطبيعي ليس مثالي الملمس\n• شعوره بالدفء عند اللمس بعكس البلاستيك البارد\n• مقاومته للماء الطبيعية وامتصاصه التدريجي للقطرات\nكما يُرفق مع كل منتج شهادة الأصالة من متجرنا.`,
-      fr: `Vous pouvez vérifier le cuir naturel de plusieurs façons :\n• Son odeur caractéristique — le plastique est inodore\n• Sa texture non parfaitement uniforme — le cuir naturel n'est pas parfait\n• Sa chaleur au toucher, contrairement au plastique froid\n• Sa résistance naturelle à l'eau et son absorption progressive\nUn certificat d'authenticité de notre boutique est inclus avec chaque produit.`,
-    },
-  },
-
-  // ── Wholesale ──
-  {
-    category: { ar: 'الجملة والشراكات', fr: 'Gros & Partenariats' },
-    question: {
-      ar: 'هل تقدمون خدمة الجملة أو الشراكات التجارية؟',
-      fr: 'Proposez-vous des ventes en gros ou des partenariats commerciaux ?',
-    },
-    answer: {
-      ar: 'نعم! نرحب بطلبات الجملة والشراكات التجارية. يرجى التواصل معنا عبر البريد الإلكتروني contact@cuir.ma أو واتساب لمناقشة الشروط والأسعار الخاصة.',
-      fr: 'Oui ! Nous accueillons les commandes en gros et les partenariats commerciaux. Veuillez nous contacter par email à contact@cuir.ma ou via WhatsApp pour discuter des conditions et des prix spéciaux.',
-    },
-  },
 ];
 
 // ── Accordion item ────────────────────────────────────────────────────────────
