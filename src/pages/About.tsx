@@ -132,19 +132,19 @@ export default function About() {
 
       {/* ── Story section ── */}
       <motion.section
-        className="max-w-6xl mx-auto px-4 py-20"
+        className="max-w-6xl mx-auto px-4 py-14 md:py-16"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-80px' }}
         variants={stagger}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12 items-center">
           {/* Text */}
           <motion.div variants={fadeUp} className={lang === 'ar' ? 'lg:order-2' : 'lg:order-1'}>
-            <h2 className="text-3xl font-display font-bold text-leather-800 mb-6">
+            <h2 className="text-3xl font-display font-bold text-leather-800 mb-5">
               {t('ourStory')}
             </h2>
-            <div className="space-y-4 text-leather-600 leading-relaxed">
+            <div className="space-y-3.5 text-leather-600 leading-relaxed">
               {lang === 'ar' ? (
                 <>
                   <p>
@@ -194,20 +194,20 @@ export default function About() {
               className="rounded-3xl overflow-hidden shadow-xl"
               style={{
                 background: 'linear-gradient(135deg, #8B5E3C 0%, #63432a 100%)',
-                minHeight: '420px',
+                minHeight: 'clamp(300px, 52vw, 380px)',
               }}
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-white/30 p-8">
-                  <Hammer className="w-24 h-24 mx-auto mb-4" />
-                  <p className="text-xl font-display">
+              <div className="absolute inset-0 flex items-center justify-center px-8 py-10">
+                <div className="text-center text-white/30">
+                  <Hammer className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4" />
+                  <p className="text-lg md:text-xl font-display">
                     {lang === 'ar' ? 'صناعة يدوية أصيلة' : 'Artisanat authentique'}
                   </p>
                 </div>
               </div>
 
               {/* Floating accent cards */}
-              <div className="absolute bottom-6 start-6 bg-white rounded-xl p-4 shadow-lg max-w-[160px]">
+              <div className="absolute bottom-5 start-5 bg-white rounded-xl p-3.5 shadow-lg max-w-[150px]">
                 <div className="flex items-center gap-2 mb-1">
                   <Star className="w-4 h-4 text-gold-500 fill-gold-500" />
                   <span className="text-xs font-bold text-leather-800">4.9/5</span>
@@ -217,7 +217,7 @@ export default function About() {
                 </p>
               </div>
 
-              <div className="absolute top-6 end-6 bg-white rounded-xl p-4 shadow-lg max-w-[160px]">
+              <div className="absolute top-5 end-5 bg-white rounded-xl p-3.5 shadow-lg max-w-[150px]">
                 <div className="flex items-center gap-2 mb-1">
                   <Shield className="w-4 h-4 text-leather-500" />
                   <span className="text-xs font-bold text-leather-800">
