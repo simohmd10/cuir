@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
@@ -43,27 +43,21 @@ function PageLoader() {
 function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation();
 
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.scrollTo(0, 0);
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    return undefined;
-  }, [pathname]);
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const previousRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = 'manual';
 
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     return () => {
+      window.cancelAnimationFrame(frame);
       window.history.scrollRestoration = previousRestoration;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
