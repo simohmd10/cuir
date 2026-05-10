@@ -21,25 +21,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      try {
-        if (session?.user) await fetchProfile(session.user.id);
-      } finally {
-        setLoading(false);
-      }
-    });
+    let cancelled = false;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Absolute safety net: never hang on the loading screen
+    const timer = setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 8000);
+
+    supabase.auth
+      .getSession()
+      .then(async ({ data: { session } }) => {
+        if (cancelled) return;
+        setSession(session);
+        try {
+          if (session?.user) await fetchProfile(session.user.id);
+        } finally {
+          if (!cancelled) {
+            clearTimeout(timer);
+            setLoading(false);
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          clearTimeout(timer);
+          setLoading(false);
+        }
+      });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
       setSession(session);
       if (session?.user) {
-        await fetchProfile(session.user.id);
+        fetchProfile(session.user.id);
       } else {
         setProfile(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchProfile = async (userId: string) => {
