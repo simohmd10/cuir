@@ -44,9 +44,10 @@ export function ProductCardSkeleton({ className = '' }: { className?: string }) 
 }
 
 // ─── ProductCard ──────────────────────────────────────────────────────────────
-const ProductCard: React.FC<{ product: Product; className?: string }> = ({
+const ProductCard: React.FC<{ product: Product; className?: string; priority?: boolean }> = ({
   product,
   className = '',
+  priority = false,
 }) => {
   const { lang, dir } = useLanguage();
   const { addItem } = useCart();
@@ -89,7 +90,9 @@ const ProductCard: React.FC<{ product: Product; className?: string }> = ({
             src={image}
             alt={name}
             className="w-full h-full"
-            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
+            srcSet={imageSrcSet}
+            priority={priority}
+            sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
           />
         </div>
 
