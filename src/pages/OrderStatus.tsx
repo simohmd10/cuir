@@ -406,7 +406,7 @@ export default function OrderStatus() {
                     : 'Besoin d\'aide concernant votre commande ?'}
                 </p>
                 <a
-                  href={`https://wa.me/212600000000?text=${encodeURIComponent(
+                  href={`https://wa.me/2126691553120?text=${encodeURIComponent(
                     lang === 'ar'
                       ? `مرحباً، أريد الاستفسار عن طلبي رقم: ${order.order_ref}`
                       : `Bonjour, je souhaite me renseigner sur ma commande : ${order.order_ref}`
