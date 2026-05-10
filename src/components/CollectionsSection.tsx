@@ -266,11 +266,11 @@ export default function CollectionsSection() {
   const headingRef = useReveal({ rootMargin: '-48px' });
 
   return (
-    <section className="bg-cream-100 py-20 md:py-28 lg:py-36" dir={dir}>
+    <section className="bg-cream-100 py-14 md:py-28 lg:py-36" dir={dir}>
       <div className="container-luxury">
 
         {/* ── Section header ── */}
-        <div ref={headingRef} className="reveal mb-14 md:mb-20 text-center">
+        <div ref={headingRef} className="reveal mb-10 md:mb-20 text-center">
           <p className="section-label">
             {isAr ? 'المجموعات' : 'Collections'}
           </p>
@@ -330,7 +330,7 @@ export default function CollectionsSection() {
                 className="h-full"
               />
             </div>
-            <div className="w-full md:w-[41.67%] min-h-[240px] md:min-h-0">
+            <div className="w-full md:w-[41.67%] aspect-[4/3] md:aspect-auto">
               <CollectionCard
                 collection={COLLECTIONS[7]}
                 isLarge
@@ -341,7 +341,7 @@ export default function CollectionsSection() {
         </div>
 
         {/* ── Editorial footer link ── */}
-        <div className="mt-14 md:mt-20 text-center">
+        <div className="mt-10 md:mt-20 text-center">
           <Link
             to="/shop"
             className="inline-flex items-center gap-4 font-body text-[11px] tracking-[0.24em] uppercase text-ink/35 hover:text-camel transition-colors duration-500"

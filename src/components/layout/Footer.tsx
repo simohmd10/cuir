@@ -48,7 +48,7 @@ function SectionHeading({ children, isArabic }: SectionHeadingProps) {
   return (
     <h3
       className={[
-        'mb-5 text-[10px] tracking-luxury uppercase text-camel/60',
+        'mb-3.5 text-[10px] tracking-luxury uppercase text-camel/60',
         isArabic
           ? 'font-arabic tracking-normal text-xs text-right'
           : 'font-body',
@@ -82,8 +82,8 @@ export default function Footer() {
   return (
     <footer className="bg-ink text-cream-100" dir={dir}>
       {/* ── Main grid ──────────────────────────────────────────────────────── */}
-      <div className="max-w-luxury mx-auto px-6 sm:px-10 pt-16 pb-12">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 lg:grid-cols-12">
+      <div className="max-w-luxury mx-auto px-6 sm:px-10 pt-10 pb-8 md:pt-16 md:pb-12">
+        <div className="grid grid-cols-1 gap-7 md:gap-10 md:grid-cols-3 lg:grid-cols-12">
 
           {/* ── Section 1: Brand ───────────────────────────────────────────── */}
           <div
@@ -95,7 +95,7 @@ export default function Footer() {
             {/* Logo wordmark */}
             <Link
               to="/"
-              className="inline-block mb-4 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
+              className="inline-block mb-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
               <span className="font-display font-light text-3xl text-cream-100 tracking-wider">
                 CUIR
@@ -104,7 +104,7 @@ export default function Footer() {
 
             {/* Brand tagline — single language */}
             <p className={[
-              'mb-5 text-[10px] tracking-luxury uppercase text-camel/70',
+              'mb-3 text-[10px] tracking-luxury uppercase text-camel/70',
               isArabic ? 'font-arabic tracking-normal text-xs' : 'font-body',
             ].join(' ')}>
               {isArabic ? 'فن الجلد المغربي' : "L'Art du Cuir Marocain"}
@@ -113,7 +113,7 @@ export default function Footer() {
             {/* Description — localized, 2 lines */}
             <p
               className={[
-                'text-xs text-cream-100/50 leading-relaxed max-w-[28ch] mb-6',
+                'text-xs text-cream-100/50 leading-relaxed max-w-[28ch] mb-4',
                 isArabic
                   ? 'font-arabic text-sm leading-loose'
                   : 'font-body',
@@ -128,7 +128,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={[
-                'inline-flex items-center gap-2 mb-6',
+                'inline-flex items-center gap-2 mb-4',
                 'text-xs text-cream-100/60 hover:text-[#25D366]',
                 'transition-colors duration-300 ease-luxury',
                 isArabic ? 'font-arabic flex-row-reverse' : 'font-body',
@@ -142,7 +142,7 @@ export default function Footer() {
             </a>
 
             {/* Social icons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <a
                 href="https://instagram.com/cuir.ma"
                 target="_blank"
@@ -185,7 +185,7 @@ export default function Footer() {
               {t('quickLinks')}
             </SectionHeading>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {QUICK_LINKS.map(({ labelFr, labelAr, path }) => (
                 <li key={path}>
                   <Link to={path} className={linkBase}>
@@ -207,7 +207,7 @@ export default function Footer() {
               {t('customerService')}
             </SectionHeading>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {SERVICE_LINKS.map(({ labelFr, labelAr, path }) => (
                 <li key={path}>
                   <Link to={path} className={linkBase}>
@@ -226,7 +226,7 @@ export default function Footer() {
       </div>
 
       {/* ── Bottom bar ─────────────────────────────────────────────────────── */}
-      <div className="max-w-luxury mx-auto px-6 sm:px-10 py-5">
+      <div className="max-w-luxury mx-auto px-6 sm:px-10 py-4">
         <div
           className={[
             'flex flex-col gap-2 items-center text-center',
