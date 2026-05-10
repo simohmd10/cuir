@@ -5,7 +5,6 @@ import { Search, X, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts, useCategories } from '../hooks/useProducts';
 import { classNames } from '../lib/utils';
-import { useRevealGroup } from '../hooks/useReveal';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -232,9 +231,6 @@ export default function Shop() {
   const remaining       = totalCount - visibleProducts.length;
   const isLoading       = productsLoading || catLoading;
 
-  // ── Grid reveal ───────────────────────────────────────────────────────────
-  const gridRef = useRevealGroup({ threshold: 0.04 });
-
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-cream-100" dir={dir}>
@@ -374,14 +370,9 @@ export default function Shop() {
 
         ) : (
           <>
-            <div
-              ref={gridRef}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 reveal-group"
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {visibleProducts.map((product, index) => (
-                <div key={product.id} className="reveal">
-                  <ProductCard product={product} priority={index < 4} />
-                </div>
+                <ProductCard key={product.id} product={product} priority={index < 4} />
               ))}
             </div>
 
