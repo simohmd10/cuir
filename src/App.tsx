@@ -46,21 +46,18 @@ function ScrollToTopOnRouteChange() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    return undefined;
-  }, [pathname]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const previousRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = 'manual';
 
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     return () => {
+      window.cancelAnimationFrame(frame);
       window.history.scrollRestoration = previousRestoration;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
