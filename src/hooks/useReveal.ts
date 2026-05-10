@@ -38,24 +38,35 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(
       if (isInViewport(el, 160)) reveal();
     });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting || entry.intersectionRatio > 0) {
-            reveal();
-            if (once) observer.unobserve(el);
-          } else if (!once) {
-            el.classList.remove('revealed');
-          }
-        });
-      },
-      { threshold, rootMargin }
-    );
+    if (typeof IntersectionObserver === 'undefined') {
+      reveal();
+      return () => cancelAnimationFrame(rafId);
+    }
 
-    observer.observe(el);
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting || entry.intersectionRatio > 0) {
+              reveal();
+              if (once) observer?.unobserve(el);
+            } else if (!once) {
+              el.classList.remove('revealed');
+            }
+          });
+        },
+        { threshold, rootMargin }
+      );
+
+      observer.observe(el);
+    } catch {
+      reveal();
+    }
+
     return () => {
       cancelAnimationFrame(rafId);
-      observer.disconnect();
+      observer?.disconnect();
     };
   }, [threshold, rootMargin, once, delay]);
 
@@ -87,25 +98,39 @@ export function useRevealGroup<T extends HTMLElement = HTMLDivElement>(
     // Failsafe: if IO callback never arrives on some mobile browsers, don't keep cards invisible.
     const failSafe = window.setTimeout(reveal, 700);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting || entry.intersectionRatio > 0) {
-            reveal();
-            if (once) observer.unobserve(el);
-          } else if (!once) {
-            el.classList.remove('revealed');
-          }
-        });
-      },
-      { threshold, rootMargin }
-    );
+    if (typeof IntersectionObserver === 'undefined') {
+      reveal();
+      return () => {
+        cancelAnimationFrame(rafId);
+        clearTimeout(failSafe);
+      };
+    }
 
-    observer.observe(el);
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting || entry.intersectionRatio > 0) {
+              reveal();
+              if (once) observer?.unobserve(el);
+            } else if (!once) {
+              el.classList.remove('revealed');
+            }
+          });
+        },
+        { threshold, rootMargin }
+      );
+
+      observer.observe(el);
+    } catch {
+      reveal();
+    }
+
     return () => {
       cancelAnimationFrame(rafId);
       clearTimeout(failSafe);
-      observer.disconnect();
+      observer?.disconnect();
     };
   }, [threshold, rootMargin, once]);
 

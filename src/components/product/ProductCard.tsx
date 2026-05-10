@@ -55,9 +55,13 @@ const ProductCard: React.FC<{ product: Product; className?: string; priority?: b
 
   const name = lang === 'ar' ? product.name_ar : product.name;
   const badgeLabel = lang === 'ar' ? (product.badge_ar ?? product.badge) : product.badge;
-  const image = getImageUrl(product.images?.[0], '/placeholder-bag.jpg');
-  const imageSrcSet = getProductImageSrcSet(product.images?.[0], '/placeholder-bag.jpg');
-  const hasVariants = product.colors.length > 1 || product.sizes.length > 1;
+  const images = Array.isArray(product.images) ? product.images : [];
+  const colors = Array.isArray(product.colors) ? product.colors : [];
+  const sizes = Array.isArray(product.sizes) ? product.sizes : [];
+
+  const image = getImageUrl(images[0], '/placeholder-bag.jpg');
+  const imageSrcSet = getProductImageSrcSet(images[0], '/placeholder-bag.jpg');
+  const hasVariants = colors.length > 1 || sizes.length > 1;
   const isLowStock   = product.stock > 0 && product.stock <= 5;
   const isOutOfStock = product.stock === 0;
   const viewLabel    = lang === 'ar' ? 'عرض المنتج' : 'Voir le produit';
@@ -67,7 +71,7 @@ const ProductCard: React.FC<{ product: Product; className?: string; priority?: b
     e.stopPropagation();
     if (isOutOfStock) return;
     if (hasVariants) { navigate(`/product/${product.id}`); return; }
-    addItem(product, 1, product.colors[0] ?? '', product.sizes[0] ?? '');
+    addItem(product, 1, colors[0] ?? '', sizes[0] ?? '');
     toast.success(
       lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Ajouté au panier',
       { description: name, position: 'bottom-center', duration: 2500 }
