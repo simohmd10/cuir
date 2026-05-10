@@ -106,14 +106,6 @@ function RouteDocumentMeta() {
         ar: { title: 'الأسئلة الشائعة — Cuir', description: 'إجابات على الأسئلة الشائعة حول الطلبات، الشحن، والإرجاع.' },
         fr: { title: 'FAQ — Cuir', description: 'Réponses aux questions fréquentes sur commandes, livraison et retours.' },
       },
-      '/returns': {
-        ar: { title: 'سياسة الإرجاع — Cuir', description: 'سياسة الإرجاع والاستبدال واسترداد المبالغ في Cuir.' },
-        fr: { title: 'Politique de retour — Cuir', description: 'Conditions de retour, échange et remboursement chez Cuir.' },
-      },
-      '/privacy': {
-        ar: { title: 'سياسة الخصوصية — Cuir', description: 'تفاصيل جمع واستخدام وحماية بيانات العملاء في Cuir.' },
-        fr: { title: 'Confidentialité — Cuir', description: 'Collecte, utilisation et protection des données clients chez Cuir.' },
-      },
       '/cart': {
         ar: { title: 'السلة — Cuir', description: 'راجع المنتجات التي أضفتها إلى سلة التسوق.' },
         fr: { title: 'Panier — Cuir', description: 'Vérifiez les articles ajoutés à votre panier.' },
