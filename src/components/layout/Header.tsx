@@ -106,6 +106,7 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-0.5">
+            {/* Language toggle — desktop only */}
             <button
               onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
               className={`hidden sm:flex text-[10px] tracking-[0.18em] uppercase px-3 py-2 font-body transition-colors duration-300 ${mutedCls} ${hoverCls}`}
@@ -113,6 +114,7 @@ export default function Header() {
               {lang === 'ar' ? 'FR' : 'AR'}
             </button>
 
+            {/* Cart */}
             <Link
               to="/cart"
               onMouseEnter={() => preloadRoute('/cart')}
@@ -128,13 +130,16 @@ export default function Header() {
               )}
             </Link>
 
+            {/* Menu — two thin lines (luxury hamburger) */}
             <button
               onClick={() => setMenuOpen(true)}
               aria-expanded={menuOpen}
               aria-controls="nav-overlay"
-              className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
+              aria-label={lang === 'ar' ? 'القائمة' : 'Menu'}
+              className={`flex flex-col items-center justify-center gap-[5px] w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
             >
-              <Menu size={19} strokeWidth={1.5} />
+              <span className="block w-[18px] h-px bg-current" />
+              <span className="block w-[12px] h-px bg-current self-start ms-[13px]" />
             </button>
           </div>
         </div>
