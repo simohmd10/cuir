@@ -502,11 +502,6 @@ export default function ProductPage() {
 
   // ── Effects ───────────────────────────────────────────────────────────────
 
-  // Scroll to top on product navigation (related products click)
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [id]);
-
   useEffect(() => {
     if (product) {
       setSelectedColor(product.colors[0] ?? '');
@@ -1125,4 +1120,3 @@ export default function ProductPage() {
     </div>
   );
 }
-
