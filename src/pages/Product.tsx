@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useRevealGroup } from '../hooks/useReveal';
 import useEmblaCarousel from 'embla-carousel-react';
 import {
   ChevronDown,
@@ -15,7 +14,7 @@ import { toast } from 'sonner';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
-import { useProduct, useProducts } from '../hooks/useProducts';
+import { useProduct, useProducts, useCategories } from '../hooks/useProducts';
 import { useReviews, useSubmitReview } from '../hooks/useReviews';
 import { formatPrice, getImageUrl, classNames, formatDate } from '../lib/utils';
 import LazyImage from '../components/ui/LazyImage';
@@ -25,9 +24,86 @@ import type { Review } from '../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Returns true if the string looks like a CSS colour value (hex or single word). */
-function isCssColor(str: string): boolean {
-  return /^#[0-9a-fA-F]{3,8}$/.test(str) || /^[a-zA-Z]+$/.test(str);
+/**
+ * Maps stored color names (French/Arabic/English/hex) to a CSS color value.
+ * Returns undefined when no mapping exists → render as a text pill instead.
+ */
+const COLOR_MAP: Record<string, string> = {
+  // Neutrals
+  noir:        '#1C1C1C',
+  black:       '#1C1C1C',
+  أسود:        '#1C1C1C',
+  blanc:       '#F5F0E8',
+  white:       '#F5F0E8',
+  أبيض:        '#F5F0E8',
+  ivoire:      '#FFFFF0',
+  crème:       '#FAF7F4',
+  creme:       '#FAF7F4',
+  gris:        '#9E9E9E',
+  grey:        '#9E9E9E',
+  gray:        '#9E9E9E',
+  رمادي:       '#9E9E9E',
+  // Browns & leather tones
+  marron:      '#6B4423',
+  brun:        '#6B4423',
+  brown:       '#6B4423',
+  بني:         '#6B4423',
+  camel:       '#C4A882',
+  كاميل:       '#C4A882',
+  cognac:      '#9B4319',
+  كونياك:      '#9B4319',
+  havane:      '#8B5A2B',
+  chocolat:    '#4A2810',
+  tabac:       '#8B6914',
+  sable:       '#C2A572',
+  tan:         '#C8A96E',
+  fauve:       '#B5651D',
+  // Reds
+  rouge:       '#C0392B',
+  red:         '#C0392B',
+  أحمر:        '#C0392B',
+  bordeaux:    '#722F37',
+  burgundy:    '#722F37',
+  // Blues
+  marine:      '#1C2E4A',
+  bleu:        '#2B5797',
+  blue:        '#2B5797',
+  أزرق:        '#2B5797',
+  navy:        '#1C2E4A',
+  cobalt:      '#0047AB',
+  // Greens
+  vert:        '#2D6A4F',
+  green:       '#2D6A4F',
+  أخضر:        '#2D6A4F',
+  kaki:        '#8B864E',
+  khaki:       '#8B864E',
+  olive:       '#6B6B2A',
+  // Metallics
+  or:          '#B8965A',
+  gold:        '#B8965A',
+  ذهبي:        '#B8965A',
+  bronze:      '#8B6914',
+  argent:      '#A8A9AD',
+  silver:      '#A8A9AD',
+  // Pinks & Purples
+  rose:        '#F48FB1',
+  pink:        '#F48FB1',
+  vieux_rose:  '#C9837A',
+  prune:       '#7B3F5E',
+  // Yellows
+  miel:        '#D4A017',
+  honey:       '#D4A017',
+};
+
+/** Returns a CSS color value for a product color name, or undefined if none. */
+function resolveColor(name: string): string | undefined {
+  // Direct hex value
+  if (/^#[0-9a-fA-F]{3,8}$/.test(name)) return name;
+  // Named CSS color from map (case-insensitive, accent-insensitive)
+  const key = name.toLowerCase().replace(/[éèêëàâùûîïôç]/g, (c) =>
+    ({ é:'e',è:'e',ê:'e',ë:'e',à:'a',â:'a',ù:'u',û:'u',î:'i',ï:'i',ô:'o',ç:'c' })[c] ?? c
+  );
+  return COLOR_MAP[key];
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -341,11 +417,10 @@ export default function ProductPage() {
   const navigate    = useNavigate();
   const { lang, dir } = useLanguage();
   const { addItem } = useCart();
-  const relatedGridRef = useRevealGroup();
-
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: product, isLoading, isError } = useProduct(id ?? '');
   const { data: reviews }        = useReviews(id ?? '');
+  const { data: allCategories }  = useCategories();
   const { data: relatedRaw }     = useProducts({
     category: product?.category,
     limit: 5,
@@ -386,6 +461,13 @@ export default function ProductPage() {
     : product?.rating ?? 0;
 
   const related = relatedRaw?.filter((p) => p.id !== id).slice(0, 4) ?? [];
+
+  // Resolve category display name from the categories list
+  const categoryName = product?.category
+    ? (allCategories?.find((c) => c.slug === product.category)
+        ?.[lang === 'ar' ? 'name_ar' : 'name']
+      ?? product.category)
+    : null;
 
   const hasColors = (product?.colors.length ?? 0) > 0;
   const hasSizes  = (product?.sizes.length ?? 0) > 0;
@@ -632,12 +714,12 @@ export default function ProductPage() {
           <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
 
             {/* Category label */}
-            {product.category && (
+            {categoryName && (
               <Link
                 to={`/shop?category=${product.category}`}
                 className="section-label hover:text-camel/80 transition-colors"
               >
-                {product.category}
+                {categoryName}
               </Link>
             )}
 
@@ -716,9 +798,10 @@ export default function ProductPage() {
                 <div className="flex flex-wrap gap-2">
                   {product.colors.map((color) => {
                     const isSelected = selectedColor === color;
-                    const isColor    = isCssColor(color);
+                    const cssColor   = resolveColor(color);
 
-                    return isColor ? (
+                    return cssColor ? (
+                      /* Colored circle swatch */
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
@@ -726,14 +809,16 @@ export default function ProductPage() {
                         aria-label={color}
                         aria-pressed={isSelected}
                         className={classNames(
-                          'w-8 h-8 rounded-full flex-shrink-0 transition-all duration-300',
+                          'w-9 h-9 rounded-full flex-shrink-0 transition-all duration-300',
+                          'border-2',
                           isSelected
-                            ? 'ring-2 ring-camel ring-offset-2 ring-offset-cream-100'
-                            : 'ring-1 ring-cream-400 hover:ring-camel/50'
+                            ? 'border-camel ring-2 ring-camel ring-offset-2 ring-offset-cream-100'
+                            : 'border-cream-300 hover:border-camel/60'
                         )}
-                        style={{ backgroundColor: color }}
+                        style={{ backgroundColor: cssColor }}
                       />
                     ) : (
+                      /* Text pill for unmapped names */
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
@@ -997,13 +1082,11 @@ export default function ProductPage() {
               </p>
             </div>
 
-            <div ref={relatedGridRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 reveal-group">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {isLoading
                 ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
                 : related.map((p) => (
-                    <div key={p.id} className="reveal">
-                      <ProductCard product={p} />
-                    </div>
+                    <ProductCard key={p.id} product={p} />
                   ))}
             </div>
 

@@ -357,10 +357,10 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
         {/* ── Bottom utility section ────────────────────────────────────────── */}
         <div className="flex-shrink-0 border-t border-ink/[0.08]">
           <ul>
-            {/* Login / Profile */}
+            {/* Login / Profile → Contact until auth pages exist */}
             <li>
               <Link
-                to={user ? '/profile' : '/login'}
+                to="/contact"
                 onClick={onClose}
                 className={[
                   'flex items-center gap-4 px-6 py-4',
@@ -370,9 +370,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <User size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {user
-                    ? (isAr ? 'حسابي' : 'Mon Compte')
-                    : (isAr ? 'تسجيل الدخول أو الإنشاء' : 'Se connecter ou S\'inscrire')}
+                  {isAr ? 'تواصل معنا' : 'Nous contacter'}
                 </span>
               </Link>
             </li>
@@ -403,10 +401,10 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               </Link>
             </li>
 
-            {/* Wishlist */}
+            {/* Shop / Collection */}
             <li>
               <Link
-                to="/wishlist"
+                to="/shop"
                 onClick={onClose}
                 className={[
                   'flex items-center gap-4 px-6 py-4',
@@ -416,7 +414,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
               >
                 <Heart size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {isAr ? 'المفضلة' : 'Wishlist'}
+                  {isAr ? 'جميع المنتجات' : 'Toute la Collection'}
                 </span>
               </Link>
             </li>
