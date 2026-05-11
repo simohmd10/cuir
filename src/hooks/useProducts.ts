@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import type { Product, Category } from '../types';
+import { sortCategoriesByHierarchy } from '../lib/categoryHierarchy';
 
 export function useProducts(options?: {
   category?: string;
@@ -81,7 +82,7 @@ export function useCategories() {
         .select('*')
         .order('name');
       if (error) throw error;
-      return data || [];
+      return sortCategoriesByHierarchy(data || []);
     },
     staleTime: 60_000,
   });

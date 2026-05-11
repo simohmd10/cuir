@@ -5,6 +5,8 @@ import { X, ChevronRight, User, ShoppingBag, Heart, Phone, Globe } from 'lucide-
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useCategories } from '../../hooks/useProducts';
+import { groupCategoriesByHierarchy } from '../../lib/categoryHierarchy';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -23,70 +25,13 @@ interface NavCategory {
   sub?: SubItem[];
 }
 
-const CATEGORIES: NavCategory[] = [
-  {
-    id: 'new',
-    labelFr: 'Nouveautés',
-    labelAr: 'الوافد الجديد',
-    href: '/shop?sort=newest',
-    badge: 'NEW',
-  },
-  {
-    id: 'handbags',
-    labelFr: 'Sacs & Maroquinerie',
-    labelAr: 'حقائب ومحافظ',
-    href: '/shop?category=handbags',
-    sub: [
-      { labelFr: 'Sacs à Main',         labelAr: 'حقائب اليد',       href: '/shop?category=sacs-a-main' },
-      { labelFr: 'Cabas & Totes',        labelAr: 'حقائب الكتف',     href: '/shop?category=cabas-totes' },
-      { labelFr: 'Pochettes & Clutches', labelAr: 'المحافظ الصغيرة', href: '/shop?category=pochettes' },
-    ],
-  },
-  {
-    id: 'travel',
-    labelFr: 'Bagagerie Cuir',
-    labelAr: 'حقائب السفر',
-    href: '/shop?category=travel-bags',
-    sub: [
-      { labelFr: 'Sacs de Voyage',  labelAr: 'حقائب الرحلات',  href: '/shop?category=sacs-voyage' },
-      { labelFr: 'Sacs Week-end',   labelAr: 'حقائب العطلة',   href: '/shop?category=sacs-weekend' },
-    ],
-  },
-  {
-    id: 'briefcases',
-    labelFr: 'Mallettes & Sacoches',
-    labelAr: 'حقائب الأعمال',
-    href: '/shop?category=briefcases',
-    sub: [
-      { labelFr: 'Mallettes Business', labelAr: 'حقائب المكتب', href: '/shop?category=mallettes' },
-      { labelFr: 'Sacoches',           labelAr: 'الحقائب الناعمة', href: '/shop?category=sacoches' },
-    ],
-  },
-  {
-    id: 'accessories',
-    labelFr: 'Accessoires & Essentiels',
-    labelAr: 'الإكسسوارات',
-    href: '/shop?category=accessories',
-    sub: [
-      { labelFr: 'Ceintures Cuir',             labelAr: 'الأحزمة',          href: '/shop?category=belts' },
-      { labelFr: 'Petite Maroquinerie',       labelAr: 'إكسسوارات صغيرة', href: '/shop?category=petite-maroquinerie' },
-      { labelFr: 'Porte-Cartes & Passeports', labelAr: 'حاملات البطاقات', href: '/shop?category=card-holders' },
-    ],
-  },
-  {
-    id: 'gifts',
-    labelFr: 'Coffrets Cadeaux',
-    labelAr: 'صناديق الهدايا',
-    href: '/shop?category=gift-sets',
-    badge: 'NEW',
-  },
-  {
-    id: 'limited',
-    labelFr: 'Collection Limitée',
-    labelAr: 'الإصدارات المحدودة',
-    href: '/shop?category=limited-collection',
-  },
-];
+const NEW_ARRIVALS_CATEGORY: NavCategory = {
+  id: 'new',
+  labelFr: 'Nouveautés',
+  labelAr: 'الوافد الجديد',
+  href: '/shop?sort=newest',
+  badge: 'NEW',
+};
 
 const PAGE_LINKS = [
   { labelFr: 'Notre Atelier',    labelAr: 'حرفتنا',            href: '/about'   },
@@ -204,8 +149,21 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
   const { lang, setLang, dir, t } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { totalItems } = useCart();
+  const { data: categories = [] } = useCategories();
   const location = useLocation();
   const isAr = lang === 'ar';
+  const menuCategories: NavCategory[] = groupCategoriesByHierarchy(categories).map(({ parent, children }) => ({
+    id: parent!.slug,
+    labelFr: parent!.name,
+    labelAr: parent!.name_ar || parent!.name,
+    href: `/shop?category=${parent!.slug}`,
+    badge: parent!.slug === 'gift-sets' ? 'NEW' : undefined,
+    sub: children.map((child) => ({
+      labelFr: child.name,
+      labelAr: child.name_ar || child.name,
+      href: `/shop?category=${child.slug}`,
+    })),
+  }));
   const savedScrollY = useRef(0);
   const shouldRestoreScroll = useRef(true);
 
@@ -331,7 +289,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
 
           {/* Categories */}
           <ul>
-            {CATEGORIES.map((cat) => (
+            {[NEW_ARRIVALS_CATEGORY, ...menuCategories].map((cat) => (
               <CategoryRow key={cat.id} cat={cat} isAr={isAr} onClose={onClose} />
             ))}
           </ul>
