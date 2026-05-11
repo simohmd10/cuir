@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
@@ -42,39 +42,14 @@ function PageLoader() {
   );
 }
 
-function NavigationResetManager() {
+function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
     window.history.scrollRestoration = 'manual';
-  }, []);
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-    const root = document.documentElement;
-    const body = document.body;
-    const prevRootBehavior = root.style.scrollBehavior;
-    const prevBodyBehavior = body.style.scrollBehavior;
-    root.style.scrollBehavior = 'auto';
-    body.style.scrollBehavior = 'auto';
-
-    const resetTop = () => {
-      window.scrollTo(0, 0);
-      root.scrollTop = 0;
-      body.scrollTop = 0;
-    };
-
-    resetTop();
-    const raf = window.requestAnimationFrame(resetTop);
-    const timeout = window.setTimeout(resetTop, 75);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      window.clearTimeout(timeout);
-      root.style.scrollBehavior = prevRootBehavior;
-      body.style.scrollBehavior = prevBodyBehavior;
-    };
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [pathname]);
 
   return null;
@@ -142,12 +117,10 @@ function RouteDocumentMeta() {
 }
 
 function CustomerLayout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main key={location.pathname} className="flex-1">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
     </div>
@@ -171,7 +144,7 @@ export default function App() {
 
   return (
     <div dir={dir} className="min-h-screen bg-beige-50">
-      <NavigationResetManager />
+      <ScrollToTopOnRouteChange />
       <RouteDocumentMeta />
       <Suspense fallback={<PageLoader />}>
         <Routes>
