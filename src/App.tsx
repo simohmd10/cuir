@@ -145,7 +145,7 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="storefront flex flex-col min-h-screen">
       <Header />
       <main key={location.pathname} className="flex-1">{children}</main>
       <Footer />

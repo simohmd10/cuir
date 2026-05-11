@@ -19,6 +19,42 @@ type OrderWithDetails = Order & {
   order_items: (OrderItem & { product_image?: string })[];
 };
 
+type OrderCustomerSnapshot = Pick<Customer, 'name' | 'phone' | 'email' | 'address' | 'city'>;
+
+const EMPTY_CUSTOMER: OrderCustomerSnapshot = {
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+};
+
+function getOrderCustomer(order: OrderWithDetails): OrderCustomerSnapshot {
+  const orderSnapshot: OrderCustomerSnapshot = {
+    name: order.customer_name ?? '',
+    phone: order.customer_phone ?? '',
+    email: order.customer_email ?? '',
+    address: order.customer_address ?? '',
+    city: order.customer_city ?? '',
+  };
+
+  const relatedCustomer: OrderCustomerSnapshot = {
+    name: order.customer?.name ?? '',
+    phone: order.customer?.phone ?? '',
+    email: order.customer?.email ?? '',
+    address: order.customer?.address ?? '',
+    city: order.customer?.city ?? '',
+  };
+
+  return {
+    name: orderSnapshot.name || relatedCustomer.name || EMPTY_CUSTOMER.name,
+    phone: orderSnapshot.phone || relatedCustomer.phone || EMPTY_CUSTOMER.phone,
+    email: orderSnapshot.email || relatedCustomer.email || EMPTY_CUSTOMER.email,
+    address: orderSnapshot.address || relatedCustomer.address || EMPTY_CUSTOMER.address,
+    city: orderSnapshot.city || relatedCustomer.city || EMPTY_CUSTOMER.city,
+  };
+}
+
 // ─── Fetch ────────────────────────────────────────────────────────────────────
 
 async function fetchOrders(page: number, status: string, search: string, dateFrom: string, dateTo: string) {
@@ -189,6 +225,7 @@ const Orders: React.FC = () => {
                   )
                   : (data?.data ?? []).map((order) => {
                     const isExpanded = expandedId === order.id;
+                    const orderCustomer = getOrderCustomer(order);
                     return (
                       <React.Fragment key={order.id}>
                         <tr
@@ -199,9 +236,9 @@ const Orders: React.FC = () => {
                             {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs font-medium text-leather-600">{order.order_ref}</td>
-                          <td className="px-4 py-3 text-leather-700">{order.customer?.name ?? '—'}</td>
-                          <td className="px-4 py-3 text-leather-500 font-mono text-xs">{order.customer?.phone ?? '—'}</td>
-                          <td className="px-4 py-3 text-leather-500">{order.customer?.city ?? '—'}</td>
+                          <td className="px-4 py-3 text-leather-700">{orderCustomer.name || '—'}</td>
+                          <td className="px-4 py-3 text-leather-500 font-mono text-xs">{orderCustomer.phone || '—'}</td>
+                          <td className="px-4 py-3 text-leather-500">{orderCustomer.city || '—'}</td>
                           <td className="px-4 py-3 text-leather-500">{order.order_items?.length ?? 0}</td>
                           <td className="px-4 py-3 font-semibold text-leather-800">{formatPrice(order.total, lang)}</td>
                           <td className="px-4 py-3"><StatusBadge status={order.status} lang={lang} /></td>
@@ -247,16 +284,16 @@ const Orders: React.FC = () => {
 
                                     {/* Customer + status */}
                                     <div className="space-y-4">
-                                      {order.customer && (
+                                      {(orderCustomer.name || orderCustomer.phone || orderCustomer.address || orderCustomer.city || orderCustomer.email) && (
                                         <div>
                                           <h4 className="text-xs font-semibold text-leather-600 uppercase tracking-wide mb-2">
                                             {lang === 'ar' ? 'معلومات العميل' : 'Informations client'}
                                           </h4>
                                           <div className="bg-white rounded-lg p-3 border border-leather-100 space-y-1.5 text-sm">
-                                            <p className="font-medium text-leather-800">{order.customer.name}</p>
-                                            <p className="text-leather-500 font-mono text-xs">{order.customer.phone}</p>
-                                            {order.customer.email && <p className="text-leather-500 text-xs">{order.customer.email}</p>}
-                                            <p className="text-leather-500 text-xs">{order.customer.address}, {order.customer.city}</p>
+                                            <p className="font-medium text-leather-800">{orderCustomer.name || '—'}</p>
+                                            <p className="text-leather-500 font-mono text-xs">{orderCustomer.phone || '—'}</p>
+                                            {orderCustomer.email && <p className="text-leather-500 text-xs">{orderCustomer.email}</p>}
+                                            <p className="text-leather-500 text-xs">{[orderCustomer.address, orderCustomer.city].filter(Boolean).join(', ') || '—'}</p>
                                           </div>
                                         </div>
                                       )}
