@@ -57,6 +57,7 @@ export default function Header() {
   return (
     <>
       <header
+        dir={dir}
         className={[
           'fixed top-0 inset-x-0 z-50 h-16 isolate',
           'transition-all duration-500',
