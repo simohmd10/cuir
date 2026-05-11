@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Award, Hammer, Leaf, ShoppingBag, Users, Package, Star, Shield } from 'lucide-react';
+import { Award, Hammer, Leaf, ShoppingBag, Users, Package, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 // ── Animation variants ────────────────────────────────────────────────────────
@@ -104,27 +104,27 @@ export default function About() {
       <motion.div
         className="relative overflow-hidden py-28 px-4 text-center"
         style={{
-          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
+          background: '#FFFFFF',
         }}
         initial="hidden"
         animate="visible"
         variants={fadeIn}
       >
         {/* Decorative circles */}
-        <div className="absolute -top-24 -start-24 w-96 h-96 rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-32 -end-20 w-[30rem] h-[30rem] rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-leather-800/20 pointer-events-none" />
+        <div className="absolute -top-24 -start-24 w-96 h-96 rounded-full bg-black/5 pointer-events-none" />
+        <div className="absolute -bottom-32 -end-20 w-[30rem] h-[30rem] rounded-full bg-black/5 pointer-events-none" />
+        <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-leather-800/10 pointer-events-none" />
 
         <motion.div variants={fadeUp} className="relative z-10 max-w-3xl mx-auto">
           {/* Icon */}
-          <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-6">
-            <Leaf className="w-10 h-10 text-gold-300" />
+          <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mx-auto mb-6">
+            <Leaf className="w-10 h-10 text-leather-700" />
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-black mb-4 leading-tight">
             {t('aboutTitle')}
           </h1>
-          <p className="text-beige-100/80 text-lg md:text-xl max-w-xl mx-auto">
+          <p className="text-black/75 text-lg md:text-xl max-w-xl mx-auto">
             {t('aboutSubtitle')}
           </p>
         </motion.div>
@@ -209,28 +209,6 @@ export default function About() {
                 aria-hidden="true"
               />
 
-              {/* Floating accent cards */}
-              <div className="absolute bottom-5 start-5 bg-white rounded-xl p-3.5 shadow-lg max-w-[150px]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="w-4 h-4 text-gold-500 fill-gold-500" />
-                  <span className="text-xs font-bold text-leather-800">4.9/5</span>
-                </div>
-                <p className="text-xs text-leather-500">
-                  {lang === 'ar' ? 'تقييم العملاء' : 'Avis clients'}
-                </p>
-              </div>
-
-              <div className="absolute top-5 end-5 bg-white rounded-xl p-3.5 shadow-lg max-w-[150px]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Shield className="w-4 h-4 text-leather-500" />
-                  <span className="text-xs font-bold text-leather-800">
-                    {lang === 'ar' ? '100% أصيل' : '100% Authentique'}
-                  </span>
-                </div>
-                <p className="text-xs text-leather-500">
-                  {lang === 'ar' ? 'جلد طبيعي مضمون' : 'Cuir naturel garanti'}
-                </p>
-              </div>
             </div>
           </motion.div>
         </div>
