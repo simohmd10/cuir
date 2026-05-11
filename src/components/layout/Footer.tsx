@@ -120,7 +120,14 @@ export default function Footer() {
             {/* Logo wordmark */}
             <Link
               to="/"
-              onClick={handleHomeLinkClick}
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                if (pathname === '/') {
+                  event.preventDefault();
+                  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+                  document.body.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
               className="inline-block mb-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
               <span className="font-display font-light text-3xl text-ink tracking-wider">
