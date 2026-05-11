@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -74,6 +74,30 @@ export default function Footer() {
   const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
 
   // Shared link style for nav items
+
+  const scrollToTop = () => {
+    const scrollTargets: Array<Window | HTMLElement> = [
+      window,
+      document.documentElement,
+      document.body,
+    ];
+
+    const appRoot = document.getElementById('root');
+    if (appRoot) {
+      scrollTargets.push(appRoot);
+    }
+
+    scrollTargets.forEach((target) => {
+      target.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    });
+  };
+
+  const handleHomeLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      event.preventDefault();
+      scrollToTop();
+    }
+  };
   const linkBase = [
     'text-xs text-ink/70 hover:text-ink',
     'transition-colors duration-300 ease-luxury',
@@ -96,11 +120,7 @@ export default function Footer() {
             {/* Logo wordmark */}
             <Link
               to="/"
-              onClick={() => {
-                if (pathname === '/') {
-                  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-                }
-              }}
+              onClick={handleHomeLinkClick}
               className="inline-block mb-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
               <span className="font-display font-light text-3xl text-ink tracking-wider">
@@ -194,7 +214,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {QUICK_LINKS.map(({ labelFr, labelAr, path }) => (
                 <li key={`${path}-${labelFr}`}>
-                  <Link to={path} className={linkBase}>
+                  <Link to={path} className={linkBase} onClick={path === '/' ? handleHomeLinkClick : undefined}>
                     {isArabic ? labelAr : labelFr}
                   </Link>
                 </li>
@@ -216,7 +236,10 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {SERVICE_LINKS.map(({ labelFr, labelAr, path }) => (
                 <li key={`${path}-${labelFr}`}>
-                  <Link to={path} className={linkBase}>
+                  <Link
+                    to={path}
+                    className={linkBase}
+                  >
                     {isArabic ? labelAr : labelFr}
                   </Link>
                 </li>
