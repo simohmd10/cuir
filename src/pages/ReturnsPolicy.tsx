@@ -55,17 +55,17 @@ export default function ReturnsPolicy() {
 
   return (
     <div className="min-h-screen bg-beige-50" dir={dir}>
-      <div className="relative py-20 px-4 text-center" style={{ background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)' }}>
-        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
+      <div className="relative py-20 px-4 text-center bg-white border-b border-beige-200">
+        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-black/5 pointer-events-none" />
+        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-black/5 pointer-events-none" />
         <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative z-10">
-          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-            <RotateCcw className="w-8 h-8 text-gold-300" />
+          <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto mb-4">
+            <RotateCcw className="w-8 h-8 text-ink" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-white mb-3">
+          <h1 className="text-4xl font-display font-bold text-ink mb-3">
             {isAr ? 'سياسة الإرجاع والاستبدال' : 'Politique de retour et échange'}
           </h1>
-          <p className="text-beige-100/80 text-base max-w-2xl mx-auto">
+          <p className="text-ink/70 text-base max-w-2xl mx-auto">
             {isAr ? 'تفاصيل واضحة حول شروط الإرجاع، الاستبدال، واسترداد المبالغ.' : 'Règles claires concernant les retours, échanges et remboursements.'}
           </p>
         </motion.div>
