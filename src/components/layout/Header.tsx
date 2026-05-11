@@ -50,11 +50,11 @@ export default function Header() {
     <>
       <header
         className={[
-          'fixed top-0 inset-x-0 z-50 h-16',
+          'fixed top-0 inset-x-0 z-50 h-16 isolate',
           'transition-all duration-500',
           transparent
             ? 'bg-transparent border-b border-transparent'
-            : 'bg-cream-100/96 backdrop-blur-[6px] border-b border-cream-300',
+            : 'bg-cream-100 border-b border-cream-300 md:bg-cream-100/96 md:backdrop-blur-[6px]',
         ].join(' ')}
       >
         <div className="container-luxury h-full flex items-center justify-between gap-6">
