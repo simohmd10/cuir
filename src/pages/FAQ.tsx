@@ -317,7 +317,12 @@ export default function FAQ() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.4 }}
           >
-            <h2 className="text-sm font-bold text-leather-400 uppercase tracking-widest mb-4 px-1">
+            <h2
+              className={[
+                'text-sm font-bold text-leather-400 mb-4 px-1',
+                lang === 'ar' ? 'text-right tracking-normal' : 'uppercase tracking-widest',
+              ].join(' ')}
+            >
               {category}
             </h2>
             <div className="space-y-3">
