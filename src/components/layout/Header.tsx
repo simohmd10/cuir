@@ -16,7 +16,7 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
-  const { t, lang, setLang } = useLanguage();
+  const { t, lang, dir, setLang } = useLanguage();
   const { totalItems } = useCart();
   const { isAdmin } = useAuth();
   const location = useLocation();
@@ -43,9 +43,9 @@ export default function Header() {
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
 
-  const textCls = 'text-ink';
-  const mutedCls = 'text-ink/55';
-  const hoverCls = 'hover:text-camel';
+  const textCls = transparent ? 'text-white' : 'text-ink';
+  const mutedCls = transparent ? 'text-white/80' : 'text-ink/55';
+  const hoverCls = transparent ? 'hover:text-white' : 'hover:text-camel';
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (location.pathname === '/') {
@@ -60,10 +60,17 @@ export default function Header() {
         className={[
           'fixed top-0 inset-x-0 z-50 h-16 isolate',
           'transition-all duration-500',
-          'bg-white border-b border-cream-300 md:bg-white/96 md:backdrop-blur-[6px]',
+          transparent
+            ? 'bg-transparent border-b border-white/20'
+            : 'bg-white border-b border-cream-300 md:bg-white/96 md:backdrop-blur-[6px]',
         ].join(' ')}
       >
-        <div className="container-luxury h-full flex items-center justify-between gap-6">
+        <div
+          className={[
+            'container-luxury h-full flex items-center justify-between gap-2 sm:gap-4',
+            dir === 'rtl' ? 'flex-row-reverse' : 'flex-row',
+          ].join(' ')}
+        >
 
           {/* Logo */}
           <Link to="/" onClick={handleLogoClick} className="flex-shrink-0 select-none" aria-label="CUIR — Accueil">
@@ -111,7 +118,7 @@ export default function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5 shrink-0">
             {/* Language toggle — desktop only */}
             <button
               onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
@@ -145,7 +152,12 @@ export default function Header() {
               className={`flex flex-col items-center justify-center gap-[5px] w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
             >
               <span className="block w-[18px] h-px bg-current" />
-              <span className="block w-[12px] h-px bg-current self-start ms-[13px]" />
+              <span
+                className={[
+                  'block w-[12px] h-px bg-current',
+                  dir === 'rtl' ? 'self-end me-[13px]' : 'self-start ms-[13px]',
+                ].join(' ')}
+              />
             </button>
           </div>
         </div>

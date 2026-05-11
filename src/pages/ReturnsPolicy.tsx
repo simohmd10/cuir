@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 const SECTION_CLASS = 'bg-white border border-beige-200 rounded-2xl p-6 md:p-7 shadow-sm';
 
 export default function ReturnsPolicy() {
-  const { lang, dir } = useLanguage();
+  const { lang } = useLanguage();
   const isAr = lang === 'ar';
 
   const sections = [
@@ -54,7 +54,7 @@ export default function ReturnsPolicy() {
   ];
 
   return (
-    <div className="min-h-screen bg-beige-50" dir={dir}>
+    <div className="min-h-screen bg-beige-50">
       <div className="relative py-20 px-4 text-center bg-white border-b border-beige-200">
         <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-black/5 pointer-events-none" />
         <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-black/5 pointer-events-none" />
