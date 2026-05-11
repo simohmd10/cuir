@@ -37,9 +37,9 @@ const CATEGORIES: NavCategory[] = [
     labelAr: 'حقائب ومحافظ',
     href: '/shop?category=handbags',
     sub: [
-      { labelFr: 'Sacs à Main',         labelAr: 'حقائب اليد',       href: '/shop?category=handbags' },
-      { labelFr: 'Pochettes & Clutches', labelAr: 'المحافظ الصغيرة', href: '/shop?category=handbags' },
-      { labelFr: 'Cabas & Totes',        labelAr: 'حقائب الكتف',     href: '/shop?category=handbags' },
+      { labelFr: 'Sacs à Main',         labelAr: 'حقائب اليد',       href: '/shop?category=sacs-a-main' },
+      { labelFr: 'Cabas & Totes',        labelAr: 'حقائب الكتف',     href: '/shop?category=cabas-totes' },
+      { labelFr: 'Pochettes & Clutches', labelAr: 'المحافظ الصغيرة', href: '/shop?category=pochettes' },
     ],
   },
   {
@@ -48,8 +48,8 @@ const CATEGORIES: NavCategory[] = [
     labelAr: 'حقائب السفر',
     href: '/shop?category=travel-bags',
     sub: [
-      { labelFr: 'Sacs de Voyage',  labelAr: 'حقائب الرحلات',  href: '/shop?category=travel-bags' },
-      { labelFr: 'Sacs Week-end',   labelAr: 'حقائب العطلة',   href: '/shop?category=travel-bags' },
+      { labelFr: 'Sacs de Voyage',  labelAr: 'حقائب الرحلات',  href: '/shop?category=sacs-voyage' },
+      { labelFr: 'Sacs Week-end',   labelAr: 'حقائب العطلة',   href: '/shop?category=sacs-weekend' },
     ],
   },
   {
@@ -58,8 +58,8 @@ const CATEGORIES: NavCategory[] = [
     labelAr: 'حقائب الأعمال',
     href: '/shop?category=briefcases',
     sub: [
-      { labelFr: 'Mallettes Business', labelAr: 'حقائب المكتب', href: '/shop?category=briefcases' },
-      { labelFr: 'Sacoches',           labelAr: 'الحقائب الناعمة', href: '/shop?category=briefcases' },
+      { labelFr: 'Mallettes Business', labelAr: 'حقائب المكتب', href: '/shop?category=mallettes' },
+      { labelFr: 'Sacoches',           labelAr: 'الحقائب الناعمة', href: '/shop?category=sacoches' },
     ],
   },
   {
@@ -68,9 +68,9 @@ const CATEGORIES: NavCategory[] = [
     labelAr: 'الإكسسوارات',
     href: '/shop?category=accessories',
     sub: [
+      { labelFr: 'Ceintures Cuir',             labelAr: 'الأحزمة',          href: '/shop?category=belts' },
+      { labelFr: 'Petite Maroquinerie',       labelAr: 'إكسسوارات صغيرة', href: '/shop?category=petite-maroquinerie' },
       { labelFr: 'Porte-Cartes & Passeports', labelAr: 'حاملات البطاقات', href: '/shop?category=card-holders' },
-      { labelFr: 'Ceintures Cuir',            labelAr: 'الأحزمة',          href: '/shop?category=belts' },
-      { labelFr: 'Petite Maroquinerie',        labelAr: 'إكسسوارات صغيرة', href: '/shop?category=accessories' },
     ],
   },
   {

@@ -19,6 +19,7 @@ const categorySchema = z.object({
   name: z.string().min(1, 'Nom requis'),
   name_ar: z.string().min(1, 'الاسم مطلوب'),
   slug: z.string().min(1, 'Slug requis').regex(/^[a-z0-9-]+$/, 'Slug: lettres minuscules, chiffres et tirets uniquement'),
+  parent_slug: z.string().nullable().optional(),
 });
 
 type CategoryForm = z.infer<typeof categorySchema>;
@@ -78,19 +79,18 @@ const Categories: React.FC = () => {
     formState: { errors, isSubmitting },
   } = useForm<CategoryForm>({ resolver: zodResolver(categorySchema) });
 
-  const nameValue = watch('name');
-
+  
   const openAdd = () => {
     setEditingCategory(null);
     setImageFile('');
-    reset({ name: '', name_ar: '', slug: '' });
+    reset({ name: '', name_ar: '', slug: '', parent_slug: null });
     setModalOpen(true);
   };
 
   const openEdit = (cat: Category) => {
     setEditingCategory(cat);
     setImageFile(cat.image ?? '');
-    reset({ name: cat.name, name_ar: cat.name_ar, slug: cat.slug });
+    reset({ name: cat.name, name_ar: cat.name_ar, slug: cat.slug, parent_slug: cat.parent_slug ?? null });
     setModalOpen(true);
   };
 
@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (form: CategoryForm) => {
-      const payload = { ...form, image: imageFile || null };
+      const payload = { ...form, parent_slug: form.parent_slug || null, image: imageFile || null };
       if (editingCategory) {
         const { error } = await supabase.from('categories').update(payload).eq('id', editingCategory.id);
         if (error) throw error;
@@ -147,6 +147,12 @@ const Categories: React.FC = () => {
     onError: () => toast.error('Erreur lors de la suppression'),
   });
 
+
+  const parentCategories = categories.filter((c) => !c.parent_slug);
+  const groupedCategories = parentCategories.map((parent) => ({
+    parent,
+    children: categories.filter((c) => c.parent_slug === parent.slug),
+  }));
   return (
     <AdminLayout>
       <div className="space-y-5 max-w-5xl">
@@ -187,14 +193,15 @@ const Categories: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {categories.map((cat) => {
+            {groupedCategories.flatMap(({ parent, children }) => [parent, ...children]).map((cat) => {
               const productCount = cat.products?.[0]?.count ?? 0;
+              const isSub = Boolean(cat.parent_slug);
               return (
                 <motion.div
                   key={cat.id}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border border-leather-100 rounded-xl overflow-hidden shadow-sm group"
+                  className={`bg-white border border-leather-100 rounded-xl overflow-hidden shadow-sm group ${isSub ? 'ring-1 ring-leather-100/70' : ''}`}
                 >
                   <div className="relative h-32">
                     <LazyImage
@@ -219,7 +226,7 @@ const Categories: React.FC = () => {
                     </div>
                   </div>
                   <div className="p-3">
-                    <p className="font-semibold text-leather-800 text-sm">{cat.name}</p>
+                    <p className="font-semibold text-leather-800 text-sm">{isSub ? `↳ ${cat.name}` : cat.name}</p>
                     <p className="text-xs text-leather-400" dir="rtl">{cat.name_ar}</p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="font-mono text-xs text-leather-400">{cat.slug}</span>
@@ -324,6 +331,22 @@ const Categories: React.FC = () => {
                       className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400"
                     />
                     {errors.name_ar && <p className="text-red-500 text-xs mt-1">{errors.name_ar.message}</p>}
+                  </div>
+
+
+                  <div>
+                    <label className="block text-xs font-medium text-leather-600 mb-1">{lang === 'ar' ? 'التصنيف الرئيسي' : 'Catégorie principale'}</label>
+                    <select
+                      {...register('parent_slug')}
+                      className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 bg-white"
+                    >
+                      <option value="">{lang === 'ar' ? 'تصنيف رئيسي (بدون أب)' : 'Catégorie principale (sans parent)'}</option>
+                      {parentCategories
+                        .filter((c) => !editingCategory || c.id !== editingCategory.id)
+                        .map((c) => (
+                          <option key={c.id} value={c.slug}>{lang === 'ar' ? c.name_ar : c.name}</option>
+                        ))}
+                    </select>
                   </div>
 
                   {/* Slug */}
