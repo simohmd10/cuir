@@ -91,6 +91,11 @@ CREATE TABLE IF NOT EXISTS orders (
   idempotency_key TEXT NOT NULL UNIQUE,
   access_token TEXT NOT NULL,
   notes TEXT,
+  customer_name TEXT,
+  customer_phone TEXT,
+  customer_email TEXT,
+  customer_address TEXT,
+  customer_city TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -526,11 +531,11 @@ BEGIN
   INSERT INTO orders (
     order_ref, customer_id, status, total, discount_amount,
     delivery_fee, coupon_code, payment_method, idempotency_key,
-    access_token, notes
+    access_token, notes, customer_name, customer_phone, customer_email, customer_address, customer_city
   ) VALUES (
     v_order_ref, v_customer_id, 'pending', v_total, v_discount_amount,
     v_delivery_fee, UPPER(COALESCE(p_coupon_code, '')), 'cod', p_idempotency_key,
-    v_access_token, p_notes
+    v_access_token, p_notes, p_customer_name, p_customer_phone, NULLIF(p_customer_email, ''), p_customer_address, p_customer_city
   ) RETURNING id INTO v_order_id;
 
   -- ── Create order items + decrement stock ─────────────────
@@ -590,9 +595,12 @@ DECLARE
   v_items JSONB;
   v_customer JSONB;
 BEGIN
-  SELECT o.*, c.name AS customer_name, c.phone AS customer_phone,
-         c.email AS customer_email, c.address AS customer_address,
-         c.city AS customer_city
+  SELECT o.*,
+         COALESCE(o.customer_name, c.name) AS customer_name,
+         COALESCE(o.customer_phone, c.phone) AS customer_phone,
+         COALESCE(o.customer_email, c.email) AS customer_email,
+         COALESCE(o.customer_address, c.address) AS customer_address,
+         COALESCE(o.customer_city, c.city) AS customer_city
   INTO v_order
   FROM orders o
   LEFT JOIN customers c ON c.id = o.customer_id

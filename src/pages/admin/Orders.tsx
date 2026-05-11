@@ -19,6 +19,42 @@ type OrderWithDetails = Order & {
   order_items: (OrderItem & { product_image?: string })[];
 };
 
+type OrderCustomerSnapshot = Pick<Customer, 'name' | 'phone' | 'email' | 'address' | 'city'>;
+
+const EMPTY_CUSTOMER: OrderCustomerSnapshot = {
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+};
+
+function getOrderCustomer(order: OrderWithDetails): OrderCustomerSnapshot {
+  const orderSnapshot: OrderCustomerSnapshot = {
+    name: order.customer_name ?? '',
+    phone: order.customer_phone ?? '',
+    email: order.customer_email ?? '',
+    address: order.customer_address ?? '',
+    city: order.customer_city ?? '',
+  };
+
+  const relatedCustomer: OrderCustomerSnapshot = {
+    name: order.customer?.name ?? '',
+    phone: order.customer?.phone ?? '',
+    email: order.customer?.email ?? '',
+    address: order.customer?.address ?? '',
+    city: order.customer?.city ?? '',
+  };
+
+  return {
+    name: orderSnapshot.name || relatedCustomer.name || EMPTY_CUSTOMER.name,
+    phone: orderSnapshot.phone || relatedCustomer.phone || EMPTY_CUSTOMER.phone,
+    email: orderSnapshot.email || relatedCustomer.email || EMPTY_CUSTOMER.email,
+    address: orderSnapshot.address || relatedCustomer.address || EMPTY_CUSTOMER.address,
+    city: orderSnapshot.city || relatedCustomer.city || EMPTY_CUSTOMER.city,
+  };
+}
+
 // ─── Fetch ────────────────────────────────────────────────────────────────────
 
 async function fetchOrders(page: number, status: string, search: string, dateFrom: string, dateTo: string) {
@@ -147,8 +183,152 @@ const Orders: React.FC = () => {
           />
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-xl border border-leather-100 shadow-sm overflow-hidden">
+        {/* Mobile cards */}
+        <div className="md:hidden space-y-3">
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-leather-100 shadow-sm p-4 space-y-3">
+                <Sk className="h-4 w-36" />
+                <Sk className="h-3 w-28" />
+                <Sk className="h-3 w-24" />
+                <Sk className="h-8 w-full rounded-lg" />
+              </div>
+            ))
+            : (data?.data ?? []).length === 0
+            ? (
+              <div className="bg-white rounded-xl border border-leather-100 shadow-sm px-4 py-12 text-center text-leather-400 text-sm">
+                {lang === 'ar' ? 'لا توجد طلبات' : 'Aucune commande trouvée'}
+              </div>
+            )
+            : (data?.data ?? []).map((order) => {
+              const isExpanded = expandedId === order.id;
+              const orderCustomer = getOrderCustomer(order);
+              return (
+                <div key={order.id} className="bg-white rounded-xl border border-leather-100 shadow-sm overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(order.id)}
+                    className="w-full text-left p-4 space-y-2"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-mono text-xs font-medium text-leather-600 break-all">{order.order_ref}</p>
+                      <span className="text-leather-400 pt-0.5">{isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-leather-700">{orderCustomer.name || '—'}</p>
+                      <StatusBadge status={order.status} lang={lang} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+                      <p className="text-leather-500 font-mono break-all">{orderCustomer.phone || '—'}</p>
+                      <p className="text-right text-leather-500">{orderCustomer.city || '—'}</p>
+                      <p className="text-leather-400">{formatDate(order.created_at, lang)}</p>
+                      <p className="text-right font-semibold text-leather-800">{formatPrice(order.total, lang)}</p>
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden border-t border-leather-100"
+                      >
+                        <div className="p-4 bg-leather-50/30 space-y-4">
+                          <div>
+                            <h4 className="text-xs font-semibold text-leather-600 uppercase tracking-wide mb-2 flex items-center gap-2">
+                              <Package size={13} />
+                              {lang === 'ar' ? 'المنتجات' : 'Articles commandés'}
+                            </h4>
+                            <div className="space-y-2">
+                              {(order.order_items ?? []).map((item) => (
+                                <div key={item.id} className="bg-white rounded-lg p-3 border border-leather-100">
+                                  <p className="font-medium text-sm text-leather-800">{item.product_name}</p>
+                                  <p className="text-xs text-leather-500 mt-0.5">
+                                    {[item.color, item.size].filter(Boolean).join(' • ') || '—'}
+                                  </p>
+                                  <div className="mt-1.5 flex items-center justify-between text-xs">
+                                    <p className="text-leather-500">×{item.quantity}</p>
+                                    <p className="text-sm font-semibold text-leather-800">{formatPrice(item.price_at_purchase * item.quantity, lang)}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <h4 className="text-xs font-semibold text-leather-600 uppercase tracking-wide mb-2">
+                              {lang === 'ar' ? 'معلومات العميل' : 'Informations client'}
+                            </h4>
+                            <div className="bg-white rounded-lg p-3 border border-leather-100 space-y-1.5 text-sm">
+                              <p className="font-medium text-leather-800">{orderCustomer.name || '—'}</p>
+                              <p className="text-leather-500 font-mono text-xs break-all">{orderCustomer.phone || '—'}</p>
+                              <p className="text-leather-500 text-xs break-all">{orderCustomer.email || '—'}</p>
+                              <p className="text-leather-500 text-xs">{[orderCustomer.address, orderCustomer.city].filter(Boolean).join(', ') || '—'}</p>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h4 className="text-xs font-semibold text-leather-600 uppercase tracking-wide mb-2">
+                              {lang === 'ar' ? 'تغيير الحالة' : 'Changer le statut'}
+                            </h4>
+                            <div className="flex gap-2 items-center">
+                              <select
+                                defaultValue={order.status}
+                                id={`status-mobile-${order.id}`}
+                                className="flex-1 px-3 py-2 border border-leather-200 rounded-lg text-sm bg-white text-leather-700 focus:outline-none focus:ring-2 focus:ring-leather-400"
+                              >
+                                {STATUS_OPTIONS.map((s) => (
+                                  <option key={s} value={s}>{getStatusLabel(s, lang)}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const sel = document.getElementById(`status-mobile-${order.id}`) as HTMLSelectElement;
+                                  updateStatusMutation.mutate({ id: order.id, status: sel.value as OrderStatus });
+                                }}
+                                disabled={updateStatusMutation.isPending}
+                                className="px-3 py-2 bg-leather-500 text-white rounded-lg text-sm font-medium hover:bg-leather-600 transition-colors disabled:opacity-60 flex items-center gap-1.5"
+                              >
+                                {updateStatusMutation.isPending && <Loader2 size={12} className="animate-spin" />}
+                                {lang === 'ar' ? 'تحديث' : 'Mettre à jour'}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="bg-white rounded-lg p-3 border border-leather-100 text-sm space-y-1.5">
+                            <div className="flex justify-between text-leather-500">
+                              <span>{lang === 'ar' ? 'المجموع الفرعي' : 'Sous-total'}</span>
+                              <span>{formatPrice(order.total - (order.delivery_fee ?? 30) + (order.discount_amount ?? 0), lang)}</span>
+                            </div>
+                            {order.discount_amount > 0 && (
+                              <div className="flex justify-between text-leather-500">
+                                <span>{lang === 'ar' ? 'الخصم' : 'Remise'}</span>
+                                <span className="text-green-600">-{formatPrice(order.discount_amount, lang)}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between text-leather-500">
+                              <span>{lang === 'ar' ? 'التوصيل' : 'Livraison'}</span>
+                              <span>{formatPrice(order.delivery_fee ?? 30, lang)}</span>
+                            </div>
+                            <div className="flex justify-between font-semibold text-leather-800 border-t border-leather-100 pt-1.5 mt-1.5">
+                              <span>{lang === 'ar' ? 'المجموع' : 'Total'}</span>
+                              <span>{formatPrice(order.total, lang)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block bg-white rounded-xl border border-leather-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -189,6 +369,7 @@ const Orders: React.FC = () => {
                   )
                   : (data?.data ?? []).map((order) => {
                     const isExpanded = expandedId === order.id;
+                    const orderCustomer = getOrderCustomer(order);
                     return (
                       <React.Fragment key={order.id}>
                         <tr
@@ -199,9 +380,9 @@ const Orders: React.FC = () => {
                             {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs font-medium text-leather-600">{order.order_ref}</td>
-                          <td className="px-4 py-3 text-leather-700">{order.customer?.name ?? '—'}</td>
-                          <td className="px-4 py-3 text-leather-500 font-mono text-xs">{order.customer?.phone ?? '—'}</td>
-                          <td className="px-4 py-3 text-leather-500">{order.customer?.city ?? '—'}</td>
+                          <td className="px-4 py-3 text-leather-700">{orderCustomer.name || '—'}</td>
+                          <td className="px-4 py-3 text-leather-500 font-mono text-xs">{orderCustomer.phone || '—'}</td>
+                          <td className="px-4 py-3 text-leather-500">{orderCustomer.city || '—'}</td>
                           <td className="px-4 py-3 text-leather-500">{order.order_items?.length ?? 0}</td>
                           <td className="px-4 py-3 font-semibold text-leather-800">{formatPrice(order.total, lang)}</td>
                           <td className="px-4 py-3"><StatusBadge status={order.status} lang={lang} /></td>
@@ -247,16 +428,16 @@ const Orders: React.FC = () => {
 
                                     {/* Customer + status */}
                                     <div className="space-y-4">
-                                      {order.customer && (
+                                      {(orderCustomer.name || orderCustomer.phone || orderCustomer.address || orderCustomer.city || orderCustomer.email) && (
                                         <div>
                                           <h4 className="text-xs font-semibold text-leather-600 uppercase tracking-wide mb-2">
                                             {lang === 'ar' ? 'معلومات العميل' : 'Informations client'}
                                           </h4>
                                           <div className="bg-white rounded-lg p-3 border border-leather-100 space-y-1.5 text-sm">
-                                            <p className="font-medium text-leather-800">{order.customer.name}</p>
-                                            <p className="text-leather-500 font-mono text-xs">{order.customer.phone}</p>
-                                            {order.customer.email && <p className="text-leather-500 text-xs">{order.customer.email}</p>}
-                                            <p className="text-leather-500 text-xs">{order.customer.address}, {order.customer.city}</p>
+                                            <p className="font-medium text-leather-800">{orderCustomer.name || '—'}</p>
+                                            <p className="text-leather-500 font-mono text-xs">{orderCustomer.phone || '—'}</p>
+                                            {orderCustomer.email && <p className="text-leather-500 text-xs">{orderCustomer.email}</p>}
+                                            <p className="text-leather-500 text-xs">{[orderCustomer.address, orderCustomer.city].filter(Boolean).join(', ') || '—'}</p>
                                           </div>
                                         </div>
                                       )}

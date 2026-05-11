@@ -17,18 +17,6 @@
       rel="stylesheet"
     />
     <title>CUIR — Maroquinerie de luxe artisanale</title>
-    <script>
-      (function () {
-        try {
-          var saved = localStorage.getItem('cuir-lang') || localStorage.getItem('language');
-          var browserLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
-          var lang = saved === 'ar' || saved === 'fr' ? saved : (browserLang.startsWith('ar') ? 'ar' : 'fr');
-          var dir = lang === 'ar' ? 'rtl' : 'ltr';
-          document.documentElement.setAttribute('lang', lang);
-          document.documentElement.setAttribute('dir', dir);
-        } catch (e) {}
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>

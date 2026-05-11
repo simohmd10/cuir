@@ -33,7 +33,11 @@ const AdminReviews = lazy(() => import('./pages/admin/Reviews'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
 function getLoaderLang(): 'ar' | 'fr' {
-  return resolveStoredLanguage();
+  if (typeof window === 'undefined') return 'fr';
+  const saved = localStorage.getItem('cuir-lang');
+  if (saved === 'ar' || saved === 'fr') return saved;
+  const browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+  return browserLang.toLowerCase().startsWith('ar') ? 'ar' : 'fr';
 }
 
 function PageLoader() {
