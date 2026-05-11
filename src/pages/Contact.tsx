@@ -144,14 +144,14 @@ export default function Contact() {
     <div className="min-h-screen bg-beige-50" dir={dir}>
       {/* ── Hero ── */}
       <div
-        className="relative py-20 px-4 text-center overflow-hidden"
+        className="relative py-20 px-4 text-center overflow-hidden bg-white border-b border-black/10"
         style={{
-          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
+          background: 'linear-gradient(160deg, #FFFFFF 0%, #F9F7F4 100%)',
         }}
       >
         {/* Decorative circles */}
-        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-white/5" />
-        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-white/5" />
+        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-black/5" />
+        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-black/5" />
 
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -159,11 +159,11 @@ export default function Contact() {
           transition={{ duration: 0.6 }}
           className="relative z-10"
         >
-          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-            <MessageCircle className="w-8 h-8 text-gold-300" />
+          <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto mb-4">
+            <MessageCircle className="w-8 h-8 text-ink" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-white mb-3">{t('contactTitle')}</h1>
-          <p className="text-beige-100/80 text-base max-w-md mx-auto">{t('contactSubtitle')}</p>
+          <h1 className="text-4xl font-display font-bold text-ink mb-3">{t('contactTitle')}</h1>
+          <p className="text-ink/70 text-base max-w-md mx-auto">{t('contactSubtitle')}</p>
         </motion.div>
       </div>
 
