@@ -192,7 +192,7 @@ function AccordionItem({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function FAQ() {
-  const { t, lang, dir } = useLanguage();
+  const { t, lang } = useLanguage();
   const [search, setSearch] = useState('');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -227,7 +227,7 @@ export default function FAQ() {
   let globalIdx = 0;
 
   return (
-    <div className="min-h-screen bg-beige-50" dir={dir}>
+    <div className="min-h-screen bg-beige-50">
       {/* ── Header ── */}
       <div
         className="relative py-20 px-4 text-center"
