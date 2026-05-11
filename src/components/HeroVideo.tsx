@@ -96,12 +96,12 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
         />
       )}
 
-      {/* ══ Warm overlay ══ */}
+      {/* ══ Soft readability overlay (no bottom fog) ══ */}
       <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.65) 45%, rgba(255,255,255,0.2) 74%, transparent 100%)',
+            'linear-gradient(to bottom, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.10) 38%, rgba(255,255,255,0.06) 68%, rgba(255,255,255,0.03) 100%)',
         }}
         aria-hidden="true"
       />
@@ -124,7 +124,7 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
             ? 'font-arabic text-[clamp(2.8rem,8vw,6.5rem)]'
             : 'font-display text-[clamp(3rem,8.5vw,7rem)]',
         ].join(' ')}
-          style={{ color: '#1C1C1C' }}
+          style={{ color: '#FFFFFF' }}
         >
           {heading}
         </h1>
@@ -132,7 +132,7 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
         {/* Subtitle */}
         <p className={[
           'hero-subtitle mt-6 md:mt-8 max-w-md mx-auto font-body font-light',
-          'tracking-wide leading-relaxed text-ink/70',
+          'tracking-wide leading-relaxed text-white/80',
           isAr
             ? 'font-arabic text-base md:text-lg'
             : 'text-sm md:text-[15px]',
@@ -147,12 +147,12 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
           <Link to="/shop" className="group relative inline-flex items-center gap-2 pb-0.5">
             <span className={[
               'relative font-body font-light tracking-[0.20em] uppercase',
-              'text-ink text-xs md:text-[13px]',
+              'text-white text-xs md:text-[13px]',
               'transition-colors duration-500 ease-[var(--ease-luxury)]',
               'group-hover:text-camel',
             ].join(' ')}>
               {primaryCta}
-              <span className="absolute -bottom-px left-0 right-0 h-px bg-ink/80 group-hover:bg-camel transition-colors duration-500 ease-[var(--ease-luxury)]" />
+              <span className="absolute -bottom-px left-0 right-0 h-px bg-white/80 group-hover:bg-camel transition-colors duration-500 ease-[var(--ease-luxury)]" />
             </span>
           </Link>
 
@@ -200,12 +200,12 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
       >
         <span className={[
           'font-body font-light tracking-[0.22em] uppercase text-[10px]',
-          'text-ink/45',
+          'text-white/55',
         ].join(' ')}>
           {scrollLabel}
         </span>
         <ChevronDown
-          className="w-4 h-4 text-ink/55 hero-bounce"
+          className="w-4 h-4 text-white/65 hero-bounce"
           strokeWidth={1.5}
         />
       </div>
