@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
@@ -31,50 +31,37 @@ const AdminCoupons = lazy(() => import('./pages/admin/Coupons'));
 const AdminReviews = lazy(() => import('./pages/admin/Reviews'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
+function getLoaderLang(): 'ar' | 'fr' {
+  if (typeof window === 'undefined') return 'fr';
+  const saved = localStorage.getItem('cuir-lang');
+  if (saved === 'ar' || saved === 'fr') return saved;
+  const browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+  return browserLang.toLowerCase().startsWith('ar') ? 'ar' : 'fr';
+}
+
 function PageLoader() {
+  const { lang } = useLanguage();
+  const activeLang = lang || getLoaderLang();
+  const loadingText = activeLang === 'fr' ? 'Chargement...' : 'جاري التحميل...';
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-beige-50">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-leather-200 border-t-leather-500 rounded-full animate-spin" />
-        <p className="text-leather-600 font-arabic">جاري التحميل...</p>
+        <p className={`text-leather-600 ${activeLang === 'ar' ? 'font-arabic' : 'font-body'}`}>{loadingText}</p>
       </div>
     </div>
   );
 }
 
-function NavigationResetManager() {
+function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
     window.history.scrollRestoration = 'manual';
-  }, []);
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-    const root = document.documentElement;
-    const body = document.body;
-    const prevRootBehavior = root.style.scrollBehavior;
-    const prevBodyBehavior = body.style.scrollBehavior;
-    root.style.scrollBehavior = 'auto';
-    body.style.scrollBehavior = 'auto';
-
-    const resetTop = () => {
-      window.scrollTo(0, 0);
-      root.scrollTop = 0;
-      body.scrollTop = 0;
-    };
-
-    resetTop();
-    const raf = window.requestAnimationFrame(resetTop);
-    const timeout = window.setTimeout(resetTop, 75);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      window.clearTimeout(timeout);
-      root.style.scrollBehavior = prevRootBehavior;
-      body.style.scrollBehavior = prevBodyBehavior;
-    };
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [pathname]);
 
   return null;
@@ -142,12 +129,10 @@ function RouteDocumentMeta() {
 }
 
 function CustomerLayout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main key={location.pathname} className="flex-1">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
     </div>
@@ -171,7 +156,7 @@ export default function App() {
 
   return (
     <div dir={dir} className="min-h-screen bg-beige-50">
-      <NavigationResetManager />
+      <ScrollToTopOnRouteChange />
       <RouteDocumentMeta />
       <Suspense fallback={<PageLoader />}>
         <Routes>
