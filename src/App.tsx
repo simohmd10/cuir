@@ -130,10 +130,13 @@ function RouteDocumentMeta() {
 }
 
 function CustomerLayout({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className={`flex-1 ${isHome ? '' : 'pt-16'}`}>{children}</main>
       <Footer />
       <WhatsAppButton />
     </div>
