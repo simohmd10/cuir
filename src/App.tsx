@@ -6,6 +6,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import { warmCommonRoutes } from './lib/routePreload';
+import { resolveStoredLanguage } from './lib/language';
 
 // Customer pages
 const Home = lazy(() => import('./pages/Home'));
