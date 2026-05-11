@@ -74,6 +74,11 @@ export interface Order {
   idempotency_key: string;
   access_token: string;
   notes?: string;
+  customer_name?: string | null;
+  customer_phone?: string | null;
+  customer_email?: string | null;
+  customer_address?: string | null;
+  customer_city?: string | null;
   created_at: string;
   customer?: Customer;
   order_items?: OrderItem[];
