@@ -114,10 +114,7 @@ export default function Header() {
           </nav>
 
           {/* Actions */}
-          <div className={[
-              "flex items-center gap-0.5 shrink-0",
-              dir === "rtl" ? "order-1 md:order-none" : "order-2 md:order-none",
-            ].join(" ")}>
+          <div className="flex items-center gap-0.5 shrink-0">
             {/* Language toggle — desktop only */}
             <button
               onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
