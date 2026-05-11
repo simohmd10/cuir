@@ -132,7 +132,7 @@ function resolveColor(name: string): string | undefined {
 
 function ProductSkeleton({ dir }: { dir: 'rtl' | 'ltr' }) {
   return (
-    <div className="min-h-screen bg-cream-100" dir={dir}>
+    <div className="min-h-screen bg-white" dir={dir}>
       <div className="container-luxury py-10 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-8 lg:gap-16">
 
@@ -549,7 +549,7 @@ export default function ProductPage() {
   // ── Error / not found ─────────────────────────────────────────────────────
   if (isError) {
     return (
-      <div className="min-h-screen bg-cream-100 flex items-center justify-center px-4" dir={dir}>
+      <div className="min-h-screen bg-white flex items-center justify-center px-4" dir={dir}>
         <div className="text-center max-w-sm space-y-6">
           <div className="w-12 h-12 border border-camel/30 flex items-center justify-center mx-auto" aria-hidden="true">
             <span className="text-camel font-display font-light text-lg">—</span>
@@ -582,7 +582,7 @@ export default function ProductPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-cream-100" dir={dir}>
+    <div className="min-h-screen bg-white" dir={dir}>
 
       {/* ══════════════════════════════════════════════
           PART 1 — Product Hero
@@ -1013,7 +1013,7 @@ export default function ProductPage() {
       {/* ══════════════════════════════════════════════
           PART 2 — Reviews
       ══════════════════════════════════════════════ */}
-      <section className="bg-cream-200 py-16 md:py-24" aria-label={lang === 'ar' ? 'التقييمات' : 'Avis'}>
+      <section className="bg-white py-16 md:py-24" aria-label={lang === 'ar' ? 'التقييمات' : 'Avis'}>
         <div className="container-luxury">
 
           {/* Section heading */}
