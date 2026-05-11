@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { translations } from '../../i18n';
@@ -62,6 +62,7 @@ function SectionHeading({ children, isArabic }: SectionHeadingProps) {
 // ─── Footer ───────────────────────────────────────────────────────────────────
 export default function Footer() {
   const { lang, dir } = useLanguage();
+  const { pathname } = useLocation();
   const isArabic = lang === 'ar';
   const t = (key: keyof typeof translations.ar) => translations[lang][key] as string;
 
@@ -95,6 +96,11 @@ export default function Footer() {
             {/* Logo wordmark */}
             <Link
               to="/"
+              onClick={() => {
+                if (pathname === '/') {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                }
+              }}
               className="inline-block mb-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
               <span className="font-display font-light text-3xl text-ink tracking-wider">
