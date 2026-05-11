@@ -130,8 +130,7 @@ export default function OrderStatus() {
     setTimeout(() => refetch(), 50);
   };
 
-  const inputClass =
-    'w-full px-4 py-3 rounded-xl border border-beige-200 bg-white text-leather-800 placeholder-leather-300 focus:outline-none focus:ring-2 focus:ring-leather-400 focus:border-transparent transition text-sm';
+  const inputClass = 'input-soft';
 
   const stepLabels: Record<OrderStatus, { ar: string; fr: string }> = {
     pending:    { ar: 'قيد الانتظار', fr: 'En attente' },
@@ -164,7 +163,7 @@ export default function OrderStatus() {
         {/* ── Search form ── */}
         <motion.form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-8"
+          className="card-luxury-static p-6 mb-8"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -205,7 +204,7 @@ export default function OrderStatus() {
 
           <motion.button
             type="submit"
-            className="mt-4 w-full py-3 bg-ink text-white rounded-xl font-bold hover:bg-ink/80 transition-colors flex items-center justify-center gap-2"
+            className="btn-solid mt-4 w-full py-3 font-bold"
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
           >
@@ -238,7 +237,7 @@ export default function OrderStatus() {
           {!isLoading && hasSearched && (isError || !order) && (
             <motion.div
               key="not-found"
-              className="bg-white rounded-2xl shadow-sm p-8 text-center"
+              className="card-luxury-static p-8 text-center"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -258,7 +257,7 @@ export default function OrderStatus() {
               exit={{ opacity: 0 }}
             >
               {/* Order reference + status badge */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="card-luxury-static p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                   <div>
                     <p className="text-xs text-leather-400 mb-1">{t('yourOrderRef')}</p>
@@ -284,7 +283,7 @@ export default function OrderStatus() {
 
               {/* Visual stepper */}
               {order.status !== 'cancelled' && (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="card-luxury-static p-6">
                   <div className="flex items-center justify-between">
                     {STATUS_STEPS.map((step, idx) => (
                       <React.Fragment key={step}>
@@ -318,7 +317,7 @@ export default function OrderStatus() {
 
               {/* Customer info */}
               {order.customer && (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="card-luxury-static p-6">
                   <h3 className="font-bold text-leather-800 mb-4 flex items-center gap-2">
                     <User className="w-4 h-4 text-leather-500" />
                     {lang === 'ar' ? 'معلومات العميل' : 'Informations client'}
@@ -342,7 +341,7 @@ export default function OrderStatus() {
 
               {/* Order items */}
               {order.order_items && order.order_items.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="card-luxury-static p-6">
                   <h3 className="font-bold text-leather-800 mb-4 flex items-center gap-2">
                     <Package className="w-4 h-4 text-leather-500" />
                     {t('orderItems')} ({order.order_items.length})
@@ -376,7 +375,7 @@ export default function OrderStatus() {
               )}
 
               {/* Price breakdown */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="card-luxury-static p-6">
                 <h3 className="font-bold text-leather-800 mb-4">
                   {lang === 'ar' ? 'ملخص المبالغ' : 'Récapitulatif des montants'}
                 </h3>
@@ -413,7 +412,7 @@ export default function OrderStatus() {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#25D366] text-white rounded-full font-semibold hover:bg-[#1ebe5d] transition-colors text-sm"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#25D366] text-white rounded-full text-sm font-semibold hover:bg-[#1ebe5d] transition-colors"
                 >
                   <MessageCircle className="w-5 h-5" />
                   {t('whatsapp')}

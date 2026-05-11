@@ -20,7 +20,7 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: 1,
-    gradient: 'from-stone-900 via-leather-800 to-stone-800',
+    gradient: 'from-white via-beige-50 to-cream-200',
     titleFr: 'Artisanat Marocain',
     titleAr: 'الحرفية المغربية الأصيلة',
     subtitleFr: 'Sacs en cuir véritable, faits à la main avec passion',
@@ -31,7 +31,7 @@ const slides: Slide[] = [
   },
   {
     id: 2,
-    gradient: 'from-amber-950 via-amber-900 to-stone-900',
+    gradient: 'from-white via-cream-100 to-beige-100',
     titleFr: 'Luxe & Élégance',
     titleAr: 'الفخامة والأناقة',
     subtitleFr: 'Chaque pièce raconte une histoire de savoir-faire ancestral',
@@ -42,7 +42,7 @@ const slides: Slide[] = [
   },
   {
     id: 3,
-    gradient: 'from-stone-950 via-stone-800 to-amber-900',
+    gradient: 'from-white via-beige-50 to-cream-200',
     titleFr: 'Collection Exclusive',
     titleAr: 'المجموعة الحصرية',
     subtitleFr: 'Éditions limitées pour les connaisseurs du beau',
@@ -104,8 +104,8 @@ const BannerCarousel: React.FC = () => {
                 />
 
                 {/* Dark gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <div className={`absolute inset-0 bg-gradient-to-${dir === 'rtl' ? 'l' : 'r'} from-black/50 to-transparent`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/35 to-transparent" />
+                <div className={`absolute inset-0 bg-gradient-to-${dir === 'rtl' ? 'l' : 'r'} from-white/55 to-transparent`} />
 
                 {/* Content */}
                 <div
@@ -127,7 +127,7 @@ const BannerCarousel: React.FC = () => {
                       />
 
                       <motion.h1
-                        className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight ${lang === 'ar' ? 'font-arabic' : 'font-display'}`}
+                        className={`text-4xl md:text-6xl lg:text-7xl font-bold text-ink mb-4 leading-tight ${lang === 'ar' ? 'font-arabic' : 'font-display'}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
@@ -136,7 +136,7 @@ const BannerCarousel: React.FC = () => {
                       </motion.h1>
 
                       <motion.p
-                        className={`text-lg md:text-xl text-white/80 mb-8 max-w-xl ${lang === 'ar' ? 'font-arabic' : ''}`}
+                        className={`text-lg md:text-xl text-ink/75 mb-8 max-w-xl ${lang === 'ar' ? 'font-arabic' : ''}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
@@ -162,10 +162,10 @@ const BannerCarousel: React.FC = () => {
                   {selectedIndex !== index && (
                     <div>
                       <div className="w-16 h-0.5 bg-gold-500 mb-6" />
-                      <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight ${lang === 'ar' ? 'font-arabic' : 'font-display'}`}>
+                      <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold text-ink mb-4 leading-tight ${lang === 'ar' ? 'font-arabic' : 'font-display'}`}>
                         {title}
                       </h1>
-                      <p className={`text-lg md:text-xl text-white/80 mb-8 max-w-xl ${lang === 'ar' ? 'font-arabic' : ''}`}>
+                      <p className={`text-lg md:text-xl text-ink/75 mb-8 max-w-xl ${lang === 'ar' ? 'font-arabic' : ''}`}>
                         {subtitle}
                       </p>
                       <Link
@@ -186,14 +186,14 @@ const BannerCarousel: React.FC = () => {
       {/* Navigation arrows - desktop only */}
       <button
         onClick={scrollPrev}
-        className="hidden md:flex absolute start-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/30 items-center justify-center text-white transition-all duration-200 hover:scale-110"
+        className="hidden md:flex absolute start-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm hover:bg-white border border-ink/15 items-center justify-center text-ink transition-all duration-200 hover:scale-110"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
       <button
         onClick={scrollNext}
-        className="hidden md:flex absolute end-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/30 items-center justify-center text-white transition-all duration-200 hover:scale-110"
+        className="hidden md:flex absolute end-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/95 backdrop-blur-sm hover:bg-white border border-ink/15 items-center justify-center text-ink transition-all duration-200 hover:scale-110"
         aria-label="Next slide"
       >
         <ChevronRight className="w-6 h-6" />
@@ -209,7 +209,7 @@ const BannerCarousel: React.FC = () => {
               'transition-all duration-300 rounded-full',
               selectedIndex === index
                 ? 'w-8 h-2 bg-gold-500'
-                : 'w-2 h-2 bg-white/50 hover:bg-white/80',
+                : 'w-2 h-2 bg-ink/30 hover:bg-ink/60',
             ].join(' ')}
             aria-label={`Go to slide ${index + 1}`}
           />
