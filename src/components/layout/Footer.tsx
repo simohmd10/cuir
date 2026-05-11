@@ -74,13 +74,13 @@ export default function Footer() {
 
   // Shared link style for nav items
   const linkBase = [
-    'text-xs text-cream-100/60 hover:text-camel',
+    'text-xs text-ink/70 hover:text-ink',
     'transition-colors duration-300 ease-luxury',
     isArabic ? 'font-arabic' : 'font-body',
   ].join(' ');
 
   return (
-    <footer className="bg-ink text-cream-100" dir={dir}>
+    <footer className="bg-white text-ink border-t border-black/10" dir={dir}>
       {/* ── Main grid ──────────────────────────────────────────────────────── */}
       <div className="max-w-luxury mx-auto px-6 sm:px-10 pt-10 pb-8 md:pt-16 md:pb-12">
         <div className="grid grid-cols-1 gap-7 md:gap-10 md:grid-cols-3 lg:grid-cols-12">
@@ -97,14 +97,14 @@ export default function Footer() {
               to="/"
               className="inline-block mb-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-camel/60 rounded-sm"
             >
-              <span className="font-display font-light text-3xl text-cream-100 tracking-wider">
+              <span className="font-display font-light text-3xl text-ink tracking-wider">
                 CUIR
               </span>
             </Link>
 
             {/* Brand tagline — single language */}
             <p className={[
-              'mb-3 text-[10px] tracking-luxury uppercase text-camel/70',
+              'mb-3 text-[10px] tracking-luxury uppercase text-ink/55',
               isArabic ? 'font-arabic tracking-normal text-xs' : 'font-body',
             ].join(' ')}>
               {isArabic ? 'فن الجلد المغربي' : "L'Art du Cuir Marocain"}
@@ -113,7 +113,7 @@ export default function Footer() {
             {/* Description — localized, 2 lines */}
             <p
               className={[
-                'text-xs text-cream-100/50 leading-relaxed max-w-[28ch] mb-4',
+                'text-xs text-ink/60 leading-relaxed max-w-[28ch] mb-4',
                 isArabic
                   ? 'font-arabic text-sm leading-loose'
                   : 'font-body',
@@ -129,7 +129,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className={[
                 'inline-flex items-center gap-2 mb-4',
-                'text-xs text-cream-100/60 hover:text-[#25D366]',
+                'text-xs text-ink/70 hover:text-[#25D366]',
                 'transition-colors duration-300 ease-luxury',
                 isArabic ? 'font-arabic flex-row-reverse' : 'font-body',
               ].join(' ')}
@@ -150,8 +150,8 @@ export default function Footer() {
                 aria-label="Instagram"
                 className={[
                   'w-8 h-8 flex items-center justify-center rounded-full',
-                  'border border-cream-100/10 text-cream-100/40',
-                  'hover:border-camel/40 hover:text-camel',
+                  'border border-black/15 text-ink/45',
+                  'hover:border-ink hover:text-ink',
                   'transition-all duration-300 ease-luxury',
                 ].join(' ')}
               >
@@ -164,8 +164,8 @@ export default function Footer() {
                 aria-label="Facebook"
                 className={[
                   'w-8 h-8 flex items-center justify-center rounded-full',
-                  'border border-cream-100/10 text-cream-100/40',
-                  'hover:border-camel/40 hover:text-camel',
+                  'border border-black/15 text-ink/45',
+                  'hover:border-ink hover:text-ink',
                   'transition-all duration-300 ease-luxury',
                 ].join(' ')}
               >
@@ -222,7 +222,7 @@ export default function Footer() {
 
       {/* ── Divider ────────────────────────────────────────────────────────── */}
       <div className="max-w-luxury mx-auto px-6 sm:px-10">
-        <div className="border-t border-cream-100/[0.07]" />
+        <div className="border-t border-black/10" />
       </div>
 
       {/* ── Bottom bar ─────────────────────────────────────────────────────── */}
@@ -235,14 +235,14 @@ export default function Footer() {
         >
           <span
             className={[
-              'text-[11px] text-cream-100/30',
+              'text-[11px] text-ink/45',
               isArabic ? 'font-arabic' : 'font-body',
             ].join(' ')}
           >
             © 2026 Cuir Maroc.{' '}{t('allRightsReserved')}.
           </span>
 
-          <span className="text-[11px] text-cream-100/25 font-body select-none">
+          <span className="text-[11px] text-ink/40 font-body select-none">
             🇲🇦{' '}
             {isArabic ? 'صُنع في المغرب' : 'Fait au Maroc'}
           </span>

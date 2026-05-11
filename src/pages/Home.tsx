@@ -99,12 +99,12 @@ const TrustBar = memo(function TrustBar() {
     { icon: <Shield className="w-4 h-4" />, label: t('cashOnDelivery') },
   ];
   return (
-    <div className="bg-cream-200 py-5">
+    <div className="bg-white border-y border-black/10 py-5">
       <div className="container-luxury">
         <ul className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-16">
           {items.map((item) => (
             <li key={item.label} className="flex items-center gap-2 text-ink/70">
-              <span className="text-camel">{item.icon}</span>
+              <span className="text-ink">{item.icon}</span>
               <span className="font-body text-[11px] tracking-luxury uppercase">{item.label}</span>
             </li>
           ))}
@@ -117,7 +117,7 @@ const TrustBar = memo(function TrustBar() {
 const DeliveryBanner = memo(function DeliveryBanner() {
   const { t } = useLanguage();
   return (
-    <div className="bg-camel py-5 text-center">
+    <div className="bg-white border-b border-black/10 py-5 text-center">
       <p className="font-display italic text-2xl text-ink px-4">
         {t('freeDelivery')}
       </p>
@@ -157,7 +157,7 @@ export default function Home() {
   const testimonialsGridRef    = useRevealGroup();
 
   return (
-    <div className="min-h-screen bg-cream-100" dir={dir}>
+    <div className="min-h-screen bg-white" dir={dir}>
 
       {/* ══ Hero ══════════════════════════════════════════════════════════════ */}
       <HeroVideo videoSrc="/hero.webm" posterSrc="/hero-poster.jpg" />
@@ -169,7 +169,7 @@ export default function Home() {
       <CollectionsSection />
 
       {/* ══ Featured Products ═══════════════════════════════════════════════ */}
-      <section className="section-luxury bg-cream-200">
+      <section className="section-luxury bg-white">
         <div className="container-luxury">
 
           <div ref={featuredHeadingRef} className="reveal mb-10 md:mb-12 text-center">
@@ -201,15 +201,15 @@ export default function Home() {
       </section>
 
       {/* ══ Editorial Story ══════════════════════════════════════════════════ */}
-      <section className="section-luxury bg-ink text-cream-100">
+      <section className="section-luxury bg-white text-ink border-y border-black/10">
         <div className="container-luxury">
           <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
 
             <div ref={storyLeftRef} className="reveal">
-              <SectionLabel className="text-camel">{t('ourStory')}</SectionLabel>
+              <SectionLabel className="text-ink/60">{t('ourStory')}</SectionLabel>
               <blockquote
                 className={[
-                  'mt-8 font-light leading-[1.15] text-cream-100',
+                  'mt-8 font-light leading-[1.15] text-ink',
                   isAr
                     ? 'font-arabic text-[clamp(2rem,4.5vw,3.25rem)]'
                     : 'font-display italic text-[clamp(1.9rem,4vw,3rem)]',
@@ -224,7 +224,7 @@ export default function Home() {
               <div className="mt-12">
                 <Link
                   to="/about"
-                  className="btn-ghost text-cream-100 border-cream-100 hover:bg-cream-100 hover:text-ink inline-flex items-center gap-3"
+                  className="btn-ghost inline-flex items-center gap-3"
                 >
                   <span>{isAr ? 'اكتشف قصتنا' : 'Découvrir notre histoire'}</span>
                   <ArrowIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -242,10 +242,10 @@ export default function Home() {
                     {feat.num}
                   </span>
                   <div>
-                    <h3 className="font-display text-xl font-light text-cream-100 mb-1">
+                    <h3 className="font-display text-xl font-light text-ink mb-1">
                       {isAr ? feat.title_ar : feat.title_fr}
                     </h3>
-                    <p className="font-body text-sm text-cream-100/60 leading-relaxed">
+                    <p className="font-body text-sm text-ink/65 leading-relaxed">
                       {isAr ? feat.desc_ar : feat.desc_fr}
                     </p>
                   </div>
@@ -257,7 +257,7 @@ export default function Home() {
       </section>
 
       {/* ══ Best Sellers ══════════════════════════════════════════════════════ */}
-      <section className="section-luxury bg-cream-100">
+      <section className="section-luxury bg-white">
         <div className="container-luxury">
 
           <div ref={bestHeadingRef} className="reveal mb-10 md:mb-12 text-center">
@@ -285,7 +285,7 @@ export default function Home() {
       <DeliveryBanner />
 
       {/* ══ Testimonials ══════════════════════════════════════════════════════ */}
-      <section className="section-luxury bg-cream-200">
+      <section className="section-luxury bg-white">
         <div className="container-luxury">
 
           <div ref={testimonialsHeadingRef} className="reveal mb-10 md:mb-12 text-center">
