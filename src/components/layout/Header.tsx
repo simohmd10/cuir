@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import type { MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, Menu } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -46,6 +47,13 @@ export default function Header() {
   const mutedCls = transparent ? 'text-cream-100/60' : 'text-ink/45';
   const hoverCls = transparent ? 'hover:text-cream-100/90' : 'hover:text-camel';
 
+  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (location.pathname === '/') {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <header
@@ -60,7 +68,7 @@ export default function Header() {
         <div className="container-luxury h-full flex items-center justify-between gap-6">
 
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 select-none" aria-label="CUIR — Accueil">
+          <Link to="/" onClick={handleLogoClick} className="flex-shrink-0 select-none" aria-label="CUIR — Accueil">
             <span className={`font-display font-light text-xl tracking-[0.14em] transition-colors duration-500 ${textCls}`}>
               CUIR
             </span>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import type { MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { X, ChevronRight, User, ShoppingBag, Heart, Phone, Globe } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -208,6 +209,17 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
   const savedScrollY = useRef(0);
   const shouldRestoreScroll = useRef(true);
 
+  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (location.pathname === '/') {
+      event.preventDefault();
+      shouldRestoreScroll.current = false;
+      onClose();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    onClose();
+  };
+
   // ── iOS-safe scroll lock ──────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
@@ -289,7 +301,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
           </button>
 
           {/* Logo */}
-          <Link to="/" onClick={onClose} className="select-none text-center">
+          <Link to="/" onClick={handleLogoClick} className="select-none text-center">
             <span className="block font-display font-light text-lg text-ink tracking-[0.14em]">
               CUIR
             </span>
