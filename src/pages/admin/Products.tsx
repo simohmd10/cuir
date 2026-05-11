@@ -105,6 +105,11 @@ const Products: React.FC = () => {
 
   const isFeatured = watch('is_featured');
   const isBestSeller = watch('is_best_seller');
+  const parentCategories = categories.filter((c) => !c.parent_slug);
+  const childrenByParent = new Map(
+    parentCategories.map((parent) => [parent.slug, categories.filter((c) => c.parent_slug === parent.slug)])
+  );
+  const orphans = categories.filter((c) => c.parent_slug && !parentCategories.find((p) => p.slug === c.parent_slug));
 
   const openAdd = () => {
     setEditingProduct(null);
@@ -252,8 +257,21 @@ const Products: React.FC = () => {
             className="px-3 py-2 border border-leather-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 text-leather-700 bg-white"
           >
             <option value="">{lang === 'ar' ? 'كل الفئات' : 'Toutes catégories'}</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.slug}>{lang === 'ar' ? c.name_ar : c.name}</option>
+            {parentCategories.map((parent) => {
+              const pName = lang === 'ar' ? (parent.name_ar || parent.name) : parent.name;
+              const children = childrenByParent.get(parent.slug) ?? [];
+              return (
+                <React.Fragment key={parent.id}>
+                  <option value={parent.slug}>{pName}</option>
+                  {children.map((child) => {
+                    const cName = lang === 'ar' ? (child.name_ar || child.name) : child.name;
+                    return <option key={child.id} value={child.slug}>{`   ↳ ${cName}`}</option>;
+                  })}
+                </React.Fragment>
+              );
+            })}
+            {orphans.map((c) => (
+              <option key={c.id} value={c.slug}>{lang === 'ar' ? (c.name_ar || c.name) : c.name}</option>
             ))}
           </select>
         </div>
@@ -455,33 +473,25 @@ const Products: React.FC = () => {
                   <label className="block text-xs font-medium text-leather-600 mb-1">Catégorie *</label>
                   <select {...register('category')} className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 bg-white text-leather-700">
                     <option value="">Sélectionner...</option>
-                    {(() => {
-                      const parents  = categories.filter((c) => !c.parent_slug);
-                      const orphans  = categories.filter((c) => c.parent_slug && !parents.find((p) => p.slug === c.parent_slug));
-                      return (
-                        <>
-                          {parents.map((parent) => {
-                            const pName = lang === 'ar' ? (parent.name_ar || parent.name) : parent.name;
-                            const children = categories.filter((c) => c.parent_slug === parent.slug);
-                            return children.length > 0 ? (
-                              <optgroup key={parent.slug} label={`▸ ${pName}`}>
-                                <option value={parent.slug}>{pName} ({lang === 'ar' ? 'عام' : 'général'})</option>
-                                {children.map((c) => {
-                                  const cName = lang === 'ar' ? (c.name_ar || c.name) : c.name;
-                                  return <option key={c.id} value={c.slug}>{'  '}↳ {cName}</option>;
-                                })}
-                              </optgroup>
-                            ) : (
-                              <option key={parent.slug} value={parent.slug}>{pName}</option>
-                            );
-                          })}
-                          {orphans.map((c) => {
+                    {parentCategories.map((parent) => {
+                      const pName = lang === 'ar' ? (parent.name_ar || parent.name) : parent.name;
+                      const children = childrenByParent.get(parent.slug) ?? [];
+                      return children.length > 0 ? (
+                        <optgroup key={parent.slug} label={`▸ ${pName}`}>
+                          <option value={parent.slug}>{pName} ({lang === 'ar' ? 'عام' : 'général'})</option>
+                          {children.map((c) => {
                             const cName = lang === 'ar' ? (c.name_ar || c.name) : c.name;
-                            return <option key={c.id} value={c.slug}>{cName}</option>;
+                            return <option key={c.id} value={c.slug}>{'  '}↳ {cName}</option>;
                           })}
-                        </>
+                        </optgroup>
+                      ) : (
+                        <option key={parent.slug} value={parent.slug}>{pName}</option>
                       );
-                    })()}
+                    })}
+                    {orphans.map((c) => {
+                      const cName = lang === 'ar' ? (c.name_ar || c.name) : c.name;
+                      return <option key={c.id} value={c.slug}>{cName}</option>;
+                    })}
                   </select>
                   {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>}
                 </div>
