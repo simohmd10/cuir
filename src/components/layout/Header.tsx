@@ -43,9 +43,9 @@ export default function Header() {
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
 
-  const textCls = transparent ? 'text-cream-100' : 'text-ink';
-  const mutedCls = transparent ? 'text-cream-100/60' : 'text-ink/45';
-  const hoverCls = transparent ? 'hover:text-cream-100/90' : 'hover:text-camel';
+  const textCls = 'text-ink';
+  const mutedCls = 'text-ink/55';
+  const hoverCls = 'hover:text-camel';
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (location.pathname === '/') {
@@ -60,9 +60,7 @@ export default function Header() {
         className={[
           'fixed top-0 inset-x-0 z-50 h-16 isolate',
           'transition-all duration-500',
-          transparent
-            ? 'bg-transparent border-b border-transparent'
-            : 'bg-cream-100 border-b border-cream-300 md:bg-cream-100/96 md:backdrop-blur-[6px]',
+          'bg-white border-b border-cream-300 md:bg-white/96 md:backdrop-blur-[6px]',
         ].join(' ')}
       >
         <div className="container-luxury h-full flex items-center justify-between gap-6">
