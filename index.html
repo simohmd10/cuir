@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#8B5E3C" />
-    <meta name="description" content="متجر كوير للحقائب الجلدية الفاخرة - حقائب يدوية أصيلة من المغرب | Cuir - Maroquinerie de luxe artisanale du Maroc" />
-    <meta name="keywords" content="حقائب جلدية, مغرب, maroquinerie, sac cuir, Maroc" />
-    <meta property="og:title" content="Cuir - متجر الحقائب الجلدية الفاخرة" />
-    <meta property="og:description" content="حقائب جلدية يدوية فاخرة من المغرب" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="description" content="Sacs et accessoires en cuir fabriqués à la main au Maroc." />
+    <meta name="keywords" content="maroquinerie, cuir, sacs en cuir, artisanat marocain, accessoires cuir" />
+    <meta property="og:title" content="CUIR — Maroquinerie de luxe artisanale" />
+    <meta property="og:description" content="Sacs et accessoires en cuir fabriqués à la main au Maroc." />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +16,19 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Cuir - متجر الحقائب الجلدية الفاخرة</title>
+    <title>CUIR — Maroquinerie de luxe artisanale</title>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('cuir-lang') || localStorage.getItem('language');
+          var browserLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+          var lang = saved === 'ar' || saved === 'fr' ? saved : (browserLang.startsWith('ar') ? 'ar' : 'fr');
+          var dir = lang === 'ar' ? 'rtl' : 'ltr';
+          document.documentElement.setAttribute('lang', lang);
+          document.documentElement.setAttribute('dir', dir);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

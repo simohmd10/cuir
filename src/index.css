@@ -30,7 +30,7 @@
     font-size: 16px;
     /* Ultra-smooth scrolling on mobile */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
+    overscroll-behavior-y: auto;
   }
 
   body {
@@ -67,6 +67,24 @@
   * {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Prevent accidental selection/callout on storefront UI */
+  body,
+  body *:not(input):not(textarea):not([contenteditable='true']) {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable='true'],
+  [contenteditable='plaintext-only'] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
 }
 
 /* ═══════════════════════════════════════
