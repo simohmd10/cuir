@@ -21,18 +21,6 @@ const fadeIn = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function StatCard({ number, label }: { number: string; label: string }) {
-  return (
-    <motion.div
-      variants={fadeUp}
-      className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 text-center"
-    >
-      <span className="text-4xl font-display font-bold text-gold-300">{number}</span>
-      <span className="text-sm text-white/80 mt-1 font-medium">{label}</span>
-    </motion.div>
-  );
-}
-
 function ValueCard({
   icon,
   title,
@@ -76,25 +64,6 @@ export default function About() {
       icon: <Shield className="w-8 h-8 text-leather-500" />,
       title: t('authenticity'),
       description: t('authenticityDesc'),
-    },
-  ];
-
-  const stats = [
-    {
-      number: '+1000',
-      label: lang === 'ar' ? 'عميل سعيد' : 'Clients satisfaits',
-    },
-    {
-      number: '+500',
-      label: lang === 'ar' ? 'منتج فريد' : 'Produits uniques',
-    },
-    {
-      number: '+5',
-      label: lang === 'ar' ? 'سنوات خبرة' : 'Années d\'expérience',
-    },
-    {
-      number: '100%',
-      label: lang === 'ar' ? 'جلد طبيعي' : 'Cuir naturel',
     },
   ];
 
@@ -235,36 +204,6 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {values.map((v, i) => (
               <ValueCard key={i} {...v} />
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ── Stats section ── */}
-      <motion.section
-        className="py-20 px-4"
-        style={{
-          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 60%, #1C1C1C 100%)',
-        }}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <div className="max-w-5xl mx-auto">
-          <motion.div variants={fadeUp} className="text-center mb-10">
-            <h2 className="text-3xl font-display font-bold text-white mb-2">
-              {lang === 'ar' ? 'بالأرقام' : 'En chiffres'}
-            </h2>
-            <p className="text-beige-100/70">
-              {lang === 'ar'
-                ? 'أرقام تعكس ثقتكم بنا'
-                : 'Des chiffres qui reflètent votre confiance en nous'}
-            </p>
-          </motion.div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((s, i) => (
-              <StatCard key={i} {...s} />
             ))}
           </div>
         </div>
