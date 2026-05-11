@@ -232,11 +232,11 @@ export default function FAQ() {
       <div
         className="relative py-20 px-4 text-center"
         style={{
-          background: 'linear-gradient(160deg, #1C1C1C 0%, #2D2926 100%)',
+          background: 'linear-gradient(160deg, #FFFFFF 0%, #F7F7F7 100%)',
         }}
       >
-        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
+        <div className="absolute -top-16 -start-16 w-64 h-64 rounded-full bg-black/5 pointer-events-none" />
+        <div className="absolute -bottom-20 -end-10 w-80 h-80 rounded-full bg-black/5 pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -244,11 +244,11 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
           className="relative z-10"
         >
-          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-black/10 flex items-center justify-center mx-auto mb-4">
             <HelpCircle className="w-8 h-8 text-gold-300" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-white mb-3">{t('faqTitle')}</h1>
-          <p className="text-beige-100/80 text-base max-w-md mx-auto">{t('faqSubtitle')}</p>
+          <h1 className="text-4xl font-display font-bold text-black mb-3">{t('faqTitle')}</h1>
+          <p className="text-black/70 text-base max-w-md mx-auto">{t('faqSubtitle')}</p>
         </motion.div>
       </div>
 
