@@ -248,10 +248,10 @@ export default function Shop() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-cream-100" dir={dir}>
+    <div className="min-h-screen bg-white" dir={dir}>
 
       {/* ── Page Header ────────────────────────────────────────────────────── */}
-      <header className="bg-cream-200 py-16 md:py-20">
+      <header className="bg-white py-16 md:py-20">
         <div className="container-luxury text-center space-y-4">
           <p className="section-label">
             {lang === 'ar' ? '— المتجر —' : '— Boutique —'}
@@ -271,9 +271,9 @@ export default function Shop() {
 
       {/* ── Sticky Filter Bar ──────────────────────────────────────────────── */}
       <div
-        className="sticky top-0 z-20 border-b border-cream-300"
+        className="sticky top-0 z-20 border-b border-black/10"
         style={{
-          backgroundColor: 'rgba(250, 247, 244, 0.95)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
         }}
