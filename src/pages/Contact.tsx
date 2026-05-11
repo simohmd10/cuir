@@ -31,8 +31,7 @@ const slideUp = {
   }),
 };
 
-const inputClass =
-  'w-full px-4 py-3 rounded-xl border border-beige-200 bg-white text-leather-800 placeholder-leather-300 focus:outline-none focus:ring-2 focus:ring-leather-400 focus:border-transparent transition text-sm';
+const inputClass = 'input-soft';
 
 // ── Info card ─────────────────────────────────────────────────────────────────
 
@@ -65,7 +64,7 @@ function InfoCard({
     <motion.div
       custom={custom}
       variants={slideUp}
-      className="bg-white rounded-2xl p-5 shadow-sm border border-beige-100 hover:shadow-md transition-shadow"
+      className="card-luxury p-5"
     >
       {href ? (
         <a href={href} target="_blank" rel="noopener noreferrer" className="block">
@@ -177,7 +176,7 @@ export default function Contact() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+            <div className="card-luxury-static p-8">
               <h2 className="text-xl font-bold text-leather-800 mb-6">
                 {lang === 'ar' ? 'أرسل لنا رسالة' : 'Envoyez-nous un message'}
               </h2>
@@ -200,7 +199,7 @@ export default function Contact() {
                     <p className="text-leather-500">{t('messageSent')}</p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-2 px-6 py-2.5 bg-ink text-white rounded-full text-sm font-semibold hover:bg-ink/80 transition-colors"
+                      className="btn-solid mt-2 rounded-full"
                     >
                       {lang === 'ar' ? 'إرسال رسالة أخرى' : 'Envoyer un autre message'}
                     </button>
@@ -314,7 +313,7 @@ export default function Contact() {
                     <motion.button
                       type="submit"
                       disabled={mutation.isPending}
-                      className="w-full py-3.5 bg-ink text-white rounded-xl font-bold hover:bg-ink/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                      className="btn-solid w-full py-3.5 text-base font-bold disabled:opacity-70"
                       whileTap={{ scale: 0.98 }}
                     >
                       {mutation.isPending ? (

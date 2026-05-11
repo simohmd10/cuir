@@ -148,7 +148,7 @@ function AccordionItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border border-beige-200 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+    <div className="card-luxury overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-4 p-5 text-start hover:bg-beige-50 transition-colors"
@@ -273,7 +273,7 @@ export default function FAQ() {
                 ? 'ابحث في الأسئلة الشائعة...'
                 : 'Rechercher dans la FAQ...'
             }
-            className="w-full ps-12 pe-4 py-4 rounded-2xl border border-beige-200 bg-white text-leather-800 placeholder-leather-300 focus:outline-none focus:ring-2 focus:ring-leather-400 focus:border-transparent transition shadow-sm text-sm"
+            className="input-soft ps-12 pe-4 py-4 rounded-2xl shadow-sm"
           />
           {search && (
             <button
