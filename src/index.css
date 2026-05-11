@@ -67,6 +67,30 @@
   * {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Storefront interaction polish: disable accidental selection on non-editable UI */
+  .storefront,
+  .storefront *:not(input):not(textarea):not(select):not(option):not([contenteditable='true']) {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .storefront input,
+  .storefront textarea,
+  .storefront select,
+  .storefront option,
+  .storefront [contenteditable='true'],
+  .storefront [contenteditable='plaintext-only'] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
+  .storefront img,
+  .storefront svg {
+    -webkit-user-drag: none;
+  }
 }
 
 /* ═══════════════════════════════════════
