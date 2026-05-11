@@ -66,7 +66,10 @@ export default function Header() {
         <div className="container-luxury h-full flex items-center justify-between gap-2 sm:gap-4">
 
           {/* Logo */}
-          <Link to="/" onClick={handleLogoClick} className="flex-shrink-0 select-none" aria-label="CUIR — Accueil">
+          <Link to="/" onClick={handleLogoClick} className={[
+              "flex-shrink-0 select-none",
+              dir === "rtl" ? "order-2 md:order-none" : "order-1 md:order-none",
+            ].join(" ")} aria-label="CUIR — Accueil">
             <span className={`font-display font-light text-xl tracking-[0.14em] transition-colors duration-500 ${textCls}`}>
               CUIR
             </span>
