@@ -96,12 +96,12 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
         />
       )}
 
-      {/* ══ Warm overlay ══ */}
+      {/* ══ Soft readability overlay (no bottom fog) ══ */}
       <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.65) 45%, rgba(255,255,255,0.2) 74%, transparent 100%)',
+            'linear-gradient(to bottom, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.10) 38%, rgba(255,255,255,0.06) 68%, rgba(255,255,255,0.03) 100%)',
         }}
         aria-hidden="true"
       />
