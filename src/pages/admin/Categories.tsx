@@ -12,6 +12,7 @@ import { supabase } from '../../lib/supabase';
 import { getImageUrl } from '../../lib/utils';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Category } from '../../types';
+import { groupCategoriesByHierarchy, sortCategoriesByHierarchy } from '../../lib/categoryHierarchy';
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -29,10 +30,9 @@ type CategoryForm = z.infer<typeof categorySchema>;
 async function fetchCategories() {
   const { data, error } = await supabase
     .from('categories')
-    .select(`*, products:products(count)`)
-    .order('name');
+    .select(`*, products:products(count)`);
   if (error) throw error;
-  return (data ?? []) as (Category & { products: { count: number }[] })[];
+  return sortCategoriesByHierarchy((data ?? []) as Category[]) as (Category & { products: { count: number }[] })[];
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -148,11 +148,9 @@ const Categories: React.FC = () => {
   });
 
 
-  const parentCategories = categories.filter((c) => !c.parent_slug);
-  const groupedCategories = parentCategories.map((parent) => ({
-    parent,
-    children: categories.filter((c) => c.parent_slug === parent.slug),
-  }));
+  const parentCategories = sortCategoriesByHierarchy(categories.filter((c) => !c.parent_slug));
+  const groupedCategories = groupCategoriesByHierarchy(categories);
+  const orderedCategories = groupedCategories.flatMap(({ parent, children }) => [parent, ...children]);
   return (
     <AdminLayout>
       <div className="space-y-5 max-w-5xl">
@@ -193,8 +191,8 @@ const Categories: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {groupedCategories.flatMap(({ parent, children }) => [parent, ...children]).map((cat) => {
-              const productCount = cat.products?.[0]?.count ?? 0;
+            {orderedCategories.map((cat) => {
+              const productCount = (cat as Category & { products?: { count: number }[] }).products?.[0]?.count ?? 0;
               const isSub = Boolean(cat.parent_slug);
               return (
                 <motion.div

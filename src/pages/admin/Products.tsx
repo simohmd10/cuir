@@ -15,6 +15,7 @@ import { supabase } from '../../lib/supabase';
 import { formatPrice, getImageUrl } from '../../lib/utils';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Product, Category } from '../../types';
+import { sortCategoriesByHierarchy } from '../../lib/categoryHierarchy';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 
@@ -61,9 +62,9 @@ async function fetchProducts(page: number, search: string, category: string) {
 }
 
 async function fetchCategories() {
-  const { data, error } = await supabase.from('categories').select('*').order('name');
+  const { data, error } = await supabase.from('categories').select('*');
   if (error) throw error;
-  return (data ?? []) as Category[];
+  return sortCategoriesByHierarchy((data ?? []) as Category[]);
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
