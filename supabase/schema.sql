@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   price_at_purchase DECIMAL(10,2) NOT NULL,
   color TEXT DEFAULT '',
   size TEXT DEFAULT '',
+  product_image TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -446,7 +447,7 @@ BEGIN
 
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
-    SELECT id, price, stock, name, name_ar
+    SELECT id, price, stock, name, name_ar, images
     INTO v_product
     FROM products
     WHERE id = (v_item->>'product_id')::UUID
@@ -531,22 +532,22 @@ BEGIN
   INSERT INTO orders (
     order_ref, customer_id, status, total, discount_amount,
     delivery_fee, coupon_code, payment_method, idempotency_key,
-    access_token, notes, customer_name, customer_phone, customer_email, customer_address, customer_city
+    access_token, notes
   ) VALUES (
     v_order_ref, v_customer_id, 'pending', v_total, v_discount_amount,
     v_delivery_fee, UPPER(COALESCE(p_coupon_code, '')), 'cod', p_idempotency_key,
-    v_access_token, p_notes, p_customer_name, p_customer_phone, NULLIF(p_customer_email, ''), p_customer_address, p_customer_city
+    v_access_token, p_notes
   ) RETURNING id INTO v_order_id;
 
   -- ── Create order items + decrement stock ─────────────────
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
-    SELECT id, price, name, name_ar INTO v_product
+    SELECT id, price, name, name_ar, images INTO v_product
     FROM products WHERE id = (v_item->>'product_id')::UUID;
 
     INSERT INTO order_items (
       order_id, product_id, product_name, product_name_ar,
-      quantity, price_at_purchase, color, size
+      quantity, price_at_purchase, color, size, product_image
     ) VALUES (
       v_order_id,
       (v_item->>'product_id')::UUID,
@@ -555,7 +556,8 @@ BEGIN
       (v_item->>'quantity')::INTEGER,
       v_product.price,
       COALESCE(v_item->>'color', ''),
-      COALESCE(v_item->>'size', '')
+      COALESCE(v_item->>'size', ''),
+      CASE WHEN array_length(v_product.images, 1) > 0 THEN v_product.images[1] ELSE NULL END
     );
 
     UPDATE products
