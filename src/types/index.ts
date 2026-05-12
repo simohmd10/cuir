@@ -35,6 +35,7 @@ export interface CartItem {
   quantity: number;
   color: string;
   size: string;
+  product_image?: string | null;
 }
 
 export interface Customer {
@@ -57,6 +58,7 @@ export interface OrderItem {
   price_at_purchase: number;
   color: string;
   size: string;
+  product_image?: string | null;
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';

@@ -8,7 +8,7 @@ import {
 import AdminLayout from '../../components/layout/AdminLayout';
 import Badge from '../../components/ui/Badge';
 import { supabase } from '../../lib/supabase';
-import { formatPrice, formatDate, getStatusColor, getStatusLabel } from '../../lib/utils';
+import { formatPrice, formatDate, getStatusColor, getStatusLabel, getImageUrl } from '../../lib/utils';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Order, OrderItem, Customer, OrderStatus } from '../../types';
 
@@ -243,13 +243,23 @@ const Orders: React.FC = () => {
                             </h4>
                             <div className="space-y-2">
                               {(order.order_items ?? []).map((item) => (
-                                <div key={item.id} className="bg-white rounded-lg p-3 border border-leather-100">
-                                  <p className="font-medium text-sm text-leather-800">{item.product_name}</p>
-                                  <p className="text-xs text-leather-500 mt-0.5">
-                                    {[item.color, item.size].filter(Boolean).join(' • ') || '—'}
-                                  </p>
-                                  <div className="mt-1.5 flex items-center justify-between text-xs">
-                                    <p className="text-leather-500">×{item.quantity}</p>
+                                <div key={item.id} className="bg-white rounded-lg p-3 border border-leather-100 flex items-center gap-3">
+                                  <img
+                                    src={getImageUrl(item.product_image ?? '', '/placeholder-bag.jpg')}
+                                    alt={item.product_name}
+                                    onError={(e) => {
+                                      (e.currentTarget as HTMLImageElement).src = '/placeholder-bag.jpg';
+                                    }}
+                                    className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm text-leather-800">{item.product_name}</p>
+                                    <p className="text-xs text-leather-500 mt-0.5">
+                                      {[item.color, item.size].filter(Boolean).join(' • ') || '—'}
+                                    </p>
+                                  </div>
+                                  <div className="text-right flex-shrink-0">
+                                    <p className="text-xs text-leather-500">×{item.quantity}</p>
                                     <p className="text-sm font-semibold text-leather-800">{formatPrice(item.price_at_purchase * item.quantity, lang)}</p>
                                   </div>
                                 </div>
@@ -411,6 +421,14 @@ const Orders: React.FC = () => {
                                       <div className="space-y-2">
                                         {(order.order_items ?? []).map((item) => (
                                           <div key={item.id} className="flex items-center gap-3 bg-white rounded-lg p-2.5 border border-leather-100">
+                                            <img
+                                              src={getImageUrl(item.product_image ?? '', '/placeholder-bag.jpg')}
+                                              alt={item.product_name}
+                                              onError={(e) => {
+                                                (e.currentTarget as HTMLImageElement).src = '/placeholder-bag.jpg';
+                                              }}
+                                              className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                            />
                                             <div className="text-sm flex-1">
                                               <p className="font-medium text-leather-800">{item.product_name}</p>
                                               <p className="text-xs text-leather-400">
