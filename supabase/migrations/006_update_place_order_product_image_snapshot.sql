@@ -126,11 +126,11 @@ BEGIN
   INSERT INTO orders (
     order_ref, customer_id, status, total, discount_amount,
     delivery_fee, coupon_code, payment_method, idempotency_key,
-    access_token, notes
+    access_token, notes, customer_name, customer_phone, customer_email, customer_address, customer_city
   ) VALUES (
     v_order_ref, v_customer_id, 'pending', v_total, v_discount_amount,
     v_delivery_fee, UPPER(COALESCE(p_coupon_code, '')), 'cod', p_idempotency_key,
-    v_access_token, p_notes
+    v_access_token, p_notes, p_customer_name, p_customer_phone, NULLIF(p_customer_email, ''), p_customer_address, p_customer_city
   ) RETURNING id INTO v_order_id;
 
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
