@@ -227,7 +227,7 @@ export default function FAQ() {
   let globalIdx = 0;
 
   return (
-    <div className="min-h-screen bg-beige-50">
+    <div className="min-h-screen bg-beige-50 overflow-x-hidden">
       {/* ── Header ── */}
       <div
         className="relative py-20 px-4 text-center"
