@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Award, Hammer, Leaf, ShoppingBag, Users, Package, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 // ── Animation variants ────────────────────────────────────────────────────────
 
@@ -48,6 +49,12 @@ function ValueCard({
 
 export default function About() {
   const { t, lang, dir } = useLanguage();
+  usePageMeta(
+    lang === 'ar' ? 'من نحن | كوير — قصتنا وحرفتنا' : 'À propos | Cuir — Notre Histoire & Savoir-Faire',
+    lang === 'ar'
+      ? 'قصة كوير، دار الحقائب الجلدية الحرفية في قلب مراكش.'
+      : "L'histoire de Cuir, maison de maroquinerie artisanale fondée au cœur de Marrakech.",
+  );
 
   const values = [
     {

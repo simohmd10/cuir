@@ -20,9 +20,11 @@ export default function WhatsAppButton() {
   }, []);
 
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(MESSAGES[lang])}`;
+
+  // Positioned high enough on mobile to never overlap sticky product/checkout CTAs
   const positionCls = dir === 'rtl'
-    ? 'bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 md:bottom-6 md:left-6'
-    : 'bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6';
+    ? 'bottom-20 left-4 md:bottom-8 md:left-8'
+    : 'bottom-20 right-4 md:bottom-8 md:right-8';
 
   return (
     <div
@@ -52,17 +54,6 @@ export default function WhatsAppButton() {
           boxShadow: '0 4px 24px rgba(37, 211, 102, 0.40)',
         }}
       >
-        <span
-          aria-label="1 new message"
-          className={[
-            'absolute -top-0.5 w-[18px] h-[18px] rounded-full',
-            'bg-red-500 text-white text-[10px] font-bold leading-none',
-            'flex items-center justify-center shadow-sm z-10',
-            dir === 'rtl' ? '-left-0.5' : '-right-0.5',
-          ].join(' ')}
-        >
-          1
-        </span>
         <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-white relative z-10" strokeWidth={1.75} />
       </a>
     </div>

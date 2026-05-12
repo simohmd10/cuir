@@ -4,6 +4,7 @@ import { Search, X, ChevronDown, Check } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts, useCategories } from '../hooks/useProducts';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { classNames } from '../lib/utils';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
 
@@ -159,6 +160,12 @@ function PillSkeleton() {
 
 export default function Shop() {
   const { lang, dir } = useLanguage();
+  usePageMeta(
+    lang === 'ar' ? 'المتجر | كوير — حقائب وإكسسوارات جلدية' : 'Boutique | Cuir — Sacs & Accessoires en Cuir',
+    lang === 'ar'
+      ? 'تصفح مجموعتنا من الحقائب والإكسسوارات الجلدية الفاخرة، مصنوعة يدويًا في المغرب.'
+      : 'Parcourez notre collection de maroquinerie de luxe — sacs, porte-cartes et accessoires en cuir naturel.',
+  );
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── URL-synced state ──────────────────────────────────────────────────────

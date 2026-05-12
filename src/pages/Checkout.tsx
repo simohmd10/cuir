@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { useCart, DELIVERY_FEE_THRESHOLD } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 import { formatPrice, getImageUrl, MOROCCAN_CITIES, generateIdempotencyKey } from '../lib/utils';
@@ -78,6 +79,7 @@ const inputClass =
 
 export default function Checkout() {
   const { t, lang, dir } = useLanguage();
+  usePageMeta(lang === 'ar' ? 'إتمام الطلب | كوير' : 'Commander | Cuir');
   // Build schema once per language (messages in the active language)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const schema = useMemo(() => buildSchema({

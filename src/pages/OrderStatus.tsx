@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { supabase } from '../lib/supabase';
 import { formatPrice, getImageUrl, formatDate } from '../lib/utils';
 import LazyImage from '../components/ui/LazyImage';
@@ -64,6 +65,7 @@ const SESSION_TTL = 90 * 60 * 1000; // 90 minutes
 
 export default function OrderStatus() {
   const { t, lang, dir } = useLanguage();
+  usePageMeta(lang === 'ar' ? 'تتبع طلبك | كوير' : 'Suivi de commande | Cuir');
   const [searchParams] = useSearchParams();
 
   const refParam = searchParams.get('ref') || '';

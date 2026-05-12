@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown, HelpCircle, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 // ── FAQ data ──────────────────────────────────────────────────────────────────
 
@@ -193,6 +194,12 @@ function AccordionItem({
 
 export default function FAQ() {
   const { t, lang } = useLanguage();
+  usePageMeta(
+    lang === 'ar' ? 'الأسئلة الشائعة | كوير' : 'FAQ | Cuir — Questions Fréquentes',
+    lang === 'ar'
+      ? 'إجابات على أسئلتكم الشائعة حول منتجاتنا والتوصيل والإرجاع.'
+      : 'Retrouvez les réponses à toutes vos questions sur nos produits, livraisons et retours.',
+  );
   const [search, setSearch] = useState('');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 

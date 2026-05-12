@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, ChevronRight, User, ShoppingBag, Heart, Phone, Globe } from 'lucide-react';
+import { X, ChevronRight, ShoppingBag, Heart, Phone, Globe } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -335,24 +335,6 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
         {/* ── Bottom utility section ────────────────────────────────────────── */}
         <div className="flex-shrink-0 border-t border-ink/[0.08]">
           <ul>
-            {/* Login / Profile → Contact until auth pages exist */}
-            <li>
-              <Link
-                to="/contact"
-                onClick={onClose}
-                className={[
-                  'flex items-center gap-4 px-6 py-4',
-                  'text-[13px] text-ink/70 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
-                ].join(' ')}
-              >
-                <User size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
-                <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
-                  {t('contact')}
-                </span>
-              </Link>
-            </li>
-
             {/* Cart */}
             <li>
               <Link

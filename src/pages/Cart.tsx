@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, Gift, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { useCart, DELIVERY_FEE_THRESHOLD } from '../context/CartContext';
 import { formatPrice, getImageUrl } from '../lib/utils';
 import { useProducts } from '../hooks/useProducts';
@@ -22,6 +23,7 @@ const stagger = {
 
 export default function Cart() {
   const { t, lang, dir } = useLanguage();
+  usePageMeta(lang === 'ar' ? 'السلة | كوير' : 'Panier | Cuir');
   const { items, removeItem, updateQuantity, subtotal } = useCart();
   const navigate = useNavigate();
   const { data: suggestedProducts } = useProducts({ limit: 4 });

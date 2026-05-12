@@ -16,6 +16,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useProduct, useProducts, useCategories } from '../hooks/useProducts';
 import { useReviews, useSubmitReview } from '../hooks/useReviews';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { formatPrice, getImageUrl, classNames, formatDate } from '../lib/utils';
 import LazyImage from '../components/ui/LazyImage';
 import StarRating from '../components/ui/StarRating';
@@ -467,6 +468,10 @@ export default function ProductPage() {
   const images        = product?.images ?? [];
   const productName   = product ? (lang === 'ar' ? product.name_ar : product.name) : '';
   const productDesc   = product ? (lang === 'ar' ? product.description_ar : product.description) : '';
+  usePageMeta(
+    productName ? `${productName} | Cuir` : (lang === 'ar' ? 'منتج | كوير' : 'Produit | Cuir'),
+    productDesc || undefined,
+  );
   const isOutOfStock  = product ? product.stock === 0 : false;
   const isLowStock    = product ? product.stock > 0 && product.stock <= 5 : false;
   const hasDiscount   = product?.original_price != null && product.original_price > product.price;

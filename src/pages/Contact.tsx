@@ -10,6 +10,7 @@ import {
 
 import { useLanguage } from '../context/LanguageContext';
 import { supabase } from '../lib/supabase';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,12 @@ function InfoCard({
 
 export default function Contact() {
   const { t, lang, dir } = useLanguage();
+  usePageMeta(
+    lang === 'ar' ? 'تواصل معنا | كوير' : 'Contact | Cuir — Maroquinerie Artisanale',
+    lang === 'ar'
+      ? 'تواصل مع فريق كوير لأي استفسار حول منتجاتنا أو طلباتك.'
+      : "Contactez l'équipe Cuir pour toute question sur nos produits ou commandes.",
+  );
   const [submitted, setSubmitted] = useState(false);
 
   const {

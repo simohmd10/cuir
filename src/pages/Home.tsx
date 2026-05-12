@@ -4,6 +4,7 @@ import { Truck, Leaf, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts } from '../hooks/useProducts';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { getImageUrl } from '../lib/utils';
 import { useReveal, useRevealGroup } from '../hooks/useReveal';
 import HeroVideo from '../components/HeroVideo';
@@ -139,11 +140,12 @@ export default function Home() {
   const { data: bestSellers, isLoading: bestSellersLoading } = useProducts({ isBestSeller: true, limit: 4 });
 
   /* ── SEO ───────────────────────────────────────────────────────────────── */
-  useEffect(() => {
-    document.title = isAr
-      ? 'كوير — حقائب جلدية فاخرة من المغرب'
-      : 'CUIR — Maroquinerie de Luxe du Maroc';
-  }, [isAr]);
+  usePageMeta(
+    isAr ? 'كوير — حقائب جلدية فاخرة من المغرب' : 'CUIR — Maroquinerie de Luxe du Maroc',
+    isAr
+      ? 'اكتشف حقائبنا وإكسسواراتنا من الجلد الطبيعي، مصنوعة يدويًا في مراكش.'
+      : 'Découvrez nos sacs et accessoires en cuir naturel, façonnés à la main par des artisans marocains.',
+  );
 
   /* ── Reveal refs ───────────────────────────────────────────────────────── */
   const featuredHeadingRef = useReveal({ delay: 0 });
@@ -172,14 +174,14 @@ export default function Home() {
       <section className="section-luxury bg-white">
         <div className="container-luxury">
 
-          <div ref={featuredHeadingRef} className="reveal mb-10 md:mb-12 text-center">
+          <div ref={featuredHeadingRef} className="reveal mb-8 md:mb-12 text-center">
             <SectionLabel>{t('featuredProducts')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'حصري ومميز' : "Pièces d'Exception"}
             </h2>
           </div>
 
-          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
+          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
             {featuredLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
@@ -260,14 +262,14 @@ export default function Home() {
       <section className="section-luxury bg-white">
         <div className="container-luxury">
 
-          <div ref={bestHeadingRef} className="reveal mb-10 md:mb-12 text-center">
+          <div ref={bestHeadingRef} className="reveal mb-8 md:mb-12 text-center">
             <SectionLabel>{t('bestSellers')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يعشقه عملاؤنا' : 'Nos Favoris'}
             </h2>
           </div>
 
-          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 md:gap-5 reveal-group">
+          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
             {bestSellersLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
@@ -288,7 +290,7 @@ export default function Home() {
       <section className="section-luxury bg-white">
         <div className="container-luxury">
 
-          <div ref={testimonialsHeadingRef} className="reveal mb-10 md:mb-12 text-center">
+          <div ref={testimonialsHeadingRef} className="reveal mb-8 md:mb-12 text-center">
             <SectionLabel>{t('testimonials')}</SectionLabel>
             <h2 className="heading-section mt-2">
               {isAr ? 'ما يقوله عملاؤنا' : 'Ce que disent nos clients'}
@@ -299,7 +301,7 @@ export default function Home() {
             {TESTIMONIALS.map((t, i) => (
               <article
                 key={i}
-                className="reveal bg-cream-50 border border-cream-300 p-8 flex flex-col gap-6"
+                className="reveal bg-cream-50 border border-cream-300 p-5 md:p-8 flex flex-col gap-5 md:gap-6"
               >
                 <Stars />
                 <blockquote
