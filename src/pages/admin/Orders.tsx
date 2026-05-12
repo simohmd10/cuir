@@ -11,6 +11,7 @@ import { supabase } from '../../lib/supabase';
 import { formatPrice, formatDate, getStatusColor, getStatusLabel, getImageUrl } from '../../lib/utils';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Order, OrderItem, Customer, OrderStatus } from '../../types';
+import LazyImage from '../../components/ui/LazyImage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -244,13 +245,10 @@ const Orders: React.FC = () => {
                             <div className="space-y-2">
                               {(order.order_items ?? []).map((item) => (
                                 <div key={item.id} className="bg-white rounded-lg p-3 border border-leather-100 flex items-center gap-3">
-                                  <img
+                                  <LazyImage
                                     src={getImageUrl(item.product_image ?? '', '/placeholder-bag.jpg')}
                                     alt={item.product_name}
-                                    onError={(e) => {
-                                      (e.currentTarget as HTMLImageElement).src = '/placeholder-bag.jpg';
-                                    }}
-                                    className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                    className="w-12 h-12 rounded-md flex-shrink-0"
                                   />
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium text-sm text-leather-800">{item.product_name}</p>
@@ -421,13 +419,10 @@ const Orders: React.FC = () => {
                                       <div className="space-y-2">
                                         {(order.order_items ?? []).map((item) => (
                                           <div key={item.id} className="flex items-center gap-3 bg-white rounded-lg p-2.5 border border-leather-100">
-                                            <img
+                                            <LazyImage
                                               src={getImageUrl(item.product_image ?? '', '/placeholder-bag.jpg')}
                                               alt={item.product_name}
-                                              onError={(e) => {
-                                                (e.currentTarget as HTMLImageElement).src = '/placeholder-bag.jpg';
-                                              }}
-                                              className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                              className="w-12 h-12 rounded-md flex-shrink-0"
                                             />
                                             <div className="text-sm flex-1">
                                               <p className="font-medium text-leather-800">{item.product_name}</p>
