@@ -43,9 +43,13 @@ export default function Header() {
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
 
-  const textCls = transparent ? 'text-cream-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.45)]' : 'text-ink';
-  const mutedCls = transparent ? 'text-cream-100/85' : 'text-ink/55';
-  const hoverCls = transparent ? 'hover:text-cream-100' : 'hover:text-camel';
+  const lightNav = isHome;
+
+  const textCls = lightNav
+    ? 'text-cream-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.45)]'
+    : 'text-ink';
+  const mutedCls = lightNav ? 'text-cream-100/85' : 'text-ink/55';
+  const hoverCls = lightNav ? 'hover:text-cream-100' : 'hover:text-camel';
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (location.pathname === '/') {
@@ -59,11 +63,13 @@ export default function Header() {
       <header
         dir={dir}
         className={[
-          'fixed top-0 inset-x-0 z-50 h-16 isolate',
-          'transition-all duration-500',
+          'fixed top-0 inset-x-0 z-50 h-16 isolate border-b',
+          'transition-[background-color,border-color,backdrop-filter,box-shadow] duration-500 ease-out',
           transparent
-            ? 'bg-transparent border-transparent md:bg-white/96 md:border-cream-300 md:backdrop-blur-[6px]'
-            : 'bg-white/92 border-b border-cream-300 backdrop-blur-[6px]',
+            ? 'bg-transparent border-transparent backdrop-blur-0'
+            : lightNav
+              ? 'bg-black/45 border-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.16)]'
+              : 'bg-white/92 border-cream-300 backdrop-blur-[6px]',
         ].join(' ')}
       >
         <div className="container-luxury h-full flex items-center justify-between gap-2 sm:gap-4">
@@ -79,7 +85,7 @@ export default function Header() {
             <span
               className={[
                 'block text-[8px] tracking-[0.28em] uppercase mt-0.5 transition-colors duration-500',
-                transparent ? 'text-cream-100/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.45)]' : 'text-camel',
+                lightNav ? 'text-cream-100/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.45)]' : 'text-camel',
               ].join(' ')}
             >
               MAROC
