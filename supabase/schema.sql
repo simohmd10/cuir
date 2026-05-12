@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   price_at_purchase DECIMAL(10,2) NOT NULL,
   color TEXT DEFAULT '',
   size TEXT DEFAULT '',
+  product_image TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -446,7 +447,7 @@ BEGIN
 
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
-    SELECT id, price, stock, name, name_ar
+    SELECT id, price, stock, name, name_ar, images
     INTO v_product
     FROM products
     WHERE id = (v_item->>'product_id')::UUID
@@ -541,12 +542,12 @@ BEGIN
   -- ── Create order items + decrement stock ─────────────────
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
-    SELECT id, price, name, name_ar INTO v_product
+    SELECT id, price, name, name_ar, images INTO v_product
     FROM products WHERE id = (v_item->>'product_id')::UUID;
 
     INSERT INTO order_items (
       order_id, product_id, product_name, product_name_ar,
-      quantity, price_at_purchase, color, size
+      quantity, price_at_purchase, color, size, product_image
     ) VALUES (
       v_order_id,
       (v_item->>'product_id')::UUID,
@@ -555,7 +556,8 @@ BEGIN
       (v_item->>'quantity')::INTEGER,
       v_product.price,
       COALESCE(v_item->>'color', ''),
-      COALESCE(v_item->>'size', '')
+      COALESCE(v_item->>'size', ''),
+      CASE WHEN array_length(v_product.images, 1) > 0 THEN v_product.images[1] ELSE NULL END
     );
 
     UPDATE products
