@@ -68,7 +68,7 @@ export default function Header() {
           transparent
             ? 'bg-transparent border-transparent backdrop-blur-0'
             : lightNav
-              ? 'bg-[rgba(25,18,12,0.55)] border-white/[0.08] backdrop-blur-xl shadow-[0_12px_32px_rgba(25,18,12,0.22)]'
+              ? 'bg-black/45 border-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.16)]'
               : 'bg-white/92 border-cream-300 backdrop-blur-[6px]',
         ].join(' ')}
       >
