@@ -43,9 +43,9 @@ export default function Header() {
   const isHome = location.pathname === '/';
   const transparent = isHome && !scrolled && !menuOpen;
 
-  const textCls = 'text-ink';
-  const mutedCls = 'text-ink/55';
-  const hoverCls = 'hover:text-camel';
+  const textCls = transparent ? 'text-cream-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.45)]' : 'text-ink';
+  const mutedCls = transparent ? 'text-cream-100/85' : 'text-ink/55';
+  const hoverCls = transparent ? 'hover:text-cream-100' : 'hover:text-camel';
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (location.pathname === '/') {
@@ -61,7 +61,9 @@ export default function Header() {
         className={[
           'fixed top-0 inset-x-0 z-50 h-16 isolate',
           'transition-all duration-500',
-          'bg-white border-b border-cream-300 md:bg-white/96 md:backdrop-blur-[6px]',
+          transparent
+            ? 'bg-transparent border-transparent md:bg-white/96 md:border-cream-300 md:backdrop-blur-[6px]'
+            : 'bg-white/92 border-b border-cream-300 backdrop-blur-[6px]',
         ].join(' ')}
       >
         <div className="container-luxury h-full flex items-center justify-between gap-2 sm:gap-4">
@@ -74,7 +76,12 @@ export default function Header() {
             <span className={`font-display font-light text-xl tracking-[0.14em] transition-colors duration-500 ${textCls}`}>
               CUIR
             </span>
-            <span className="block text-[8px] tracking-[0.28em] uppercase text-camel mt-0.5">
+            <span
+              className={[
+                'block text-[8px] tracking-[0.28em] uppercase mt-0.5 transition-colors duration-500',
+                transparent ? 'text-cream-100/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.45)]' : 'text-camel',
+              ].join(' ')}
+            >
               MAROC
             </span>
           </Link>
