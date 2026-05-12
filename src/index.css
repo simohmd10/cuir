@@ -396,8 +396,8 @@
 ═══════════════════════════════════════ */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s var(--ease-luxury), transform 0.8s var(--ease-luxury);
+  transform: translateY(20px);
+  transition: opacity 0.9s var(--ease-luxury), transform 0.9s var(--ease-luxury);
 }
 
 /* Direct reveal — useReveal adds .revealed to this element itself */
@@ -415,7 +415,7 @@
 
 .reveal-fade {
   opacity: 0;
-  transition: opacity 0.8s var(--ease-luxury);
+  transition: opacity 0.9s var(--ease-luxury);
 }
 
 .reveal-fade.revealed {

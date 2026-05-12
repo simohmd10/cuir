@@ -181,7 +181,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
+          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 reveal-group">
             {featuredLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>
@@ -223,7 +223,7 @@ export default function Home() {
                   <>Le cuir n&apos;est pas qu&apos;une matière,<br />c&apos;est une histoire racontée<br />à chaque point de couture</>
                 )}
               </blockquote>
-              <div className="mt-12">
+              <div className="mt-10 md:mt-12">
                 <Link
                   to="/about"
                   className="btn-ghost inline-flex items-center gap-3"
@@ -269,7 +269,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 reveal-group">
+          <div ref={bestGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 reveal-group">
             {bestSellersLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="reveal"><ProductCardSkeleton /></div>

@@ -150,7 +150,7 @@ const ProductCard: React.FC<{ product: Product; className?: string; priority?: b
       {/* ── Info area ──────────────────────────────────────────────────────── */}
       <Link
         to={`/product/${product.id}`}
-        className="flex flex-col gap-1.5 pt-3 pb-1 focus:outline-none"
+        className="flex flex-col gap-1.5 pt-3 pb-2 focus:outline-none"
         tabIndex={-1}
         aria-hidden="true"
       >

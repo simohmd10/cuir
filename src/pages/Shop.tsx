@@ -278,7 +278,7 @@ export default function Shop() {
 
       {/* ── Sticky Filter Bar ──────────────────────────────────────────────── */}
       <div
-        className="sticky top-0 z-20 border-b border-black/10"
+        className="sticky top-16 z-20 border-b border-black/10"
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
