@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, ChevronRight, ShoppingBag, Heart, Phone, Globe } from 'lucide-react';
+import { X, ChevronRight, ShoppingBag, Heart, Phone } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -146,21 +146,21 @@ interface NavOverlayProps {
 }
 
 export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
-  const { lang, setLang, dir, t } = useLanguage();
+  const { dir, t } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { totalItems } = useCart();
   const { data: categories = [] } = useCategories();
   const location = useLocation();
-  const isAr = lang === 'ar';
+  const isAr = false;
   const menuCategories: NavCategory[] = groupCategoriesByHierarchy(categories).map(({ parent, children }) => ({
     id: parent!.slug,
     labelFr: parent!.name,
-    labelAr: parent!.name_ar || parent!.name,
+    labelAr: parent!.name,
     href: `/shop?category=${parent!.slug}`,
     badge: parent!.slug === 'gift-sets' ? 'NEW' : undefined,
     sub: children.map((child) => ({
       labelFr: child.name,
-      labelAr: child.name_ar || child.name,
+      labelAr: child.name,
       href: `/shop?category=${child.slug}`,
     })),
   }));
@@ -399,20 +399,6 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
 
             {/* Language */}
             <li className="border-t border-ink/[0.06]">
-              <button
-                onClick={() => setLang(isAr ? 'fr' : 'ar')}
-                className={[
-                  'w-full flex items-center gap-4 px-6 py-4',
-                  'text-[13px] text-ink/50 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
-                ].join(' ')}
-              >
-                <Globe size={17} strokeWidth={1.5} className="flex-none text-ink/35" />
-                <span className="font-body flex-1 text-start">
-                  {t('language')}
-                </span>
-                <ChevronRight size={13} strokeWidth={1.5} className="flex-none text-ink/25" />
-              </button>
             </li>
           </ul>
         </div>

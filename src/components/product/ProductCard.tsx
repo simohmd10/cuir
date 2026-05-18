@@ -53,8 +53,8 @@ const ProductCard: React.FC<{ product: Product; className?: string; priority?: b
   const { addItem } = useCart();
   const navigate = useNavigate();
 
-  const name = lang === 'ar' ? product.name_ar : product.name;
-  const badgeLabel = lang === 'ar' ? (product.badge_ar ?? product.badge) : product.badge;
+  const name = product.name;
+  const badgeLabel = product.badge;
   const images = Array.isArray(product.images) ? product.images : [];
   const colors = Array.isArray(product.colors) ? product.colors : [];
   const sizes = Array.isArray(product.sizes) ? product.sizes : [];

@@ -277,7 +277,7 @@ export default function Checkout() {
                         <input
                           {...register('address')}
                           className={`${inputClass} ps-10`}
-                          placeholder={lang === 'ar' ? 'شارع محمد الخامس، رقم 10' : '10 Rue Mohammed V'}
+                          placeholder="10 Rue Mohammed V"
                         />
                       </div>
                     </Field>
@@ -293,7 +293,7 @@ export default function Checkout() {
                           defaultValue=""
                         >
                           <option value="" disabled>
-                            {lang === 'ar' ? 'اختر مدينتك' : 'Choisissez votre ville'}
+                            Choisissez votre ville
                           </option>
                           {MOROCCAN_CITIES.map((city) => (
                             <option key={city} value={city}>
@@ -315,7 +315,7 @@ export default function Checkout() {
                           {...register('notes')}
                           rows={3}
                           className={`${inputClass} ps-10 resize-none`}
-                          placeholder={lang === 'ar' ? 'أي تعليمات خاصة للتوصيل...' : 'Instructions spéciales pour la livraison...'}
+                          placeholder="Instructions spéciales pour la livraison..."
                         />
                       </div>
                     </Field>
@@ -335,7 +335,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-leather-800">
-                      {lang === 'ar' ? 'الدفع عند الاستلام' : 'Paiement à la livraison'}
+                      Paiement à la livraison
                     </p>
                     <p className="text-xs text-leather-500 mt-0.5">{t('cashOnDeliveryDesc')}</p>
                   </div>
@@ -357,7 +357,7 @@ export default function Checkout() {
                 {/* Items list */}
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {items.map((item) => {
-                    const name = lang === 'ar' ? item.product.name_ar : item.product.name;
+                    const name = item.product.name;
                     const image = getImageUrl(item.product.images?.[0], '');
                     return (
                       <div
@@ -402,7 +402,7 @@ export default function Checkout() {
                           setCouponInput(e.target.value);
                           setCouponError('');
                         }}
-                        placeholder={lang === 'ar' ? 'CUIR2024' : 'CUIR2024'}
+                        placeholder="CUIR2024"
                         className={`${inputClass} flex-1 uppercase`}
                         dir="ltr"
                       />
