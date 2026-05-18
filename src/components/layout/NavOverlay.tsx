@@ -117,17 +117,17 @@ function CategoryRow({
           style={{ maxHeight: open ? `${(cat.sub!.length * 48) + 16}px` : '0px' }}
         >
           {cat.sub!.map((sub) => (
-            <li key={sub.href + (isAr ? sub.labelAr : sub.labelFr)}>
+            <li key={sub.href + (sub.labelFr)}>
               <Link
                 to={sub.href}
                 onClick={onClose}
                 className={[
                   'flex items-center py-3 text-[13px] text-ink/55 hover:text-camel',
                   'transition-colors duration-200 tracking-[0.01em]',
-                  isAr ? 'font-arabic pr-10 pl-6 justify-end' : 'pl-10 pr-6',
+                  'pl-10 pr-6',
                 ].join(' ')}
               >
-                {isAr ? sub.labelAr : sub.labelFr}
+                {sub.labelFr}
               </Link>
             </li>
           ))}
@@ -146,12 +146,11 @@ interface NavOverlayProps {
 }
 
 export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
-  const { lang, setLang, dir, t } = useLanguage();
+  const { t } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { totalItems } = useCart();
   const { data: categories = [] } = useCategories();
   const location = useLocation();
-  const isAr = lang === 'ar';
   const menuCategories: NavCategory[] = groupCategoriesByHierarchy(categories).map(({ parent, children }) => ({
     id: parent!.slug,
     labelFr: parent!.name,
@@ -230,19 +229,16 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
         id="nav-overlay"
         role="dialog"
         aria-modal="true"
-        aria-label={isAr ? 'قائمة التنقل' : 'Menu de navigation'}
-        dir={dir}
+        aria-label="Menu de navigation"
         onClick={(e) => e.stopPropagation()}
         className={[
           'absolute inset-y-0 flex flex-col bg-white shadow-2xl',
           'transition-transform duration-[420ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
           'w-[88vw] max-w-sm',
           // RTL: slides from the right; LTR: slides from the left
-          dir === 'rtl' ? 'right-0' : 'left-0',
+          'left-0',
           isOpen
             ? 'translate-x-0'
-            : dir === 'rtl'
-            ? 'translate-x-full'
             : '-translate-x-full',
         ].join(' ')}
       >
@@ -272,7 +268,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
           <Link
             to="/cart"
             onClick={onClose}
-            aria-label={isAr ? `السلة — ${totalItems}` : `Panier — ${totalItems}`}
+            aria-label={`Panier — ${totalItems}`}
             className="relative w-9 h-9 flex items-center justify-center text-ink/60 hover:text-ink transition-colors duration-200"
           >
             <ShoppingBag size={18} strokeWidth={1.5} />
@@ -290,7 +286,7 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
           {/* Categories */}
           <ul>
             {[NEW_ARRIVALS_CATEGORY, ...menuCategories].map((cat) => (
-              <CategoryRow key={cat.id} cat={cat} isAr={isAr} onClose={onClose} />
+              <CategoryRow key={cat.id} cat={cat} isAr={false} onClose={onClose} />
             ))}
           </ul>
 
@@ -308,10 +304,10 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                     'block py-[15px] px-6 text-[13px] text-ink/50',
                     'tracking-[0.08em] uppercase font-body',
                     'hover:text-camel transition-colors duration-200',
-                    isAr ? 'text-right font-arabic normal-case tracking-normal text-[14px]' : '',
+                    '',
                   ].join(' ')}
                 >
-                  {isAr ? link.labelAr : link.labelFr}
+                  {link.labelFr}
                 </Link>
               </li>
             ))}
@@ -343,13 +339,13 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                 className={[
                   'flex items-center gap-4 px-6 py-4',
                   'text-[13px] text-ink/70 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
+                  '',
                 ].join(' ')}
               >
                 <ShoppingBag size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
                 <span className={[
                   'flex-1',
-                  isAr ? 'font-arabic text-[14px] text-right' : 'font-body',
+                  'font-body',
                 ].join(' ')}>
                   {t('cart')}
                 </span>
@@ -369,11 +365,11 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                 className={[
                   'flex items-center gap-4 px-6 py-4',
                   'text-[13px] text-ink/70 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
+                  '',
                 ].join(' ')}
               >
                 <Heart size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
-                <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
+                <span className={'font-body'}>
                   {t('allProducts')}
                 </span>
               </Link>
@@ -387,32 +383,14 @@ export default function NavOverlay({ isOpen, onClose }: NavOverlayProps) {
                 className={[
                   'flex items-center gap-4 px-6 py-4',
                   'text-[13px] text-ink/70 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
+                  '',
                 ].join(' ')}
               >
                 <Phone size={17} strokeWidth={1.5} className="flex-none text-ink/40" />
-                <span className={isAr ? 'font-arabic text-[14px]' : 'font-body'}>
+                <span className={'font-body'}>
                   {t('contact')}
                 </span>
               </Link>
-            </li>
-
-            {/* Language */}
-            <li className="border-t border-ink/[0.06]">
-              <button
-                onClick={() => setLang(isAr ? 'fr' : 'ar')}
-                className={[
-                  'w-full flex items-center gap-4 px-6 py-4',
-                  'text-[13px] text-ink/50 hover:text-ink transition-colors duration-200',
-                  isAr ? 'flex-row-reverse' : '',
-                ].join(' ')}
-              >
-                <Globe size={17} strokeWidth={1.5} className="flex-none text-ink/35" />
-                <span className="font-body flex-1 text-start">
-                  {t('language')}
-                </span>
-                <ChevronRight size={13} strokeWidth={1.5} className="flex-none text-ink/25" />
-              </button>
             </li>
           </ul>
         </div>
