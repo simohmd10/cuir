@@ -324,7 +324,7 @@ export default function Shop() {
                     )}
                     aria-pressed={categoryParam === cat.slug}
                   >
-                    {lang === 'ar' ? cat.name_ar : cat.name}
+                    {cat.name}
                   </button>
                 ))}
           </div>

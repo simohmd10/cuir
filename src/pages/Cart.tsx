@@ -151,7 +151,7 @@ export default function Cart() {
               {/* Items */}
               <AnimatePresence initial={false}>
                 {items.map((item) => {
-                  const name = lang === 'ar' ? item.product.name_ar : item.product.name;
+                  const name = item.product.name;
                   const image = getImageUrl(item.product.images?.[0], '');
                   const itemTotal = item.product.price * item.quantity;
 

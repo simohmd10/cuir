@@ -16,7 +16,7 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
-  const { t, lang, dir, setLang } = useLanguage();
+  const { t, dir } = useLanguage();
   const { totalItems } = useCart();
   const { isAdmin } = useAuth();
   const location = useLocation();
@@ -129,14 +129,6 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-0.5 shrink-0">
-            {/* Language toggle — desktop only */}
-            <button
-              onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
-              className={`hidden sm:flex text-[10px] tracking-[0.18em] uppercase px-3 py-2 font-body transition-colors duration-300 ${mutedCls} ${hoverCls}`}
-            >
-              {lang === 'ar' ? 'FR' : 'AR'}
-            </button>
-
             {/* Cart */}
             <Link
               to="/cart"
@@ -158,7 +150,7 @@ export default function Header() {
               onClick={() => setMenuOpen(true)}
               aria-expanded={menuOpen}
               aria-controls="nav-overlay"
-              aria-label={lang === 'ar' ? 'القائمة' : 'Menu'}
+              aria-label="Menu"
               className={`flex flex-col items-center justify-center gap-[5px] w-10 h-10 transition-colors duration-300 ${textCls} ${hoverCls}`}
             >
               <span className="block w-[18px] h-px bg-current" />

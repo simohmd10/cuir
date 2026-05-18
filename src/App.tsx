@@ -6,7 +6,6 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import { warmCommonRoutes } from './lib/routePreload';
-import { resolveStoredLanguage } from './lib/language';
 
 // Customer pages
 const Home = lazy(() => import('./pages/Home'));
@@ -32,24 +31,15 @@ const AdminCoupons = lazy(() => import('./pages/admin/Coupons'));
 const AdminReviews = lazy(() => import('./pages/admin/Reviews'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
-function getLoaderLang(): 'ar' | 'fr' {
-  if (typeof window === 'undefined') return 'fr';
-  const saved = localStorage.getItem('cuir-lang');
-  if (saved === 'ar' || saved === 'fr') return saved;
-  const browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || '';
-  return browserLang.toLowerCase().startsWith('ar') ? 'ar' : 'fr';
-}
-
 function PageLoader() {
   const { lang } = useLanguage();
-  const activeLang = lang || getLoaderLang();
-  const loadingText = activeLang === 'fr' ? 'Chargement...' : 'جاري التحميل...';
+  const loadingText = 'Chargement...';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-beige-50">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-leather-200 border-t-leather-500 rounded-full animate-spin" />
-        <p className={`text-leather-600 ${activeLang === 'ar' ? 'font-arabic' : 'font-body'}`}>{loadingText}</p>
+        <p className="text-leather-600 font-body">{loadingText}</p>
       </div>
     </div>
   );
@@ -110,7 +100,7 @@ function RouteDocumentMeta() {
 
     const route = routeMeta[pathname];
     if (route) {
-      const selected = lang === 'ar' ? route.ar : route.fr;
+      const selected = route.fr;
       document.title = selected.title;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute('content', selected.description);

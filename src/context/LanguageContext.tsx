@@ -1,10 +1,8 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { translations, type Language, type TranslationKey } from '../i18n';
-import { resolveStoredLanguage } from '../lib/language';
+import { createContext, useContext, type ReactNode } from 'react';
+import { translations, type TranslationKey } from '../i18n';
 
 interface LanguageContextType {
-  lang: Language;
-  setLang: (lang: Language) => void;
+  lang: 'ar' | 'fr';
   t: (key: TranslationKey) => string;
   dir: 'rtl' | 'ltr';
 }
@@ -12,28 +10,15 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>(() => resolveStoredLanguage());
-
-  const setLang = (newLang: Language) => {
-    setLangState(newLang);
-    localStorage.setItem('cuir-lang', newLang);
-    localStorage.setItem('language', newLang);
-  };
+  const lang = 'fr' as const;
+  const dir = 'ltr' as const;
 
   const t = (key: TranslationKey): string => {
-    return translations[lang][key] as string;
+    return (translations.fr[key] as string) ?? key;
   };
 
-  const dir = lang === 'ar' ? 'rtl' : 'ltr';
-
-  useEffect(() => {
-    document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute('dir', dir);
-    document.body.setAttribute('dir', dir);
-  }, [lang, dir]);
-
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t, dir }}>
+    <LanguageContext.Provider value={{ lang, t, dir }}>
       {children}
     </LanguageContext.Provider>
   );
