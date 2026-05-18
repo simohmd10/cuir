@@ -21,9 +21,7 @@ import { sortCategoriesByHierarchy } from '../../lib/categoryHierarchy';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Nom requis'),
-  name_ar: z.string().min(1, 'الاسم مطلوب'),
   description: z.string().default(''),
-  description_ar: z.string().default(''),
   price: z.coerce.number().positive('Prix > 0'),
   original_price: z.coerce.number().optional(),
   category: z.string().min(1, 'Catégorie requise'),
@@ -31,7 +29,6 @@ const productSchema = z.object({
   colors: z.string().default(''),
   sizes: z.string().default(''),
   badge: z.string().default(''),
-  badge_ar: z.string().default(''),
   is_featured: z.boolean().default(false),
   is_best_seller: z.boolean().default(false),
 });
@@ -115,9 +112,9 @@ const Products: React.FC = () => {
     setEditingProduct(null);
     setPreviewImages([]);
     reset({
-      name: '', name_ar: '', description: '', description_ar: '',
+      name: '', description: '',
       price: 0, original_price: undefined, category: '', stock: 0,
-      colors: '', sizes: '', badge: '', badge_ar: '',
+      colors: '', sizes: '', badge: '',
       is_featured: false, is_best_seller: false,
     });
     setModalOpen(true);
@@ -127,15 +124,14 @@ const Products: React.FC = () => {
     setEditingProduct(p);
     setPreviewImages(p.images ?? []);
     reset({
-      name: p.name, name_ar: p.name_ar,
+      name: p.name,
       description: p.description ?? '',
-      description_ar: p.description_ar ?? '',
       price: p.price,
       original_price: p.original_price,
       category: p.category, stock: p.stock,
       colors: (p.colors ?? []).join(', '),
       sizes: (p.sizes ?? []).join(', '),
-      badge: p.badge ?? '', badge_ar: p.badge_ar ?? '',
+      badge: p.badge ?? '',
       is_featured: p.is_featured,
       is_best_seller: p.is_best_seller,
     });
@@ -173,9 +169,7 @@ const Products: React.FC = () => {
     mutationFn: async (form: ProductForm) => {
       const payload = {
         name: form.name,
-        name_ar: form.name_ar,
         description: form.description,
-        description_ar: form.description_ar,
         price: form.price,
         original_price: form.original_price || null,
         category: form.category,
@@ -183,7 +177,6 @@ const Products: React.FC = () => {
         colors: form.colors ? form.colors.split(',').map((s) => s.trim()).filter(Boolean) : [],
         sizes: form.sizes ? form.sizes.split(',').map((s) => s.trim()).filter(Boolean) : [],
         badge: form.badge || null,
-        badge_ar: form.badge_ar || null,
         is_featured: form.is_featured,
         is_best_seller: form.is_best_seller,
         images: previewImages,
@@ -426,28 +419,19 @@ const Products: React.FC = () => {
 
               <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="p-6 space-y-5">
                 {/* Names */}
-                <div className="grid grid-cols-2 gap-4">
+                <div>
                   <div>
                     <label className="block text-xs font-medium text-leather-600 mb-1">Nom (FR) *</label>
                     <input {...register('name')} className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400" />
                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-leather-600 mb-1">الاسم (AR) *</label>
-                    <input {...register('name_ar')} dir="rtl" className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400" />
-                    {errors.name_ar && <p className="text-red-500 text-xs mt-1">{errors.name_ar.message}</p>}
-                  </div>
                 </div>
 
                 {/* Descriptions */}
-                <div className="grid grid-cols-2 gap-4">
+                <div>
                   <div>
                     <label className="block text-xs font-medium text-leather-600 mb-1">Description (FR)</label>
                     <textarea {...register('description')} rows={3} className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 resize-none" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-leather-600 mb-1">الوصف (AR)</label>
-                    <textarea {...register('description_ar')} dir="rtl" rows={3} className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400 resize-none" />
                   </div>
                 </div>
 
@@ -509,14 +493,10 @@ const Products: React.FC = () => {
                 </div>
 
                 {/* Badge */}
-                <div className="grid grid-cols-2 gap-4">
+                <div>
                   <div>
                     <label className="block text-xs font-medium text-leather-600 mb-1">Badge (FR)</label>
                     <input {...register('badge')} placeholder="Nouveau" className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-leather-600 mb-1">الشارة (AR)</label>
-                    <input {...register('badge_ar')} dir="rtl" placeholder="جديد" className="w-full border border-leather-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leather-400" />
                   </div>
                 </div>
 
