@@ -10,17 +10,14 @@ import type { Customer, Order } from '../../types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type CustomerWithStats = Customer & {
-  order_count: number;
-  total_spent: number;
-};
+type CustomerRow = Customer & { orders: { count: number }[] };
 
 // ─── Fetch ────────────────────────────────────────────────────────────────────
 
 async function fetchCustomers(page: number, search: string) {
   let query = supabase
     .from('customers')
-    .select('*', { count: 'exact' })
+    .select('*, orders:orders(count)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range((page - 1) * 10, page * 10 - 1);
 
@@ -30,7 +27,7 @@ async function fetchCustomers(page: number, search: string) {
 
   const { data, error, count } = await query;
   if (error) throw error;
-  return { data: (data ?? []) as Customer[], count: count ?? 0 };
+  return { data: (data ?? []) as CustomerRow[], count: count ?? 0 };
 }
 
 async function fetchCustomerOrders(customerId: string) {
@@ -52,7 +49,7 @@ const Sk: React.FC<{ className?: string }> = ({ className = '' }) => (
 // ─── Customer detail modal ────────────────────────────────────────────────────
 
 const CustomerModal: React.FC<{
-  customer: Customer;
+  customer: CustomerRow;
   onClose: () => void;
   lang: 'ar' | 'fr';
 }> = ({ customer, onClose, lang }) => {
@@ -179,7 +176,7 @@ const Customers: React.FC = () => {
   const { lang } = useLanguage();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-customers', page, search],
@@ -245,7 +242,7 @@ const Customers: React.FC = () => {
                       </td>
                     </tr>
                   )
-                  : (data?.data ?? []).map((customer) => (
+                  : (data?.data ?? []).map((customer: CustomerRow) => (
                     <tr
                       key={customer.id}
                       className="hover:bg-leather-50/40 transition-colors cursor-pointer"
@@ -266,9 +263,9 @@ const Customers: React.FC = () => {
                       <td className="px-4 py-3 text-leather-500">{customer.city}</td>
                       <td className="px-4 py-3 text-leather-400 text-xs">{formatDate(customer.created_at, lang)}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className="inline-flex items-center gap-1 text-leather-500 text-xs">
-                          <ShoppingCart size={12} />
-                          {lang === 'ar' ? 'عرض' : 'Voir'}
+                        <span className="inline-flex items-center gap-1.5 text-leather-700 text-sm font-medium">
+                          <ShoppingCart size={12} className="text-leather-400" />
+                          {customer.orders?.[0]?.count ?? 0}
                         </span>
                       </td>
                     </tr>

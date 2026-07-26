@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Users,
   Tag,
+  Ticket,
   Star,
   Settings,
   LogOut,
@@ -30,10 +31,82 @@ const navItems: NavItem[] = [
   { label: 'Orders', labelAr: 'الطلبات', path: '/admin/orders', icon: <ShoppingCart size={18} /> },
   { label: 'Customers', labelAr: 'العملاء', path: '/admin/customers', icon: <Users size={18} /> },
   { label: 'Categories', labelAr: 'الفئات', path: '/admin/categories', icon: <Tag size={18} /> },
-  { label: 'Coupons', labelAr: 'كوبونات', path: '/admin/coupons', icon: <Tag size={18} /> },
+  { label: 'Coupons', labelAr: 'كوبونات', path: '/admin/coupons', icon: <Ticket size={18} /> },
   { label: 'Reviews', labelAr: 'التقييمات', path: '/admin/reviews', icon: <Star size={18} /> },
   { label: 'Settings', labelAr: 'الإعدادات', path: '/admin/settings', icon: <Settings size={18} /> },
 ];
+
+interface SidebarContentProps {
+  lang: 'ar' | 'fr';
+  t: (key: string) => string;
+  user: { email?: string } | null | undefined;
+  activePath: string;
+  onNavClick: () => void;
+  onSignOut: () => void;
+}
+
+const SidebarContent: React.FC<SidebarContentProps> = ({ lang, t, user, activePath, onNavClick, onSignOut }) => (
+  <div className="flex flex-col h-full">
+    {/* Logo */}
+    <div className="px-6 py-6 border-b border-leather-200">
+      <Link to="/admin/dashboard" className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-leather-500 flex items-center justify-center flex-shrink-0">
+          <span className="text-white font-bold text-sm font-display">C</span>
+        </div>
+        <div>
+          <p className="font-bold text-leather-800 text-sm font-display tracking-wide">CUIR</p>
+          <p className="text-leather-400 text-xs">{t('adminPanelLabel')}</p>
+        </div>
+      </Link>
+    </div>
+
+    {/* Nav */}
+    <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      {navItems.map((item) => {
+        const active = activePath === item.path;
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={onNavClick}
+            className={[
+              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
+              active
+                ? 'bg-leather-500 text-white shadow-sm'
+                : 'text-leather-600 hover:bg-leather-50 hover:text-leather-800',
+            ].join(' ')}
+          >
+            <span className={active ? 'text-white' : 'text-leather-400'}>{item.icon}</span>
+            <span>{lang === 'ar' ? item.labelAr : item.label}</span>
+            {active && <ChevronRight size={14} className="ml-auto opacity-70" />}
+          </Link>
+        );
+      })}
+    </nav>
+
+    {/* User / Sign out */}
+    <div className="px-3 py-4 border-t border-leather-100">
+      <div className="flex items-center gap-3 px-3 py-2 mb-2">
+        <div className="w-8 h-8 rounded-full bg-leather-200 flex items-center justify-center flex-shrink-0">
+          <span className="text-leather-600 font-bold text-xs uppercase">
+            {user?.email?.[0] ?? 'A'}
+          </span>
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-leather-700 truncate">{user?.email}</p>
+          <p className="text-xs text-leather-400">{t('adminUserLabel')}</p>
+        </div>
+      </div>
+      <button
+        onClick={onSignOut}
+        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+      >
+        <LogOut size={16} />
+        <span>{t('logout')}</span>
+      </button>
+    </div>
+  </div>
+);
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -51,76 +124,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     navigate('/admin/login');
   };
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-6 py-6 border-b border-leather-200">
-        <Link to="/admin/dashboard" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-leather-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm font-display">C</span>
-          </div>
-          <div>
-            <p className="font-bold text-leather-800 text-sm font-display tracking-wide">CUIR</p>
-            <p className="text-leather-400 text-xs">{t('adminPanelLabel')}</p>
-          </div>
-        </Link>
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const active = isActive(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={[
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
-                active
-                  ? 'bg-leather-500 text-white shadow-sm'
-                  : 'text-leather-600 hover:bg-leather-50 hover:text-leather-800',
-              ].join(' ')}
-            >
-              <span className={active ? 'text-white' : 'text-leather-400'}>{item.icon}</span>
-              <span>{lang === 'ar' ? item.labelAr : item.label}</span>
-              {active && <ChevronRight size={14} className="ml-auto opacity-70" />}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* User / Sign out */}
-      <div className="px-3 py-4 border-t border-leather-100">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-leather-200 flex items-center justify-center flex-shrink-0">
-            <span className="text-leather-600 font-bold text-xs uppercase">
-              {user?.email?.[0] ?? 'A'}
-            </span>
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-leather-700 truncate">{user?.email}</p>
-            <p className="text-xs text-leather-400">{t('adminUserLabel')}</p>
-          </div>
-        </div>
-        <button
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-        >
-          <LogOut size={16} />
-          <span>{t('logout')}</span>
-        </button>
-      </div>
-    </div>
-  );
+  const sidebarProps: SidebarContentProps = {
+    lang,
+    t,
+    user,
+    activePath: location.pathname,
+    onNavClick: () => setSidebarOpen(false),
+    onSignOut: handleSignOut,
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden" dir="ltr">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-leather-100 flex-shrink-0">
-        <SidebarContent />
+        <SidebarContent {...sidebarProps} />
       </aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -141,7 +158,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               transition={{ type: 'tween', duration: 0.25 }}
               className="fixed left-0 top-0 bottom-0 w-60 bg-white z-50 lg:hidden flex flex-col border-r border-leather-100"
             >
-              <SidebarContent />
+              <SidebarContent {...sidebarProps} />
             </motion.aside>
           </>
         )}

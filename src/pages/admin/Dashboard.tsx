@@ -170,7 +170,7 @@ const Dashboard: React.FC = () => {
 
         {/* Stats grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="bg-white rounded-xl border border-leather-100 p-5">
                 <Skeleton className="h-8 w-24 mb-2" />
@@ -179,7 +179,7 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <StatCard
               label={lang === 'ar' ? 'إجمالي المبيعات' : 'Ventes Totales'}
               value={formatPrice(stats?.total_sales ?? 0, lang)}

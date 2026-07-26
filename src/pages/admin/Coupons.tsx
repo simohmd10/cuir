@@ -51,6 +51,7 @@ const Coupons: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Coupon | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const { data: coupons = [], isLoading } = useQuery({
     queryKey: ['admin-coupons'],
@@ -123,11 +124,16 @@ const Coupons: React.FC = () => {
       const { error } = await supabase.from('coupons').update({ is_active }).eq('id', id);
       if (error) throw error;
     },
+    onMutate: ({ id }) => setTogglingId(id),
     onSuccess: () => {
+      setTogglingId(null);
       qc.invalidateQueries({ queryKey: ['admin-coupons'] });
       toast.success(lang === 'ar' ? 'تم التحديث' : 'Statut mis à jour');
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => {
+      setTogglingId(null);
+      toast.error('Erreur');
+    },
   });
 
   const deleteMutation = useMutation({
@@ -244,7 +250,7 @@ const Coupons: React.FC = () => {
                       <td className="px-4 py-3">
                         <button
                           onClick={() => toggleMutation.mutate({ id: coupon.id, is_active: !coupon.is_active })}
-                          disabled={toggleMutation.isPending}
+                          disabled={togglingId === coupon.id}
                           className="flex items-center gap-1.5 transition-colors"
                         >
                           {coupon.is_active

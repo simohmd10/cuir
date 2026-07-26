@@ -173,7 +173,9 @@ const Reviews: React.FC = () => {
               onClick={selectAllPending}
               className="text-xs text-leather-500 hover:text-leather-700 underline transition-colors"
             >
-              {lang === 'ar' ? 'تحديد الكل المعلق' : 'Sélectionner tous les en attente'}
+              {lang === 'ar'
+                ? `تحديد الكل في هذه الصفحة (${pendingReviews.length})`
+                : `Sélectionner les en attente de cette page (${pendingReviews.length})`}
             </button>
           )}
         </div>
