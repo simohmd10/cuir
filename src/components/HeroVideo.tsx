@@ -54,7 +54,7 @@ export default function HeroVideo({ videoSrc, mp4Src, posterSrc }: HeroVideoProp
   return (
     <section
       dir={dir}
-      className="relative w-full h-[100svh] overflow-hidden flex items-center justify-center hero-grain"
+      className="relative w-full h-[100vh] overflow-hidden flex items-center justify-center hero-grain"
       aria-label={isAr ? 'القسم الرئيسي' : 'Section héro'}
     >
 
