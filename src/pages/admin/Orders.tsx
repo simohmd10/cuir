@@ -109,6 +109,8 @@ const Orders: React.FC = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedStatuses, setSelectedStatuses] = useState<Record<string, OrderStatus>>({});
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-orders', page, statusFilter, search, dateFrom, dateTo],
@@ -124,12 +126,17 @@ const Orders: React.FC = () => {
         .eq('id', id);
       if (error) throw error;
     },
+    onMutate: ({ id }) => setUpdatingId(id),
     onSuccess: () => {
+      setUpdatingId(null);
       qc.invalidateQueries({ queryKey: ['admin-orders'] });
       qc.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success(lang === 'ar' ? 'تم تحديث الحالة' : 'Statut mis à jour');
     },
-    onError: () => toast.error(lang === 'ar' ? 'خطأ في التحديث' : 'Erreur de mise à jour'),
+    onError: () => {
+      setUpdatingId(null);
+      toast.error(lang === 'ar' ? 'خطأ في التحديث' : 'Erreur de mise à jour');
+    },
   });
 
   const totalPages = Math.ceil((data?.count ?? 0) / 10);
@@ -283,8 +290,8 @@ const Orders: React.FC = () => {
                             </h4>
                             <div className="flex gap-2 items-center">
                               <select
-                                defaultValue={order.status}
-                                id={`status-mobile-${order.id}`}
+                                value={selectedStatuses[order.id] ?? order.status}
+                                onChange={(e) => setSelectedStatuses((prev) => ({ ...prev, [order.id]: e.target.value as OrderStatus }))}
                                 className="flex-1 px-3 py-2 border border-leather-200 rounded-lg text-sm bg-white text-leather-700 focus:outline-none focus:ring-2 focus:ring-leather-400"
                               >
                                 {STATUS_OPTIONS.map((s) => (
@@ -294,13 +301,12 @@ const Orders: React.FC = () => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const sel = document.getElementById(`status-mobile-${order.id}`) as HTMLSelectElement;
-                                  updateStatusMutation.mutate({ id: order.id, status: sel.value as OrderStatus });
+                                  updateStatusMutation.mutate({ id: order.id, status: selectedStatuses[order.id] ?? order.status });
                                 }}
-                                disabled={updateStatusMutation.isPending}
+                                disabled={updatingId === order.id}
                                 className="px-3 py-2 bg-leather-500 text-white rounded-lg text-sm font-medium hover:bg-leather-600 transition-colors disabled:opacity-60 flex items-center gap-1.5"
                               >
-                                {updateStatusMutation.isPending && <Loader2 size={12} className="animate-spin" />}
+                                {updatingId === order.id && <Loader2 size={12} className="animate-spin" />}
                                 {lang === 'ar' ? 'تحديث' : 'Mettre à jour'}
                               </button>
                             </div>
@@ -462,8 +468,8 @@ const Orders: React.FC = () => {
                                         </h4>
                                         <div className="flex gap-2 items-center">
                                           <select
-                                            defaultValue={order.status}
-                                            id={`status-${order.id}`}
+                                            value={selectedStatuses[order.id] ?? order.status}
+                                            onChange={(e) => setSelectedStatuses((prev) => ({ ...prev, [order.id]: e.target.value as OrderStatus }))}
                                             className="flex-1 px-3 py-2 border border-leather-200 rounded-lg text-sm bg-white text-leather-700 focus:outline-none focus:ring-2 focus:ring-leather-400"
                                           >
                                             {STATUS_OPTIONS.map((s) => (
@@ -473,13 +479,12 @@ const Orders: React.FC = () => {
                                           <button
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              const sel = document.getElementById(`status-${order.id}`) as HTMLSelectElement;
-                                              updateStatusMutation.mutate({ id: order.id, status: sel.value as OrderStatus });
+                                              updateStatusMutation.mutate({ id: order.id, status: selectedStatuses[order.id] ?? order.status });
                                             }}
-                                            disabled={updateStatusMutation.isPending}
+                                            disabled={updatingId === order.id}
                                             className="px-3 py-2 bg-leather-500 text-white rounded-lg text-sm font-medium hover:bg-leather-600 transition-colors disabled:opacity-60 flex items-center gap-1.5"
                                           >
-                                            {updateStatusMutation.isPending && <Loader2 size={12} className="animate-spin" />}
+                                            {updatingId === order.id && <Loader2 size={12} className="animate-spin" />}
                                             {lang === 'ar' ? 'تحديث' : 'Mettre à jour'}
                                           </button>
                                         </div>

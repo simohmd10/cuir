@@ -16,18 +16,23 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
-  const { signIn, isAdmin } = useAuth();
+  const { signIn, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [awaitingRedirect, setAwaitingRedirect] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
 
-  // Navigate only after onAuthStateChange has fetched the profile and isAdmin is confirmed
   useEffect(() => {
-    if (awaitingRedirect && isAdmin) {
+    if (!awaitingRedirect) return;
+    if (isAdmin) {
       navigate('/admin/dashboard', { replace: true });
+    } else if (!loading) {
+      // Auth settled but user doesn't have admin role
+      setAwaitingRedirect(false);
+      setAccessDenied(true);
     }
-  }, [isAdmin, awaitingRedirect, navigate]);
+  }, [isAdmin, loading, awaitingRedirect, navigate]);
 
   const {
     register,
@@ -74,6 +79,12 @@ const Login: React.FC = () => {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-lg border border-leather-100 p-8">
           <h2 className="text-xl font-semibold text-leather-800 mb-6">Connexion</h2>
+
+          {accessDenied && (
+            <div className="mb-5 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 text-center">
+              Accès refusé — ce compte n'a pas les droits administrateur.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}
