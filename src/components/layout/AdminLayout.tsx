@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import type { TranslationKey } from '../../i18n';
 
 interface NavItem {
   label: string;
@@ -38,7 +39,7 @@ const navItems: NavItem[] = [
 
 interface SidebarContentProps {
   lang: 'ar' | 'fr';
-  t: (key: string) => string;
+  t: (key: TranslationKey) => string;
   user: { email?: string } | null | undefined;
   activePath: string;
   onNavClick: () => void;

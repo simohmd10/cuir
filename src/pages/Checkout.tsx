@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -97,12 +97,6 @@ export default function Checkout() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  // Redirect if empty
-  if (items.length === 0) {
-    navigate('/cart', { replace: true });
-    return null;
-  }
-
   const deliveryFee = subtotal >= DELIVERY_FEE_THRESHOLD ? 0 : DELIVERY_FEE;
 
   // Discount amount
@@ -133,7 +127,8 @@ export default function Checkout() {
         .select('*')
         .eq('code', couponInput.trim().toUpperCase())
         .eq('is_active', true)
-        .gt('expires_at', new Date().toISOString())
+        // expires_at NULL = coupon sans date d'expiration (jamais expiré)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .lte('min_order_amount', subtotal)
         .maybeSingle();
 
@@ -198,6 +193,19 @@ export default function Checkout() {
   const onSubmit = (data: FormData) => {
     placeOrderMutation.mutate(data);
   };
+
+  // Panier vide → retour au panier. En effet (et non pendant le rendu) pour ne
+  // pas changer le nombre de hooks appelés : un `return` anticipé avant
+  // useForm/useMutation viole les règles des hooks et fait planter React.
+  // `isSuccess` évite le rebond vers /cart après clearCart() en fin de commande.
+  const orderPlaced = placeOrderMutation.isSuccess;
+  useEffect(() => {
+    if (items.length === 0 && !orderPlaced) {
+      navigate('/cart', { replace: true });
+    }
+  }, [items.length, orderPlaced, navigate]);
+
+  if (items.length === 0) return null;
 
   return (
     <div className="min-h-screen bg-beige-50" dir={dir}>
@@ -501,7 +509,7 @@ export default function Checkout() {
 
                 <p className="text-xs text-center text-leather-400">
                   {t('termsAgree')}{' '}
-                  <Link to="/terms" className="underline hover:text-leather-600">
+                  <Link to="/returns" className="underline hover:text-leather-600">
                     {t('termsOfService')}
                   </Link>
                 </p>

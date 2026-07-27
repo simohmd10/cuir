@@ -355,7 +355,7 @@ export default function OrderStatus() {
                         <div key={item.id} className="flex items-center gap-3">
                           <div className="w-14 h-14 rounded-lg bg-beige-100 flex-shrink-0 overflow-hidden">
                             <LazyImage
-                              src={getImageUrl('')}
+                              src={getImageUrl(item.product_image ?? '', '/placeholder-bag.jpg')}
                               alt={name}
                               className="w-full h-full"
                             />
