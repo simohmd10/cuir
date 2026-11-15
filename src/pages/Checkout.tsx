@@ -16,6 +16,7 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { useCart, DELIVERY_FEE_THRESHOLD } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 import { formatPrice, getImageUrl, MOROCCAN_CITIES, generateIdempotencyKey } from '../lib/utils';
+import { isDemoMode } from '../lib/demoData';
 import LazyImage from '../components/ui/LazyImage';
 import type { CheckoutFormData, PlaceOrderResult, Coupon } from '../types';
 
@@ -151,6 +152,18 @@ export default function Checkout() {
   const placeOrderMutation = useMutation<PlaceOrderResult, Error, FormData>({
     mutationFn: async (data) => {
       const idempotencyKey = generateIdempotencyKey();
+
+      // Vitrine sans base : la commande est simulée, rien n'est enregistré.
+      // La page de suivi l'indiquera, faute de commande à retrouver.
+      if (isDemoMode()) {
+        await new Promise((r) => setTimeout(r, 700));
+        return {
+          order_ref: `CU-DEMO-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+          access_token: 'demo',
+          total,
+          discount_amount: discountAmount,
+        } as PlaceOrderResult;
+      }
 
       const { data: result, error } = await supabase.rpc('place_order', {
         p_items: items.map((i) => ({

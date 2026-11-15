@@ -68,6 +68,8 @@ function shouldUseSupabaseTransforms(): boolean {
 export function getImageUrl(path: string, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
   if (path.startsWith('http')) return path;
+  // Chemin servi depuis public/ (catalogue de démonstration) : déjà une URL valide.
+  if (path.startsWith('/')) return path;
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) return fallback || '/placeholder-bag.jpg';
   return `${supabaseUrl}/storage/v1/object/public/products/${path}`;
@@ -76,6 +78,8 @@ export function getImageUrl(path: string, fallback?: string): string {
 export function getResponsiveImageUrl(path: string, width: number, fallback?: string): string {
   if (!path) return fallback || '/placeholder-bag.jpg';
   if (path.startsWith('http')) return `${path}${path.includes('?') ? '&' : '?'}width=${width}&quality=72&format=webp`;
+  // Fichier statique : pas de service de redimensionnement, on sert tel quel.
+  if (path.startsWith('/')) return path;
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) return fallback || '/placeholder-bag.jpg';
   return `${supabaseUrl}/storage/v1/render/image/public/products/${path}?width=${width}&quality=72&format=webp`;

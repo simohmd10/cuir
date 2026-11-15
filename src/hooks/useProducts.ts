@@ -2,6 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import type { Product, Category } from '../types';
 import { sortCategoriesByHierarchy } from '../lib/categoryHierarchy';
+import {
+  isDemoMode,
+  filterDemoProducts,
+  DEMO_PRODUCTS,
+  DEMO_CATEGORIES,
+} from '../lib/demoData';
 
 export function useProducts(options?: {
   category?: string;
@@ -15,6 +21,9 @@ export function useProducts(options?: {
   return useQuery<Product[]>({
     queryKey: ['products', options],
     queryFn: async () => {
+      // Vitrine sans base : on sert le catalogue de démonstration.
+      if (isDemoMode()) return filterDemoProducts(options);
+
       let query = supabase.from('products').select('*');
 
       if (options?.categories && options.categories.length > 0) {
@@ -60,6 +69,12 @@ export function useProduct(id: string) {
   return useQuery<Product>({
     queryKey: ['product', id],
     queryFn: async () => {
+      if (isDemoMode()) {
+        const found = DEMO_PRODUCTS.find((p) => p.id === id);
+        if (!found) throw new Error('Produit introuvable');
+        return found;
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -77,6 +92,8 @@ export function useCategories() {
   return useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: async () => {
+      if (isDemoMode()) return sortCategoriesByHierarchy(DEMO_CATEGORIES);
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')

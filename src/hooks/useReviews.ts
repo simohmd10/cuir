@@ -2,11 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import type { Review } from '../types';
 import { toast } from 'sonner';
+import { isDemoMode, DEMO_REVIEWS } from '../lib/demoData';
 
 export function useReviews(productId: string) {
   return useQuery<Review[]>({
     queryKey: ['reviews', productId],
     queryFn: async () => {
+      if (isDemoMode()) {
+        return DEMO_REVIEWS.filter((r) => r.product_id === productId);
+      }
+
       const { data, error } = await supabase
         .from('reviews')
         .select('*')
@@ -26,6 +31,12 @@ export function useSubmitReview() {
 
   return useMutation({
     mutationFn: async (review: Omit<Review, 'id' | 'status' | 'created_at'>) => {
+      // En démo, l'avis est accepté sans être conservé : rien à écrire.
+      if (isDemoMode()) {
+        return { ...review, id: `demo-${Date.now()}`, status: 'pending' as const,
+                 created_at: new Date().toISOString() };
+      }
+
       const { data, error } = await supabase
         .from('reviews')
         .insert({ ...review, status: 'pending' })
