@@ -4,6 +4,7 @@ import { Search, X, ChevronDown, Check } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts, useCategories } from '../hooks/useProducts';
+import QueryError from '../components/ui/QueryError';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { classNames } from '../lib/utils';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
@@ -186,7 +187,7 @@ export default function Shop() {
   }, [lang]);
 
   // ── Data ──────────────────────────────────────────────────────────────────
-  const { data: categories, isLoading: catLoading } = useCategories();
+  const { data: categories, isLoading: catLoading, isError: catError } = useCategories();
 
   // When a parent category is selected, also include its children so products
   // assigned to sub-categories still appear in the parent listing.
@@ -198,7 +199,12 @@ export default function Shop() {
     return children.length > 0 ? [categoryParam, ...children] : undefined;
   })();
 
-  const { data: products, isLoading: productsLoading } = useProducts({
+  const {
+    data: products,
+    isLoading: productsLoading,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useProducts({
     ...(categoryFilter
       ? { categories: categoryFilter }
       : categoryParam && categoryParam !== 'all'
@@ -252,6 +258,8 @@ export default function Shop() {
   const hasMore         = visibleProducts.length < totalCount;
   const remaining       = totalCount - visibleProducts.length;
   const isLoading       = productsLoading || catLoading;
+  // Une requête en échec ne doit pas se confondre avec un catalogue vide.
+  const isError         = productsError || catError;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -266,7 +274,9 @@ export default function Shop() {
           <h1 className="heading-section text-balance">
             {lang === 'ar' ? 'جميع التصاميم' : 'Toute la Collection'}
           </h1>
-          {!productsLoading && (
+          {/* Pas de compteur en cas d'échec : « 0 pièce » laisserait croire
+              que le catalogue est vide alors que rien n'a pu être chargé. */}
+          {!productsLoading && !isError && (
             <p className="text-[11px] tracking-luxury uppercase font-body text-ink/35 tabular-nums">
               {lang === 'ar'
                 ? `عرض ${totalCount} منتجاً`
@@ -369,7 +379,7 @@ export default function Shop() {
           </div>
 
           {/* Count on mobile */}
-          {!isLoading && (
+          {!isLoading && !isError && (
             <p className="text-[10px] tracking-luxury uppercase text-ink/25 font-body sm:hidden tabular-nums">
               {lang === 'ar'
                 ? `${totalCount} منتج`
@@ -386,6 +396,9 @@ export default function Shop() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)}
           </div>
+
+        ) : isError ? (
+          <QueryError lang={lang} onRetry={() => refetchProducts()} />
 
         ) : totalCount === 0 ? (
           <div className="grid grid-cols-1"><EmptyState lang={lang} /></div>

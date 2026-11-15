@@ -10,6 +10,7 @@ import { useReveal, useRevealGroup } from '../hooks/useReveal';
 import HeroVideo from '../components/HeroVideo';
 import CollectionsSection from '../components/CollectionsSection';
 import ProductCard, { ProductCardSkeleton } from '../components/product/ProductCard';
+import QueryError from '../components/ui/QueryError';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Static data
@@ -136,7 +137,12 @@ export default function Home() {
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   /* ── Data fetching ─────────────────────────────────────────────────────── */
-  const { data: featured, isLoading: featuredLoading } = useProducts({ isFeatured: true, limit: 8 });
+  const {
+    data: featured,
+    isLoading: featuredLoading,
+    isError: featuredError,
+    refetch: refetchFeatured,
+  } = useProducts({ isFeatured: true, limit: 8 });
   const { data: bestSellers, isLoading: bestSellersLoading } = useProducts({ isBestSeller: true, limit: 4 });
 
   /* ── SEO ───────────────────────────────────────────────────────────────── */
@@ -181,17 +187,21 @@ export default function Home() {
             </h2>
           </div>
 
-          <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 reveal-group">
-            {featuredLoading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="reveal"><ProductCardSkeleton /></div>
-                ))
-              : featured?.map((product, index) => (
-                  <div key={product.id} className="reveal">
-                    <ProductCard product={product} priority={index < 2} />
-                  </div>
-                ))}
-          </div>
+          {featuredError ? (
+            <QueryError lang={lang} onRetry={() => refetchFeatured()} compact />
+          ) : (
+            <div ref={featuredGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 reveal-group">
+              {featuredLoading
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="reveal"><ProductCardSkeleton /></div>
+                  ))
+                : featured?.map((product, index) => (
+                    <div key={product.id} className="reveal">
+                      <ProductCard product={product} priority={index < 2} />
+                    </div>
+                  ))}
+            </div>
+          )}
 
           <div ref={featuredCtaRef} className="reveal mt-10 md:mt-12 flex justify-center">
             <Link to="/shop" className="btn-ghost inline-flex items-center gap-3">
